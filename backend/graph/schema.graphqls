@@ -1,0 +1,318 @@
+# ============================================================
+# Physiotherapy EMR — GraphQL Schema (gqlgen)
+# graph/schema.graphqls
+# ============================================================
+
+# ── Scalars ─────────────────────────────────────────────────
+scalar Time # maps to time.Time
+scalar UUID # maps to uuid.UUID
+# ── Enums ───────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  THERAPIST
+  RECEPTIONIST
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+# ── Nested types ─────────────────────────────────────────────
+
+type EmergencyContact {
+  name: String!
+  phone: String!
+  relation: String!
+}
+
+input EmergencyContactInput {
+  name: String!
+  phone: String!
+  relation: String!
+}
+
+type Vitals {
+  bp: String # "120/80"
+  hr: Int # bpm
+  spo2: Int # %
+  temp: Float # celsius
+  weight: Float # kg
+}
+
+input VitalsInput {
+  bp: String
+  hr: Int
+  spo2: Int
+  temp: Float
+  weight: Float
+}
+
+# ── Types ────────────────────────────────────────────────────
+
+type User {
+  id: UUID!
+  email: String!
+  role: UserRole!
+  isActive: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+  staff: Staff
+}
+
+type Patient {
+  id: UUID!
+  medicalRecordNo: String!
+  fullName: String!
+  dateOfBirth: Time!
+  gender: Gender!
+  phone: String
+  email: String
+  address: String
+  emergencyContact: EmergencyContact
+  createdAt: Time!
+  updatedAt: Time!
+  appointments: [Appointment!]!
+  treatmentSessions: [TreatmentSession!]!
+}
+
+type Staff {
+  id: UUID!
+  userId: UUID!
+  fullName: String!
+  specialization: String
+  licenseNo: String
+  phone: String
+  createdAt: Time!
+  updatedAt: Time!
+  user: User!
+  appointments: [Appointment!]!
+}
+
+type Appointment {
+  id: UUID!
+  patientId: UUID!
+  staffId: UUID!
+  scheduledAt: Time!
+  durationMin: Int!
+  status: AppointmentStatus!
+  chiefComplaint: String
+  notes: String
+  createdAt: Time!
+  updatedAt: Time!
+  patient: Patient!
+  staff: Staff!
+  session: TreatmentSession
+}
+
+type TreatmentSession {
+  id: UUID!
+  appointmentId: UUID
+  patientId: UUID!
+  staffId: UUID!
+  sessionDate: Time!
+  sessionNo: Int!
+  status: SessionStatus!
+  createdAt: Time!
+  updatedAt: Time!
+  appointment: Appointment
+  patient: Patient!
+  staff: Staff!
+  soapNote: SOAPNote
+}
+
+type SOAPNote {
+  id: UUID!
+  sessionId: UUID!
+  subjective: String!
+  objective: String!
+  assessment: String!
+  plan: String!
+  painScale: Int
+  vitals: Vitals
+  createdAt: Time!
+  updatedAt: Time!
+  session: TreatmentSession!
+}
+
+# ── Auth ─────────────────────────────────────────────────────
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+# ── Pagination ───────────────────────────────────────────────
+
+type PatientConnection {
+  nodes: [Patient!]!
+  totalCount: Int!
+}
+
+type StaffConnection {
+  nodes: [Staff!]!
+  totalCount: Int!
+}
+
+type AppointmentConnection {
+  nodes: [Appointment!]!
+  totalCount: Int!
+}
+
+type TreatmentSessionConnection {
+  nodes: [TreatmentSession!]!
+  totalCount: Int!
+}
+
+# ── Inputs ───────────────────────────────────────────────────
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  role: UserRole!
+}
+
+input CreateStaffInput {
+  userId: UUID!
+  fullName: String!
+  specialization: String
+  licenseNo: String
+  phone: String
+}
+
+input CreatePatientInput {
+  fullName: String!
+  dateOfBirth: Time!
+  gender: Gender!
+  phone: String
+  email: String
+  address: String
+  emergencyContact: EmergencyContactInput
+}
+
+input UpdatePatientInput {
+  fullName: String
+  phone: String
+  email: String
+  address: String
+  emergencyContact: EmergencyContactInput
+}
+
+input CreateAppointmentInput {
+  patientId: UUID!
+  staffId: UUID!
+  scheduledAt: Time!
+  durationMin: Int!
+  chiefComplaint: String
+  notes: String
+}
+
+input UpdateAppointmentStatusInput {
+  status: AppointmentStatus!
+}
+
+input CreateSessionInput {
+  appointmentId: UUID
+  patientId: UUID!
+  staffId: UUID!
+  sessionDate: Time!
+}
+
+input CreateSOAPNoteInput {
+  sessionId: UUID!
+  subjective: String!
+  objective: String!
+  assessment: String!
+  plan: String!
+  painScale: Int
+  vitals: VitalsInput
+}
+
+input UpdateSOAPNoteInput {
+  subjective: String
+  objective: String
+  assessment: String
+  plan: String
+  painScale: Int
+  vitals: VitalsInput
+}
+
+# ── Filters ──────────────────────────────────────────────────
+
+input AppointmentFilter {
+  patientId: UUID
+  staffId: UUID
+  status: AppointmentStatus
+  dateFrom: Time
+  dateTo: Time
+}
+
+input SessionFilter {
+  patientId: UUID
+  staffId: UUID
+  status: SessionStatus
+  dateFrom: Time
+  dateTo: Time
+}
+
+# ── Root ─────────────────────────────────────────────────────
+
+type Query {
+  me: User!
+
+  patient(id: UUID!): Patient
+  patients(search: String, limit: Int, offset: Int): PatientConnection!
+
+  staff(id: UUID!): Staff
+  allStaff(search: String, limit: Int, offset: Int): StaffConnection!
+
+  appointment(id: UUID!): Appointment
+  appointments(filter: AppointmentFilter, limit: Int, offset: Int): AppointmentConnection!
+
+  treatmentSession(id: UUID!): TreatmentSession
+  treatmentSessions(filter: SessionFilter, limit: Int, offset: Int): TreatmentSessionConnection!
+
+  soapNote(sessionId: UUID!): SOAPNote
+}
+
+type Mutation {
+  login(input: LoginInput!): AuthPayload!
+
+  createUser(input: CreateUserInput!): User!
+  createStaff(input: CreateStaffInput!): Staff!
+
+  createPatient(input: CreatePatientInput!): Patient!
+  updatePatient(id: UUID!, input: UpdatePatientInput!): Patient!
+
+  createAppointment(input: CreateAppointmentInput!): Appointment!
+  updateAppointmentStatus(id: UUID!, input: UpdateAppointmentStatusInput!): Appointment!
+  cancelAppointment(id: UUID!): Appointment!
+
+  createSession(input: CreateSessionInput!): TreatmentSession!
+  completeSession(id: UUID!): TreatmentSession!
+  cancelSession(id: UUID!): TreatmentSession!
+
+  createSOAPNote(input: CreateSOAPNoteInput!): SOAPNote!
+  updateSOAPNote(id: UUID!, input: UpdateSOAPNoteInput!): SOAPNote!
+}
