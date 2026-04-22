@@ -11,6 +11,7 @@ import (
 )
 
 type SoapNoteRepository interface {
+	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.SOAPNote, []error)
 	FindAll(ctx context.Context, limit *int32, offset *int32) ([]*entity.SOAPNote, *int32, error)
 	FindBySessionID(ctx context.Context, sessionID uuid.UUID) (*entity.SOAPNote, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.SOAPNote, error)
@@ -45,6 +46,21 @@ func (s *soapNoteRepository) Create(ctx context.Context, input model.CreateSOAPN
 		return nil, err
 	}
 	return &soapNote, nil
+}
+
+// Loader implements [SoapNoteRepository].
+func (s *soapNoteRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.SOAPNote, []error) {
+	stmt := goqu.From(entity.TABLE_SOAP_NOTE)
+	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
+	results := []*entity.SOAPNote{}
+	if err := s.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	soapNotes := []*model.SOAPNote{}
+	for idx := range results {
+		soapNotes = append(soapNotes, results[idx].ToModel())
+	}
+	return soapNotes, nil
 }
 
 // FindAll implements [SoapNoteRepository].

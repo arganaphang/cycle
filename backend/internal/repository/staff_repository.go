@@ -12,6 +12,7 @@ import (
 )
 
 type StaffRepository interface {
+	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Staff, []error)
 	FindAll(ctx context.Context, search *string, limit *int32, offset *int32) ([]*entity.Staff, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Staff, error)
 	Create(ctx context.Context, input model.CreateStaffInput) (*entity.Staff, error)
@@ -43,6 +44,21 @@ func (s *staffRepository) Create(ctx context.Context, input model.CreateStaffInp
 		return nil, err
 	}
 	return &staff, nil
+}
+
+// Loader implements [StaffRepository].
+func (s *staffRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Staff, []error) {
+	stmt := goqu.From(entity.TABLE_STAFF)
+	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
+	results := []*entity.Staff{}
+	if err := s.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	staffs := []*model.Staff{}
+	for idx := range results {
+		staffs = append(staffs, results[idx].ToModel())
+	}
+	return staffs, nil
 }
 
 // FindAll implements [StaffRepository].

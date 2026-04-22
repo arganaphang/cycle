@@ -11,6 +11,7 @@ import (
 )
 
 type TreatmentSessionRepository interface {
+	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.TreatmentSession, []error)
 	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) ([]*entity.TreatmentSession, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.TreatmentSession, error)
 	Create(ctx context.Context, input model.CreateSessionInput) (*entity.TreatmentSession, error)
@@ -41,6 +42,21 @@ func (t *treatmentSessionRepository) Create(ctx context.Context, input model.Cre
 		return nil, err
 	}
 	return &treatmentSession, nil
+}
+
+// Loader implements [TreatmentSessionRepository].
+func (t *treatmentSessionRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.TreatmentSession, []error) {
+	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION)
+	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
+	results := []*entity.TreatmentSession{}
+	if err := t.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	treatmentSessions := []*model.TreatmentSession{}
+	for idx := range results {
+		treatmentSessions = append(treatmentSessions, results[idx].ToModel())
+	}
+	return treatmentSessions, nil
 }
 
 // FindAll implements [TreatmentSessionRepository].

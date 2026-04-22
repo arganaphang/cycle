@@ -11,6 +11,7 @@ import (
 )
 
 type AppointmentRepository interface {
+	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Appointment, []error)
 	FindAll(ctx context.Context, filter *model.AppointmentFilter, limit *int32, offset *int32) ([]*entity.Appointment, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Appointment, error)
 	Create(ctx context.Context, input model.CreateAppointmentInput) (*entity.Appointment, error)
@@ -43,6 +44,21 @@ func (a *appointmentRepository) Create(ctx context.Context, input model.CreateAp
 		return nil, err
 	}
 	return &appointment, nil
+}
+
+// Loader implements [AppointmentRepository].
+func (a *appointmentRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Appointment, []error) {
+	stmt := goqu.From(entity.TABLE_APPOINTMENT)
+	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
+	results := []*entity.Appointment{}
+	if err := a.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	appointments := []*model.Appointment{}
+	for idx := range results {
+		appointments = append(appointments, results[idx].ToModel())
+	}
+	return appointments, nil
 }
 
 // FindAll implements [AppointmentRepository].

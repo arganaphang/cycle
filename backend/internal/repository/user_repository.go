@@ -12,6 +12,7 @@ import (
 )
 
 type UserRepository interface {
+	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.User, []error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.User, error)
 	FindByEmail(ctx context.Context, email string) (*entity.User, error)
 	Create(ctx context.Context, input model.CreateUserInput) (*entity.User, error)
@@ -45,6 +46,21 @@ func (u *userRepository) Create(ctx context.Context, input model.CreateUserInput
 		return nil, err
 	}
 	return &user, nil
+}
+
+// Loader implements [UserRepository].
+func (u *userRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.User, []error) {
+	stmt := goqu.From(entity.TABLE_USER)
+	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
+	results := []*entity.User{}
+	if err := u.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	users := []*model.User{}
+	for idx := range results {
+		users = append(users, results[idx].ToModel())
+	}
+	return users, nil
 }
 
 // FindByID implements [UserRepository].

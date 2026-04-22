@@ -12,6 +12,7 @@ import (
 )
 
 type PatientRepository interface {
+	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Patient, []error)
 	FindAll(ctx context.Context, search *string, limit *int32, offset *int32) ([]*entity.Patient, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Patient, error)
 	Create(ctx context.Context, input model.CreatePatientInput) (*entity.Patient, error)
@@ -45,6 +46,21 @@ func (p *patientRepository) Create(ctx context.Context, input model.CreatePatien
 		return nil, err
 	}
 	return &patient, nil
+}
+
+// Loader implements [PatientRepository].
+func (p *patientRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Patient, []error) {
+	stmt := goqu.From(entity.TABLE_PATIENT)
+	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
+	results := []*entity.Patient{}
+	if err := p.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	patients := []*model.Patient{}
+	for idx := range results {
+		patients = append(patients, results[idx].ToModel())
+	}
+	return patients, nil
 }
 
 // FindAll implements [PatientRepository].
