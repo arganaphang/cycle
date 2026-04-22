@@ -71,8 +71,8 @@ CREATE TABLE IF NOT EXISTS patients (
     CONSTRAINT patients_mrn_unique UNIQUE (medical_record_no)
 );
 
--- 3. staff
-CREATE TABLE IF NOT EXISTS staff (
+-- 3. staffs
+CREATE TABLE IF NOT EXISTS staffs (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id         UUID         NOT NULL,
     full_name       VARCHAR(255) NOT NULL,
@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS staff (
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT staff_user_fk      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
-    CONSTRAINT staff_user_unique  UNIQUE (user_id)
+    CONSTRAINT staffs_user_fk      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
+    CONSTRAINT staffs_user_unique  UNIQUE (user_id)
 );
 
 -- 4. appointments
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS appointments (
     updated_at       TIMESTAMPTZ        NOT NULL DEFAULT NOW(),
 
     CONSTRAINT appointments_patient_fk FOREIGN KEY (patient_id) REFERENCES patients (id) ON DELETE RESTRICT,
-    CONSTRAINT appointments_staff_fk   FOREIGN KEY (staff_id)   REFERENCES staff    (id) ON DELETE RESTRICT,
+    CONSTRAINT appointments_staff_fk   FOREIGN KEY (staff_id)   REFERENCES staffs    (id) ON DELETE RESTRICT,
     CONSTRAINT appointments_duration_check CHECK (duration_min > 0)
 );
 
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS treatment_sessions (
 
     CONSTRAINT ts_appointment_fk FOREIGN KEY (appointment_id) REFERENCES appointments       (id) ON DELETE SET NULL,
     CONSTRAINT ts_patient_fk     FOREIGN KEY (patient_id)     REFERENCES patients           (id) ON DELETE RESTRICT,
-    CONSTRAINT ts_staff_fk       FOREIGN KEY (staff_id)       REFERENCES staff              (id) ON DELETE RESTRICT,
+    CONSTRAINT ts_staff_fk       FOREIGN KEY (staff_id)       REFERENCES staffs              (id) ON DELETE RESTRICT,
     CONSTRAINT ts_appointment_unique UNIQUE (appointment_id),
     CONSTRAINT ts_session_no_check   CHECK (session_no > 0)
 );
@@ -191,8 +191,8 @@ CREATE TRIGGER trg_patients_updated_at
     BEFORE UPDATE ON patients
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-CREATE TRIGGER trg_staff_updated_at
-    BEFORE UPDATE ON staff
+CREATE TRIGGER trg_staffs_updated_at
+    BEFORE UPDATE ON staffs
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TRIGGER trg_appointments_updated_at

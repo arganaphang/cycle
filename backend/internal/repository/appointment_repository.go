@@ -4,16 +4,16 @@ import (
 	"context"
 
 	"github.com/arganaphang/cycle/backend/graph/model"
+	"github.com/arganaphang/cycle/backend/internal/entity"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
 type AppointmentRepository interface {
-	FindAll(ctx context.Context, filter *model.AppointmentFilter, limit *int, offset *int) ([]*model.Appointment, *int, error)
-	FindByID(ctx context.Context, id uuid.UUID) (*model.Appointment, error)
-	Create(ctx context.Context, input model.CreateAppointmentInput) (*model.Appointment, error)
-	UpdateStatus(ctx context.Context, id uuid.UUID, status model.UpdateAppointmentStatusInput) (*model.Appointment, error)
-	CancelStatus(ctx context.Context, id uuid.UUID) (*model.Appointment, error)
+	FindAll(ctx context.Context, filter *model.AppointmentFilter, limit *int, offset *int) ([]*entity.Appointment, *int, error)
+	FindByID(ctx context.Context, id uuid.UUID) (*entity.Appointment, error)
+	Create(ctx context.Context, input model.CreateAppointmentInput) (*entity.Appointment, error)
+	UpdateStatus(ctx context.Context, id uuid.UUID, status model.UpdateAppointmentStatusInput) (*entity.Appointment, error)
 }
 
 type appointmentRepository struct {
@@ -24,27 +24,22 @@ func NewAppointmentRepository(db *sqlx.DB) AppointmentRepository {
 	return &appointmentRepository{db: db}
 }
 
-// CancelStatus implements [AppointmentRepository].
-func (a *appointmentRepository) CancelStatus(ctx context.Context, id uuid.UUID) (*model.Appointment, error) {
-	panic("unimplemented")
-}
-
 // Create implements [AppointmentRepository].
-func (a *appointmentRepository) Create(ctx context.Context, input model.CreateAppointmentInput) (*model.Appointment, error) {
+func (a *appointmentRepository) Create(ctx context.Context, input model.CreateAppointmentInput) (*entity.Appointment, error) {
 	panic("unimplemented")
 }
 
 // FindAll implements [AppointmentRepository].
-func (a *appointmentRepository) FindAll(ctx context.Context, filter *model.AppointmentFilter, limit *int, offset *int) ([]*model.Appointment, *int, error) {
+func (a *appointmentRepository) FindAll(ctx context.Context, filter *model.AppointmentFilter, limit *int, offset *int) ([]*entity.Appointment, *int, error) {
 	panic("unimplemented")
 }
 
 // FindByID implements [AppointmentRepository].
-func (a *appointmentRepository) FindByID(ctx context.Context, id uuid.UUID) (*model.Appointment, error) {
+func (a *appointmentRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.Appointment, error) {
 	panic("unimplemented")
 }
 
 // UpdateStatus implements [AppointmentRepository].
-func (a *appointmentRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status model.UpdateAppointmentStatusInput) (*model.Appointment, error) {
+func (a *appointmentRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status model.UpdateAppointmentStatusInput) (*entity.Appointment, error) {
 	panic("unimplemented")
 }

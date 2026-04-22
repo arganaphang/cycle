@@ -3,8 +3,11 @@ package entity
 import (
 	"time"
 
+	"github.com/arganaphang/cycle/backend/graph/model"
 	"github.com/google/uuid"
 )
+
+const TABLE_STAFF = "staffs"
 
 type Staff struct {
 	ID             uuid.UUID `db:"id"             json:"id"`
@@ -15,4 +18,18 @@ type Staff struct {
 	Phone          *string   `db:"phone"          json:"phone,omitempty"`
 	CreatedAt      time.Time `db:"created_at"     json:"created_at"`
 	UpdatedAt      time.Time `db:"updated_at"     json:"updated_at"`
+}
+
+func (s Staff) ToModel() *model.Staff {
+	return &model.Staff{
+		ID:             s.ID,
+		UserID:         s.UserID,
+		FullName:       s.FullName,
+		Specialization: s.Specialization,
+		LicenseNo:      s.LicenseNo,
+		Phone:          s.Phone,
+		CreatedAt:      s.CreatedAt,
+		UpdatedAt:      s.UpdatedAt,
+		User:           &model.User{}, // TODO: Complete this
+	}
 }

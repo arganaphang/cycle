@@ -84,6 +84,8 @@ type ComplexityRoot struct {
 		UpdateAppointmentStatus func(childComplexity int, id uuid.UUID, input model.UpdateAppointmentStatusInput) int
 		UpdatePatient           func(childComplexity int, id uuid.UUID, input model.UpdatePatientInput) int
 		UpdateSOAPNote          func(childComplexity int, id uuid.UUID, input model.UpdateSOAPNoteInput) int
+		UpdateStaff             func(childComplexity int, id uuid.UUID, input model.UpdateStaffInput) int
+		UpdateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 	}
 
 	Patient struct {
@@ -195,7 +197,9 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error)
 	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
+	UpdateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*model.User, error)
 	CreateStaff(ctx context.Context, input model.CreateStaffInput) (*model.Staff, error)
+	UpdateStaff(ctx context.Context, id uuid.UUID, input model.UpdateStaffInput) (*model.Staff, error)
 	CreatePatient(ctx context.Context, input model.CreatePatientInput) (*model.Patient, error)
 	UpdatePatient(ctx context.Context, id uuid.UUID, input model.UpdatePatientInput) (*model.Patient, error)
 	CreateAppointment(ctx context.Context, input model.CreateAppointmentInput) (*model.Appointment, error)
@@ -501,6 +505,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.UpdateSOAPNote(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateSOAPNoteInput)), true
+	case "Mutation.updateStaff":
+		if e.ComplexityRoot.Mutation.UpdateStaff == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateStaff_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UpdateStaff(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateStaffInput)), true
+	case "Mutation.updateUser":
+		if e.ComplexityRoot.Mutation.UpdateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUser_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UpdateUser(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateUserInput)), true
 
 	case "Patient.address":
 		if e.ComplexityRoot.Patient.Address == nil {
@@ -1029,6 +1055,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateAppointmentStatusInput,
 		ec.unmarshalInputUpdatePatientInput,
 		ec.unmarshalInputUpdateSOAPNoteInput,
+		ec.unmarshalInputUpdateStaffInput,
+		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputVitalsInput,
 	)
 	first := true
@@ -1275,6 +1303,38 @@ func (ec *executionContext) field_Mutation_updateSOAPNote_args(ctx context.Conte
 	}
 	args["id"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateSOAPNoteInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateSOAPNoteInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateStaff_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateStaffInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateStaffInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateUserInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateUserInput)
 	if err != nil {
 		return nil, err
 	}
@@ -2290,6 +2350,63 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateUser,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().UpdateUser(ctx, fc.Args["id"].(uuid.UUID), fc.Args["input"].(model.UpdateUserInput))
+		},
+		nil,
+		ec.marshalNUser2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			case "isActive":
+				return ec.fieldContext_User_isActive(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "staff":
+				return ec.fieldContext_User_staff(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createStaff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -2347,6 +2464,69 @@ func (ec *executionContext) fieldContext_Mutation_createStaff(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createStaff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateStaff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateStaff,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().UpdateStaff(ctx, fc.Args["id"].(uuid.UUID), fc.Args["input"].(model.UpdateStaffInput))
+		},
+		nil,
+		ec.marshalNStaff2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaff,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateStaff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Staff_id(ctx, field)
+			case "userId":
+				return ec.fieldContext_Staff_userId(ctx, field)
+			case "fullName":
+				return ec.fieldContext_Staff_fullName(ctx, field)
+			case "specialization":
+				return ec.fieldContext_Staff_specialization(ctx, field)
+			case "licenseNo":
+				return ec.fieldContext_Staff_licenseNo(ctx, field)
+			case "phone":
+				return ec.fieldContext_Staff_phone(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Staff_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Staff_updatedAt(ctx, field)
+			case "user":
+				return ec.fieldContext_Staff_user(ctx, field)
+			case "appointments":
+				return ec.fieldContext_Staff_appointments(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Staff", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateStaff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8104,6 +8284,101 @@ func (ec *executionContext) unmarshalInputUpdateSOAPNoteInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateStaffInput(ctx context.Context, obj any) (model.UpdateStaffInput, error) {
+	var it model.UpdateStaffInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"fullName", "specialization", "licenseNo", "phone"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "fullName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FullName = data
+		case "specialization":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("specialization"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Specialization = data
+		case "licenseNo":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("licenseNo"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.LicenseNo = data
+		case "phone":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Phone = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj any) (model.UpdateUserInput, error) {
+	var it model.UpdateUserInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email", "password", "role"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Password = data
+		case "role":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			data, err := ec.unmarshalNUserRole2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUserRole(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Role = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputVitalsInput(ctx context.Context, obj any) (model.VitalsInput, error) {
 	var it model.VitalsInput
 	if obj == nil {
@@ -8430,9 +8705,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateUser":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createStaff":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createStaff(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateStaff":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateStaff(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -10058,6 +10347,16 @@ func (ec *executionContext) unmarshalNUpdatePatientInput2githubᚗcomᚋarganaph
 
 func (ec *executionContext) unmarshalNUpdateSOAPNoteInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateSOAPNoteInput(ctx context.Context, v any) (model.UpdateSOAPNoteInput, error) {
 	res, err := ec.unmarshalInputUpdateSOAPNoteInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateStaffInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateStaffInput(ctx context.Context, v any) (model.UpdateStaffInput, error) {
+	res, err := ec.unmarshalInputUpdateStaffInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateUserInput(ctx context.Context, v any) (model.UpdateUserInput, error) {
+	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

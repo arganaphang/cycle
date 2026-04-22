@@ -3,8 +3,11 @@ package entity
 import (
 	"time"
 
+	"github.com/arganaphang/cycle/backend/graph/model"
 	"github.com/google/uuid"
 )
+
+const TABLE_PATIENT = "patients"
 
 type EmergencyContact struct {
 	Name     string `json:"name"`
@@ -24,4 +27,26 @@ type Patient struct {
 	EmergencyContact *EmergencyContact `db:"emergency_contact"   json:"emergency_contact,omitempty"`
 	CreatedAt        time.Time         `db:"created_at"          json:"created_at"`
 	UpdatedAt        time.Time         `db:"updated_at"          json:"updated_at"`
+}
+
+func (p Patient) ToModel() *model.Patient {
+	return &model.Patient{
+		ID:              p.ID,
+		MedicalRecordNo: p.MedicalRecordNo,
+		FullName:        p.FullName,
+		DateOfBirth:     p.DateOfBirth,
+		Gender:          model.Gender(p.Gender),
+		Phone:           p.Phone,
+		Email:           p.Email,
+		Address:         p.Address,
+		EmergencyContact: &model.EmergencyContact{
+			Name:     p.EmergencyContact.Name,
+			Phone:    p.EmergencyContact.Phone,
+			Relation: p.EmergencyContact.Relation,
+		},
+		CreatedAt:         p.CreatedAt,
+		UpdatedAt:         p.UpdatedAt,
+		Appointments:      []*model.Appointment{},      // TODO: Complete this
+		TreatmentSessions: []*model.TreatmentSession{}, // TODO: Complete this
+	}
 }

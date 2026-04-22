@@ -193,8 +193,21 @@ input CreateUserInput {
   role: UserRole!
 }
 
+input UpdateUserInput {
+  email: String!
+  password: String!
+  role: UserRole!
+}
+
 input CreateStaffInput {
   userId: UUID!
+  fullName: String!
+  specialization: String
+  licenseNo: String
+  phone: String
+}
+
+input UpdateStaffInput {
   fullName: String!
   specialization: String
   licenseNo: String
@@ -300,7 +313,10 @@ type Mutation {
   login(input: LoginInput!): AuthPayload!
 
   createUser(input: CreateUserInput!): User!
+  updateUser(id: UUID!, input: UpdateUserInput!): User!
+
   createStaff(input: CreateStaffInput!): Staff!
+  updateStaff(id: UUID!, input: UpdateStaffInput!): Staff!
 
   createPatient(input: CreatePatientInput!): Patient!
   updatePatient(id: UUID!, input: UpdatePatientInput!): Patient!

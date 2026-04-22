@@ -222,6 +222,19 @@ type UpdateSOAPNoteInput struct {
 	Vitals     *VitalsInput `json:"vitals,omitempty"`
 }
 
+type UpdateStaffInput struct {
+	FullName       string  `json:"fullName"`
+	Specialization *string `json:"specialization,omitempty"`
+	LicenseNo      *string `json:"licenseNo,omitempty"`
+	Phone          *string `json:"phone,omitempty"`
+}
+
+type UpdateUserInput struct {
+	Email    string   `json:"email"`
+	Password string   `json:"password"`
+	Role     UserRole `json:"role"`
+}
+
 type User struct {
 	ID        uuid.UUID `json:"id"`
 	Email     string    `json:"email"`

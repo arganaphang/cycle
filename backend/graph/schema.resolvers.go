@@ -23,9 +23,19 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
 }
 
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+}
+
 // CreateStaff is the resolver for the createStaff field.
 func (r *mutationResolver) CreateStaff(ctx context.Context, input model.CreateStaffInput) (*model.Staff, error) {
 	panic(fmt.Errorf("not implemented: CreateStaff - createStaff"))
+}
+
+// UpdateStaff is the resolver for the updateStaff field.
+func (r *mutationResolver) UpdateStaff(ctx context.Context, id uuid.UUID, input model.UpdateStaffInput) (*model.Staff, error) {
+	panic(fmt.Errorf("not implemented: UpdateStaff - updateStaff"))
 }
 
 // CreatePatient is the resolver for the createPatient field.

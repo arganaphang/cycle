@@ -3,8 +3,11 @@ package entity
 import (
 	"time"
 
+	"github.com/arganaphang/cycle/backend/graph/model"
 	"github.com/google/uuid"
 )
+
+const TABLE_USER = "users"
 
 type UserRole string
 
@@ -30,4 +33,16 @@ type User struct {
 	IsActive     bool      `db:"is_active"     json:"is_active"`
 	CreatedAt    time.Time `db:"created_at"    json:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at"    json:"updated_at"`
+}
+
+func (u User) ToModel() *model.User {
+	return &model.User{
+		ID:        u.ID,
+		Email:     u.Email,
+		Role:      model.UserRole(u.Role),
+		IsActive:  u.IsActive,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+		Staff:     &model.Staff{}, // TODO: Complete this
+	}
 }
