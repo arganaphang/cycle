@@ -15,6 +15,21 @@ import (
 	"github.com/google/uuid"
 )
 
+// Patient is the resolver for the patient field.
+func (r *appointmentResolver) Patient(ctx context.Context, obj *model.Appointment) (*model.Patient, error) {
+	return GetPatient(ctx, obj.PatientID)
+}
+
+// Staff is the resolver for the staff field.
+func (r *appointmentResolver) Staff(ctx context.Context, obj *model.Appointment) (*model.Staff, error) {
+	return GetStaff(ctx, obj.StaffID)
+}
+
+// Session is the resolver for the session field.
+func (r *appointmentResolver) Session(ctx context.Context, obj *model.Appointment) (*model.TreatmentSession, error) {
+	return GetTreatmentSessionByAppointmentID(ctx, obj.ID)
+}
+
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error) {
 	result, err := r.Services.UserService.Login(ctx, input)
@@ -112,6 +127,16 @@ func (r *mutationResolver) UpdateSOAPNote(ctx context.Context, id uuid.UUID, inp
 	return r.Services.SoapNoteService.Update(ctx, id, input)
 }
 
+// Appointments is the resolver for the appointments field.
+func (r *patientResolver) Appointments(ctx context.Context, obj *model.Patient) ([]*model.Appointment, error) {
+	return GetAppointmentByPatientID(ctx, obj.ID)
+}
+
+// TreatmentSessions is the resolver for the treatmentSessions field.
+func (r *patientResolver) TreatmentSessions(ctx context.Context, obj *model.Patient) ([]*model.TreatmentSession, error) {
+	return GetTreatmentSessionByPatientID(ctx, obj.ID)
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	auth := ForAuthContext(ctx)
@@ -166,11 +191,75 @@ func (r *queryResolver) SoapNote(ctx context.Context, sessionID uuid.UUID) (*mod
 	return r.Services.SoapNoteService.FindBySessionID(ctx, sessionID)
 }
 
+// Session is the resolver for the session field.
+func (r *sOAPNoteResolver) Session(ctx context.Context, obj *model.SOAPNote) (*model.TreatmentSession, error) {
+	return GetTreatmentSession(ctx, obj.SessionID)
+}
+
+// User is the resolver for the user field.
+func (r *staffResolver) User(ctx context.Context, obj *model.Staff) (*model.User, error) {
+	return GetUser(ctx, obj.UserID)
+}
+
+// Appointments is the resolver for the appointments field.
+func (r *staffResolver) Appointments(ctx context.Context, obj *model.Staff) ([]*model.Appointment, error) {
+	return GetAppointmentByStaffID(ctx, obj.ID)
+}
+
+// Appointment is the resolver for the appointment field.
+func (r *treatmentSessionResolver) Appointment(ctx context.Context, obj *model.TreatmentSession) (*model.Appointment, error) {
+	return GetAppointment(ctx, *obj.AppointmentID)
+}
+
+// Patient is the resolver for the patient field.
+func (r *treatmentSessionResolver) Patient(ctx context.Context, obj *model.TreatmentSession) (*model.Patient, error) {
+	return GetPatient(ctx, obj.PatientID)
+}
+
+// Staff is the resolver for the staff field.
+func (r *treatmentSessionResolver) Staff(ctx context.Context, obj *model.TreatmentSession) (*model.Staff, error) {
+	return GetStaff(ctx, obj.StaffID)
+}
+
+// SoapNote is the resolver for the soapNote field.
+func (r *treatmentSessionResolver) SoapNote(ctx context.Context, obj *model.TreatmentSession) (*model.SOAPNote, error) {
+	return GetSOAPNoteByTreatmentSessionID(ctx, obj.ID)
+}
+
+// Staff is the resolver for the staff field.
+func (r *userResolver) Staff(ctx context.Context, obj *model.User) (*model.Staff, error) {
+	return GetStaffByUserID(ctx, obj.ID)
+}
+
+// Appointment returns AppointmentResolver implementation.
+func (r *Resolver) Appointment() AppointmentResolver { return &appointmentResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
+// Patient returns PatientResolver implementation.
+func (r *Resolver) Patient() PatientResolver { return &patientResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// SOAPNote returns SOAPNoteResolver implementation.
+func (r *Resolver) SOAPNote() SOAPNoteResolver { return &sOAPNoteResolver{r} }
+
+// Staff returns StaffResolver implementation.
+func (r *Resolver) Staff() StaffResolver { return &staffResolver{r} }
+
+// TreatmentSession returns TreatmentSessionResolver implementation.
+func (r *Resolver) TreatmentSession() TreatmentSessionResolver { return &treatmentSessionResolver{r} }
+
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
+type appointmentResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
+type patientResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type sOAPNoteResolver struct{ *Resolver }
+type staffResolver struct{ *Resolver }
+type treatmentSessionResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

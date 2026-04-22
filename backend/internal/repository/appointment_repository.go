@@ -12,6 +12,8 @@ import (
 
 type AppointmentRepository interface {
 	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Appointment, []error)
+	LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([]*model.Appointment, []error)
+	LoaderByStaffIDs(ctx context.Context, staffIDs []uuid.UUID) ([]*model.Appointment, []error)
 	FindAll(ctx context.Context, filter *model.AppointmentFilter, limit *int32, offset *int32) ([]*entity.Appointment, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Appointment, error)
 	Create(ctx context.Context, input model.CreateAppointmentInput) (*entity.Appointment, error)
@@ -61,6 +63,36 @@ func (a *appointmentRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]
 	return appointments, nil
 }
 
+// LoaderByPatientIDs implements [AppointmentRepository].
+func (a *appointmentRepository) LoaderByPatientIDs(ctx context.Context, IDs []uuid.UUID) ([]*model.Appointment, []error) {
+	stmt := goqu.From(entity.TABLE_APPOINTMENT)
+	sql, _, _ := stmt.Where(goqu.C("patient_id").In(IDs)).ToSQL()
+	results := []*entity.Appointment{}
+	if err := a.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	appointments := []*model.Appointment{}
+	for idx := range results {
+		appointments = append(appointments, results[idx].ToModel())
+	}
+	return appointments, nil
+}
+
+// LoaderByStaffIDs implements [AppointmentRepository].
+func (a *appointmentRepository) LoaderByStaffIDs(ctx context.Context, IDs []uuid.UUID) ([]*model.Appointment, []error) {
+	stmt := goqu.From(entity.TABLE_APPOINTMENT)
+	sql, _, _ := stmt.Where(goqu.C("staff_id").In(IDs)).ToSQL()
+	results := []*entity.Appointment{}
+	if err := a.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	appointments := []*model.Appointment{}
+	for idx := range results {
+		appointments = append(appointments, results[idx].ToModel())
+	}
+	return appointments, nil
+}
+
 // FindAll implements [AppointmentRepository].
 func (a *appointmentRepository) FindAll(ctx context.Context, filter *model.AppointmentFilter, limit *int32, offset *int32) ([]*entity.Appointment, *int32, error) {
 	limitFilter := uint(20)
@@ -73,20 +105,20 @@ func (a *appointmentRepository) FindAll(ctx context.Context, filter *model.Appoi
 	}
 	stmt := goqu.From(entity.TABLE_APPOINTMENT)
 
-	if filter.PatientID != nil {
-		stmt = stmt.Where(goqu.C("patient_id").Eq(filter.PatientID))
+	if filter != nil && filter.PatientID != nil {
+		stmt = stmt.Where(goqu.C("patient_id").Eq(*filter.PatientID))
 	}
-	if filter.StaffID != nil {
-		stmt = stmt.Where(goqu.C("staff_id").Eq(filter.StaffID))
+	if filter != nil && filter.StaffID != nil {
+		stmt = stmt.Where(goqu.C("staff_id").Eq(*filter.StaffID))
 	}
-	if filter.Status != nil {
-		stmt = stmt.Where(goqu.C("status").Eq(filter.Status))
+	if filter != nil && filter.Status != nil {
+		stmt = stmt.Where(goqu.C("status").Eq(*filter.Status))
 	}
-	if filter.DateFrom != nil {
-		stmt = stmt.Where(goqu.C("scheduled_at").Gte(filter.DateFrom))
+	if filter != nil && filter.DateFrom != nil {
+		stmt = stmt.Where(goqu.C("scheduled_at").Gte(*filter.DateFrom))
 	}
-	if filter.DateTo != nil {
-		stmt = stmt.Where(goqu.C("scheduled_at").Gte(filter.DateTo))
+	if filter != nil && filter.DateTo != nil {
+		stmt = stmt.Where(goqu.C("scheduled_at").Gte(*filter.DateTo))
 	}
 
 	sql, _, _ := stmt.Limit(limitFilter).Offset(offsetFilter).ToSQL()

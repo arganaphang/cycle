@@ -30,8 +30,14 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 type Config = graphql.Config[ResolverRoot, DirectiveRoot, ComplexityRoot]
 
 type ResolverRoot interface {
+	Appointment() AppointmentResolver
 	Mutation() MutationResolver
+	Patient() PatientResolver
 	Query() QueryResolver
+	SOAPNote() SOAPNoteResolver
+	Staff() StaffResolver
+	TreatmentSession() TreatmentSessionResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct {
@@ -194,6 +200,11 @@ type ComplexityRoot struct {
 	}
 }
 
+type AppointmentResolver interface {
+	Patient(ctx context.Context, obj *model.Appointment) (*model.Patient, error)
+	Staff(ctx context.Context, obj *model.Appointment) (*model.Staff, error)
+	Session(ctx context.Context, obj *model.Appointment) (*model.TreatmentSession, error)
+}
 type MutationResolver interface {
 	Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error)
 	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
@@ -211,6 +222,10 @@ type MutationResolver interface {
 	CreateSOAPNote(ctx context.Context, input model.CreateSOAPNoteInput) (*model.SOAPNote, error)
 	UpdateSOAPNote(ctx context.Context, id uuid.UUID, input model.UpdateSOAPNoteInput) (*model.SOAPNote, error)
 }
+type PatientResolver interface {
+	Appointments(ctx context.Context, obj *model.Patient) ([]*model.Appointment, error)
+	TreatmentSessions(ctx context.Context, obj *model.Patient) ([]*model.TreatmentSession, error)
+}
 type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
 	Patient(ctx context.Context, id uuid.UUID) (*model.Patient, error)
@@ -222,6 +237,22 @@ type QueryResolver interface {
 	TreatmentSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
 	TreatmentSessions(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error)
 	SoapNote(ctx context.Context, sessionID uuid.UUID) (*model.SOAPNote, error)
+}
+type SOAPNoteResolver interface {
+	Session(ctx context.Context, obj *model.SOAPNote) (*model.TreatmentSession, error)
+}
+type StaffResolver interface {
+	User(ctx context.Context, obj *model.Staff) (*model.User, error)
+	Appointments(ctx context.Context, obj *model.Staff) ([]*model.Appointment, error)
+}
+type TreatmentSessionResolver interface {
+	Appointment(ctx context.Context, obj *model.TreatmentSession) (*model.Appointment, error)
+	Patient(ctx context.Context, obj *model.TreatmentSession) (*model.Patient, error)
+	Staff(ctx context.Context, obj *model.TreatmentSession) (*model.Staff, error)
+	SoapNote(ctx context.Context, obj *model.TreatmentSession) (*model.SOAPNote, error)
+}
+type UserResolver interface {
+	Staff(ctx context.Context, obj *model.User) (*model.Staff, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -1841,7 +1872,7 @@ func (ec *executionContext) _Appointment_patient(ctx context.Context, field grap
 		field,
 		ec.fieldContext_Appointment_patient,
 		func(ctx context.Context) (any, error) {
-			return obj.Patient, nil
+			return ec.Resolvers.Appointment().Patient(ctx, obj)
 		},
 		nil,
 		ec.marshalNPatient2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPatient,
@@ -1854,8 +1885,8 @@ func (ec *executionContext) fieldContext_Appointment_patient(_ context.Context, 
 	fc = &graphql.FieldContext{
 		Object:     "Appointment",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1898,7 +1929,7 @@ func (ec *executionContext) _Appointment_staff(ctx context.Context, field graphq
 		field,
 		ec.fieldContext_Appointment_staff,
 		func(ctx context.Context) (any, error) {
-			return obj.Staff, nil
+			return ec.Resolvers.Appointment().Staff(ctx, obj)
 		},
 		nil,
 		ec.marshalNStaff2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaff,
@@ -1911,8 +1942,8 @@ func (ec *executionContext) fieldContext_Appointment_staff(_ context.Context, fi
 	fc = &graphql.FieldContext{
 		Object:     "Appointment",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1949,7 +1980,7 @@ func (ec *executionContext) _Appointment_session(ctx context.Context, field grap
 		field,
 		ec.fieldContext_Appointment_session,
 		func(ctx context.Context) (any, error) {
-			return obj.Session, nil
+			return ec.Resolvers.Appointment().Session(ctx, obj)
 		},
 		nil,
 		ec.marshalOTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
@@ -1962,8 +1993,8 @@ func (ec *executionContext) fieldContext_Appointment_session(_ context.Context, 
 	fc = &graphql.FieldContext{
 		Object:     "Appointment",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -3549,7 +3580,7 @@ func (ec *executionContext) _Patient_appointments(ctx context.Context, field gra
 		field,
 		ec.fieldContext_Patient_appointments,
 		func(ctx context.Context) (any, error) {
-			return obj.Appointments, nil
+			return ec.Resolvers.Patient().Appointments(ctx, obj)
 		},
 		nil,
 		ec.marshalNAppointment2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentᚄ,
@@ -3562,8 +3593,8 @@ func (ec *executionContext) fieldContext_Patient_appointments(_ context.Context,
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -3606,7 +3637,7 @@ func (ec *executionContext) _Patient_treatmentSessions(ctx context.Context, fiel
 		field,
 		ec.fieldContext_Patient_treatmentSessions,
 		func(ctx context.Context) (any, error) {
-			return obj.TreatmentSessions, nil
+			return ec.Resolvers.Patient().TreatmentSessions(ctx, obj)
 		},
 		nil,
 		ec.marshalNTreatmentSession2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionᚄ,
@@ -3619,8 +3650,8 @@ func (ec *executionContext) fieldContext_Patient_treatmentSessions(_ context.Con
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -4727,7 +4758,7 @@ func (ec *executionContext) _SOAPNote_session(ctx context.Context, field graphql
 		field,
 		ec.fieldContext_SOAPNote_session,
 		func(ctx context.Context) (any, error) {
-			return obj.Session, nil
+			return ec.Resolvers.SOAPNote().Session(ctx, obj)
 		},
 		nil,
 		ec.marshalNTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
@@ -4740,8 +4771,8 @@ func (ec *executionContext) fieldContext_SOAPNote_session(_ context.Context, fie
 	fc = &graphql.FieldContext{
 		Object:     "SOAPNote",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -5016,7 +5047,7 @@ func (ec *executionContext) _Staff_user(ctx context.Context, field graphql.Colle
 		field,
 		ec.fieldContext_Staff_user,
 		func(ctx context.Context) (any, error) {
-			return obj.User, nil
+			return ec.Resolvers.Staff().User(ctx, obj)
 		},
 		nil,
 		ec.marshalNUser2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUser,
@@ -5029,8 +5060,8 @@ func (ec *executionContext) fieldContext_Staff_user(_ context.Context, field gra
 	fc = &graphql.FieldContext{
 		Object:     "Staff",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -5061,7 +5092,7 @@ func (ec *executionContext) _Staff_appointments(ctx context.Context, field graph
 		field,
 		ec.fieldContext_Staff_appointments,
 		func(ctx context.Context) (any, error) {
-			return obj.Appointments, nil
+			return ec.Resolvers.Staff().Appointments(ctx, obj)
 		},
 		nil,
 		ec.marshalNAppointment2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentᚄ,
@@ -5074,8 +5105,8 @@ func (ec *executionContext) fieldContext_Staff_appointments(_ context.Context, f
 	fc = &graphql.FieldContext{
 		Object:     "Staff",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -5459,7 +5490,7 @@ func (ec *executionContext) _TreatmentSession_appointment(ctx context.Context, f
 		field,
 		ec.fieldContext_TreatmentSession_appointment,
 		func(ctx context.Context) (any, error) {
-			return obj.Appointment, nil
+			return ec.Resolvers.TreatmentSession().Appointment(ctx, obj)
 		},
 		nil,
 		ec.marshalOAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment,
@@ -5472,8 +5503,8 @@ func (ec *executionContext) fieldContext_TreatmentSession_appointment(_ context.
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -5516,7 +5547,7 @@ func (ec *executionContext) _TreatmentSession_patient(ctx context.Context, field
 		field,
 		ec.fieldContext_TreatmentSession_patient,
 		func(ctx context.Context) (any, error) {
-			return obj.Patient, nil
+			return ec.Resolvers.TreatmentSession().Patient(ctx, obj)
 		},
 		nil,
 		ec.marshalNPatient2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPatient,
@@ -5529,8 +5560,8 @@ func (ec *executionContext) fieldContext_TreatmentSession_patient(_ context.Cont
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -5573,7 +5604,7 @@ func (ec *executionContext) _TreatmentSession_staff(ctx context.Context, field g
 		field,
 		ec.fieldContext_TreatmentSession_staff,
 		func(ctx context.Context) (any, error) {
-			return obj.Staff, nil
+			return ec.Resolvers.TreatmentSession().Staff(ctx, obj)
 		},
 		nil,
 		ec.marshalNStaff2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaff,
@@ -5586,8 +5617,8 @@ func (ec *executionContext) fieldContext_TreatmentSession_staff(_ context.Contex
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -5624,7 +5655,7 @@ func (ec *executionContext) _TreatmentSession_soapNote(ctx context.Context, fiel
 		field,
 		ec.fieldContext_TreatmentSession_soapNote,
 		func(ctx context.Context) (any, error) {
-			return obj.SoapNote, nil
+			return ec.Resolvers.TreatmentSession().SoapNote(ctx, obj)
 		},
 		nil,
 		ec.marshalOSOAPNote2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSOAPNote,
@@ -5637,8 +5668,8 @@ func (ec *executionContext) fieldContext_TreatmentSession_soapNote(_ context.Con
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -5937,7 +5968,7 @@ func (ec *executionContext) _User_staff(ctx context.Context, field graphql.Colle
 		field,
 		ec.fieldContext_User_staff,
 		func(ctx context.Context) (any, error) {
-			return obj.Staff, nil
+			return ec.Resolvers.User().Staff(ctx, obj)
 		},
 		nil,
 		ec.marshalOStaff2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaff,
@@ -5950,8 +5981,8 @@ func (ec *executionContext) fieldContext_User_staff(_ context.Context, field gra
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -8459,32 +8490,32 @@ func (ec *executionContext) _Appointment(ctx context.Context, sel ast.SelectionS
 		case "id":
 			out.Values[i] = ec._Appointment_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "patientId":
 			out.Values[i] = ec._Appointment_patientId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "staffId":
 			out.Values[i] = ec._Appointment_staffId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "scheduledAt":
 			out.Values[i] = ec._Appointment_scheduledAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "durationMin":
 			out.Values[i] = ec._Appointment_durationMin(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
 			out.Values[i] = ec._Appointment_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "chiefComplaint":
 			out.Values[i] = ec._Appointment_chiefComplaint(ctx, field, obj)
@@ -8493,25 +8524,118 @@ func (ec *executionContext) _Appointment(ctx context.Context, sel ast.SelectionS
 		case "createdAt":
 			out.Values[i] = ec._Appointment_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Appointment_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "patient":
-			out.Values[i] = ec._Appointment_patient(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Appointment_patient(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "staff":
-			out.Values[i] = ec._Appointment_staff(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Appointment_staff(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "session":
-			out.Values[i] = ec._Appointment_session(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Appointment_session(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8833,27 +8957,27 @@ func (ec *executionContext) _Patient(ctx context.Context, sel ast.SelectionSet, 
 		case "id":
 			out.Values[i] = ec._Patient_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "medicalRecordNo":
 			out.Values[i] = ec._Patient_medicalRecordNo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "fullName":
 			out.Values[i] = ec._Patient_fullName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "dateOfBirth":
 			out.Values[i] = ec._Patient_dateOfBirth(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "gender":
 			out.Values[i] = ec._Patient_gender(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "phone":
 			out.Values[i] = ec._Patient_phone(ctx, field, obj)
@@ -8866,23 +8990,85 @@ func (ec *executionContext) _Patient(ctx context.Context, sel ast.SelectionSet, 
 		case "createdAt":
 			out.Values[i] = ec._Patient_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Patient_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "appointments":
-			out.Values[i] = ec._Patient_appointments(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Patient_appointments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "treatmentSessions":
-			out.Values[i] = ec._Patient_treatmentSessions(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Patient_treatmentSessions(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9219,32 +9405,32 @@ func (ec *executionContext) _SOAPNote(ctx context.Context, sel ast.SelectionSet,
 		case "id":
 			out.Values[i] = ec._SOAPNote_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "sessionId":
 			out.Values[i] = ec._SOAPNote_sessionId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "subjective":
 			out.Values[i] = ec._SOAPNote_subjective(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "objective":
 			out.Values[i] = ec._SOAPNote_objective(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "assessment":
 			out.Values[i] = ec._SOAPNote_assessment(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "plan":
 			out.Values[i] = ec._SOAPNote_plan(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "painScale":
 			out.Values[i] = ec._SOAPNote_painScale(ctx, field, obj)
@@ -9253,18 +9439,49 @@ func (ec *executionContext) _SOAPNote(ctx context.Context, sel ast.SelectionSet,
 		case "createdAt":
 			out.Values[i] = ec._SOAPNote_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._SOAPNote_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "session":
-			out.Values[i] = ec._SOAPNote_session(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SOAPNote_session(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9302,17 +9519,17 @@ func (ec *executionContext) _Staff(ctx context.Context, sel ast.SelectionSet, ob
 		case "id":
 			out.Values[i] = ec._Staff_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "userId":
 			out.Values[i] = ec._Staff_userId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "fullName":
 			out.Values[i] = ec._Staff_fullName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "specialization":
 			out.Values[i] = ec._Staff_specialization(ctx, field, obj)
@@ -9323,23 +9540,85 @@ func (ec *executionContext) _Staff(ctx context.Context, sel ast.SelectionSet, ob
 		case "createdAt":
 			out.Values[i] = ec._Staff_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Staff_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "user":
-			out.Values[i] = ec._Staff_user(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Staff_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "appointments":
-			out.Values[i] = ec._Staff_appointments(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Staff_appointments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9421,59 +9700,183 @@ func (ec *executionContext) _TreatmentSession(ctx context.Context, sel ast.Selec
 		case "id":
 			out.Values[i] = ec._TreatmentSession_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "appointmentId":
 			out.Values[i] = ec._TreatmentSession_appointmentId(ctx, field, obj)
 		case "patientId":
 			out.Values[i] = ec._TreatmentSession_patientId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "staffId":
 			out.Values[i] = ec._TreatmentSession_staffId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "sessionDate":
 			out.Values[i] = ec._TreatmentSession_sessionDate(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "sessionNo":
 			out.Values[i] = ec._TreatmentSession_sessionNo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
 			out.Values[i] = ec._TreatmentSession_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "createdAt":
 			out.Values[i] = ec._TreatmentSession_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._TreatmentSession_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "appointment":
-			out.Values[i] = ec._TreatmentSession_appointment(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TreatmentSession_appointment(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "patient":
-			out.Values[i] = ec._TreatmentSession_patient(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TreatmentSession_patient(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "staff":
-			out.Values[i] = ec._TreatmentSession_staff(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TreatmentSession_staff(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "soapNote":
-			out.Values[i] = ec._TreatmentSession_soapNote(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TreatmentSession_soapNote(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9555,35 +9958,66 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._User_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "role":
 			out.Values[i] = ec._User_role(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "isActive":
 			out.Values[i] = ec._User_isActive(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "createdAt":
 			out.Values[i] = ec._User_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._User_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "staff":
-			out.Values[i] = ec._User_staff(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_staff(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

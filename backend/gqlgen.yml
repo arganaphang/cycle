@@ -191,3 +191,41 @@ models:
     model:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
+  User:
+    fields:
+      staff:
+        resolver: true
+  Patient:
+    fields:
+      appointments:
+        resolver: true
+      treatmentSessions:
+        resolver: true
+  Staff:
+    fields:
+      user:
+        resolver: true
+      appointments:
+        resolver: true
+  Appointment:
+    fields:
+      patient:
+        resolver: true
+      staff:
+        resolver: true
+      session:
+        resolver: true
+  TreatmentSession:
+    fields:
+      appointment:
+        resolver: true
+      patient:
+        resolver: true
+      staff:
+        resolver: true
+      soapNote:
+        resolver: true
+  SOAPNote:
+    fields:
+      session:
+        resolver: true

@@ -12,6 +12,8 @@ import (
 
 type TreatmentSessionRepository interface {
 	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.TreatmentSession, []error)
+	LoaderByAppointmentIDs(ctx context.Context, appointmentIDs []uuid.UUID) ([]*model.TreatmentSession, []error)
+	LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([]*model.TreatmentSession, []error)
 	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) ([]*entity.TreatmentSession, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.TreatmentSession, error)
 	Create(ctx context.Context, input model.CreateSessionInput) (*entity.TreatmentSession, error)
@@ -59,6 +61,36 @@ func (t *treatmentSessionRepository) Loader(ctx context.Context, IDs []uuid.UUID
 	return treatmentSessions, nil
 }
 
+// LoaderByAppointmentID implements [TreatmentSessionRepository].
+func (t *treatmentSessionRepository) LoaderByAppointmentIDs(ctx context.Context, appointmentIDs []uuid.UUID) ([]*model.TreatmentSession, []error) {
+	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION)
+	sql, _, _ := stmt.Where(goqu.C("appointment_id").In(appointmentIDs)).ToSQL()
+	results := []*entity.TreatmentSession{}
+	if err := t.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	treatmentSessions := []*model.TreatmentSession{}
+	for idx := range results {
+		treatmentSessions = append(treatmentSessions, results[idx].ToModel())
+	}
+	return treatmentSessions, nil
+}
+
+// LoaderByPatientIDs implements [TreatmentSessionRepository].
+func (t *treatmentSessionRepository) LoaderByPatientIDs(ctx context.Context, appointmentIDs []uuid.UUID) ([]*model.TreatmentSession, []error) {
+	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION)
+	sql, _, _ := stmt.Where(goqu.C("patient_id").In(appointmentIDs)).ToSQL()
+	results := []*entity.TreatmentSession{}
+	if err := t.db.Select(&results, sql); err != nil {
+		return nil, []error{err}
+	}
+	treatmentSessions := []*model.TreatmentSession{}
+	for idx := range results {
+		treatmentSessions = append(treatmentSessions, results[idx].ToModel())
+	}
+	return treatmentSessions, nil
+}
+
 // FindAll implements [TreatmentSessionRepository].
 func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) ([]*entity.TreatmentSession, *int32, error) {
 	limitFilter := uint(20)
@@ -71,19 +103,19 @@ func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.
 	}
 	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION)
 
-	if filter.PatientID != nil {
+	if filter != nil && filter.PatientID != nil {
 		stmt = stmt.Where(goqu.C("patient_id").Eq(filter.PatientID))
 	}
-	if filter.StaffID != nil {
+	if filter != nil && filter.StaffID != nil {
 		stmt = stmt.Where(goqu.C("staff_id").Eq(filter.StaffID))
 	}
-	if filter.Status != nil {
+	if filter != nil && filter.Status != nil {
 		stmt = stmt.Where(goqu.C("status").Eq(filter.Status))
 	}
-	if filter.DateFrom != nil {
+	if filter != nil && filter.DateFrom != nil {
 		stmt = stmt.Where(goqu.C("session_date").Gte(filter.DateFrom))
 	}
-	if filter.DateTo != nil {
+	if filter != nil && filter.DateTo != nil {
 		stmt = stmt.Where(goqu.C("session_date").Gte(filter.DateTo))
 	}
 

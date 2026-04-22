@@ -60,7 +60,8 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 
-	srvWithHttp := graph.HttpMiddleware(srv)
+	srvWithLoader := graph.LoaderMiddleware(repositories, srv)
+	srvWithHttp := graph.HttpMiddleware(srvWithLoader)
 	srvWithAuth := graph.AuthMiddleware(repositories)(srvWithHttp)
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
