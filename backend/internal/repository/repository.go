@@ -11,7 +11,7 @@ type Repositories struct {
 	UserRepository             UserRepository
 }
 
-func NewRepository(db *sqlx.DB) Repositories {
+func NewRepositories(db *sqlx.DB) Repositories {
 	return Repositories{
 		AppointmentRepository:      NewAppointmentRepository(db),
 		PatientRepository:          NewPatientRepository(db),

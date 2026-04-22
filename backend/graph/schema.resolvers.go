@@ -7,7 +7,9 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"net/http"
+	"time"
 
 	"github.com/arganaphang/cycle/backend/graph/model"
 	"github.com/google/uuid"
@@ -15,127 +17,153 @@ import (
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
+	result, err := r.Services.UserService.Login(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	// ? Set Cookie
+	hr := ForHttpContext(ctx)
+	if hr == nil {
+		return nil, errors.New("failed to get http context")
+	}
+
+	cookie := &http.Cookie{
+		Name:     "auth_token",
+		Value:    result.Token,
+		HttpOnly: true,
+		Expires:  time.Now().Add((time.Hour * 24 * 30) - time.Second),
+	}
+
+	http.SetCookie(hr, cookie)
+
+	return result, nil
 }
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+	return r.Services.UserService.Create(ctx, input)
 }
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+	return r.Services.UserService.Update(ctx, id, input)
 }
 
 // CreateStaff is the resolver for the createStaff field.
 func (r *mutationResolver) CreateStaff(ctx context.Context, input model.CreateStaffInput) (*model.Staff, error) {
-	panic(fmt.Errorf("not implemented: CreateStaff - createStaff"))
+	return r.Services.StaffService.Create(ctx, input)
 }
 
 // UpdateStaff is the resolver for the updateStaff field.
 func (r *mutationResolver) UpdateStaff(ctx context.Context, id uuid.UUID, input model.UpdateStaffInput) (*model.Staff, error) {
-	panic(fmt.Errorf("not implemented: UpdateStaff - updateStaff"))
+	return r.Services.StaffService.Update(ctx, id, input)
 }
 
 // CreatePatient is the resolver for the createPatient field.
 func (r *mutationResolver) CreatePatient(ctx context.Context, input model.CreatePatientInput) (*model.Patient, error) {
-	panic(fmt.Errorf("not implemented: CreatePatient - createPatient"))
+	return r.Services.PatientService.Create(ctx, input)
 }
 
 // UpdatePatient is the resolver for the updatePatient field.
 func (r *mutationResolver) UpdatePatient(ctx context.Context, id uuid.UUID, input model.UpdatePatientInput) (*model.Patient, error) {
-	panic(fmt.Errorf("not implemented: UpdatePatient - updatePatient"))
+	return r.Services.PatientService.Update(ctx, id, input)
 }
 
 // CreateAppointment is the resolver for the createAppointment field.
 func (r *mutationResolver) CreateAppointment(ctx context.Context, input model.CreateAppointmentInput) (*model.Appointment, error) {
-	panic(fmt.Errorf("not implemented: CreateAppointment - createAppointment"))
+	return r.Services.AppointmentService.Create(ctx, input)
 }
 
 // UpdateAppointmentStatus is the resolver for the updateAppointmentStatus field.
 func (r *mutationResolver) UpdateAppointmentStatus(ctx context.Context, id uuid.UUID, input model.UpdateAppointmentStatusInput) (*model.Appointment, error) {
-	panic(fmt.Errorf("not implemented: UpdateAppointmentStatus - updateAppointmentStatus"))
+	return r.Services.AppointmentService.UpdateStatus(ctx, id, input)
 }
 
 // CancelAppointment is the resolver for the cancelAppointment field.
 func (r *mutationResolver) CancelAppointment(ctx context.Context, id uuid.UUID) (*model.Appointment, error) {
-	panic(fmt.Errorf("not implemented: CancelAppointment - cancelAppointment"))
+	return r.Services.AppointmentService.UpdateStatus(ctx, id, model.UpdateAppointmentStatusInput{
+		Status: model.AppointmentStatusCancelled,
+	})
 }
 
 // CreateSession is the resolver for the createSession field.
 func (r *mutationResolver) CreateSession(ctx context.Context, input model.CreateSessionInput) (*model.TreatmentSession, error) {
-	panic(fmt.Errorf("not implemented: CreateSession - createSession"))
+	return r.Services.TreatmentSessionService.Create(ctx, input)
 }
 
 // CompleteSession is the resolver for the completeSession field.
 func (r *mutationResolver) CompleteSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error) {
-	panic(fmt.Errorf("not implemented: CompleteSession - completeSession"))
+	return r.Services.TreatmentSessionService.UpdateStatus(ctx, id, model.SessionStatusCompleted)
 }
 
 // CancelSession is the resolver for the cancelSession field.
 func (r *mutationResolver) CancelSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error) {
-	panic(fmt.Errorf("not implemented: CancelSession - cancelSession"))
+	return r.Services.TreatmentSessionService.UpdateStatus(ctx, id, model.SessionStatusCancelled)
 }
 
 // CreateSOAPNote is the resolver for the createSOAPNote field.
 func (r *mutationResolver) CreateSOAPNote(ctx context.Context, input model.CreateSOAPNoteInput) (*model.SOAPNote, error) {
-	panic(fmt.Errorf("not implemented: CreateSOAPNote - createSOAPNote"))
+	return r.Services.SoapNoteService.Create(ctx, input)
 }
 
 // UpdateSOAPNote is the resolver for the updateSOAPNote field.
 func (r *mutationResolver) UpdateSOAPNote(ctx context.Context, id uuid.UUID, input model.UpdateSOAPNoteInput) (*model.SOAPNote, error) {
-	panic(fmt.Errorf("not implemented: UpdateSOAPNote - updateSOAPNote"))
+	return r.Services.SoapNoteService.Update(ctx, id, input)
 }
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
+	auth := ForAuthContext(ctx)
+	if auth == nil {
+		return nil, errors.New("failed to get auth context")
+	}
+	return r.Services.UserService.FindByID(ctx, auth.ID)
 }
 
 // Patient is the resolver for the patient field.
 func (r *queryResolver) Patient(ctx context.Context, id uuid.UUID) (*model.Patient, error) {
-	panic(fmt.Errorf("not implemented: Patient - patient"))
+	return r.Services.PatientService.FindByID(ctx, id)
 }
 
 // Patients is the resolver for the patients field.
 func (r *queryResolver) Patients(ctx context.Context, search *string, limit *int32, offset *int32) (*model.PatientConnection, error) {
-	panic(fmt.Errorf("not implemented: Patients - patients"))
+	return r.Services.PatientService.FindAll(ctx, search, limit, offset)
 }
 
 // Staff is the resolver for the staff field.
 func (r *queryResolver) Staff(ctx context.Context, id uuid.UUID) (*model.Staff, error) {
-	panic(fmt.Errorf("not implemented: Staff - staff"))
+	return r.Services.StaffService.FindByID(ctx, id)
 }
 
-// AllStaff is the resolver for the allStaff field.
-func (r *queryResolver) AllStaff(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error) {
-	panic(fmt.Errorf("not implemented: AllStaff - allStaff"))
+// Staffs is the resolver for the staffs field.
+func (r *queryResolver) Staffs(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error) {
+	return r.Services.StaffService.FindAll(ctx, search, limit, offset)
 }
 
 // Appointment is the resolver for the appointment field.
 func (r *queryResolver) Appointment(ctx context.Context, id uuid.UUID) (*model.Appointment, error) {
-	panic(fmt.Errorf("not implemented: Appointment - appointment"))
+	return r.Services.AppointmentService.FindByID(ctx, id)
 }
 
 // Appointments is the resolver for the appointments field.
 func (r *queryResolver) Appointments(ctx context.Context, filter *model.AppointmentFilter, limit *int32, offset *int32) (*model.AppointmentConnection, error) {
-	panic(fmt.Errorf("not implemented: Appointments - appointments"))
+	return r.Services.AppointmentService.FindAll(ctx, filter, limit, offset)
 }
 
 // TreatmentSession is the resolver for the treatmentSession field.
 func (r *queryResolver) TreatmentSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error) {
-	panic(fmt.Errorf("not implemented: TreatmentSession - treatmentSession"))
+	return r.Services.TreatmentSessionService.FindByID(ctx, id)
 }
 
 // TreatmentSessions is the resolver for the treatmentSessions field.
 func (r *queryResolver) TreatmentSessions(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error) {
-	panic(fmt.Errorf("not implemented: TreatmentSessions - treatmentSessions"))
+	return r.Services.TreatmentSessionService.FindAll(ctx, filter, limit, offset)
 }
 
 // SoapNote is the resolver for the soapNote field.
 func (r *queryResolver) SoapNote(ctx context.Context, sessionID uuid.UUID) (*model.SOAPNote, error) {
-	panic(fmt.Errorf("not implemented: SoapNote - soapNote"))
+	return r.Services.SoapNoteService.FindBySessionID(ctx, sessionID)
 }
 
 // Mutation returns MutationResolver implementation.

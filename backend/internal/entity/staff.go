@@ -30,6 +30,5 @@ func (s Staff) ToModel() *model.Staff {
 		Phone:          s.Phone,
 		CreatedAt:      s.CreatedAt,
 		UpdatedAt:      s.UpdatedAt,
-		User:           &model.User{}, // TODO: Complete this
 	}
 }

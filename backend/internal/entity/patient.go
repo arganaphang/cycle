@@ -44,9 +44,7 @@ func (p Patient) ToModel() *model.Patient {
 			Phone:    p.EmergencyContact.Phone,
 			Relation: p.EmergencyContact.Relation,
 		},
-		CreatedAt:         p.CreatedAt,
-		UpdatedAt:         p.UpdatedAt,
-		Appointments:      []*model.Appointment{},      // TODO: Complete this
-		TreatmentSessions: []*model.TreatmentSession{}, // TODO: Complete this
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
 	}
 }

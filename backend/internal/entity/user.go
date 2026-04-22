@@ -43,6 +43,5 @@ func (u User) ToModel() *model.User {
 		IsActive:  u.IsActive,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
-		Staff:     &model.Staff{}, // TODO: Complete this
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type TreatmentSessionService interface {
-	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int, offset *int) ([]*model.TreatmentSession, *int, error)
+	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
 	Create(ctx context.Context, input model.CreateSessionInput) (*model.TreatmentSession, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status model.SessionStatus) (*model.TreatmentSession, error)
@@ -33,16 +33,19 @@ func (t *treatmentSessionService) Create(ctx context.Context, input model.Create
 }
 
 // FindAll implements [TreatmentSessionService].
-func (t *treatmentSessionService) FindAll(ctx context.Context, filter *model.SessionFilter, limit *int, offset *int) ([]*model.TreatmentSession, *int, error) {
+func (t *treatmentSessionService) FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error) {
 	result, count, err := t.repositories.TreatmentSessionRepository.FindAll(ctx, filter, limit, offset)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	sessions := []*model.TreatmentSession{}
 	for idx := range result {
 		sessions = append(sessions, result[idx].ToModel())
 	}
-	return sessions, count, nil
+	return &model.TreatmentSessionConnection{
+		Nodes:      sessions,
+		TotalCount: *count,
+	}, nil
 }
 
 // FindByID implements [TreatmentSessionService].

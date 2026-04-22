@@ -223,16 +223,16 @@ type UpdateSOAPNoteInput struct {
 }
 
 type UpdateStaffInput struct {
-	FullName       string  `json:"fullName"`
+	FullName       *string `json:"fullName,omitempty"`
 	Specialization *string `json:"specialization,omitempty"`
 	LicenseNo      *string `json:"licenseNo,omitempty"`
 	Phone          *string `json:"phone,omitempty"`
 }
 
 type UpdateUserInput struct {
-	Email    string   `json:"email"`
-	Password string   `json:"password"`
-	Role     UserRole `json:"role"`
+	Email    *string   `json:"email,omitempty"`
+	Password *string   `json:"password,omitempty"`
+	Role     *UserRole `json:"role,omitempty"`
 }
 
 type User struct {
@@ -327,18 +327,16 @@ type Gender string
 const (
 	GenderMale   Gender = "MALE"
 	GenderFemale Gender = "FEMALE"
-	GenderOther  Gender = "OTHER"
 )
 
 var AllGender = []Gender{
 	GenderMale,
 	GenderFemale,
-	GenderOther,
 }
 
 func (e Gender) IsValid() bool {
 	switch e {
-	case GenderMale, GenderFemale, GenderOther:
+	case GenderMale, GenderFemale:
 		return true
 	}
 	return false

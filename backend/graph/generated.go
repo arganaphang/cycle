@@ -110,7 +110,6 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		AllStaff          func(childComplexity int, search *string, limit *int32, offset *int32) int
 		Appointment       func(childComplexity int, id uuid.UUID) int
 		Appointments      func(childComplexity int, filter *model.AppointmentFilter, limit *int32, offset *int32) int
 		Me                func(childComplexity int) int
@@ -118,6 +117,7 @@ type ComplexityRoot struct {
 		Patients          func(childComplexity int, search *string, limit *int32, offset *int32) int
 		SoapNote          func(childComplexity int, sessionID uuid.UUID) int
 		Staff             func(childComplexity int, id uuid.UUID) int
+		Staffs            func(childComplexity int, search *string, limit *int32, offset *int32) int
 		TreatmentSession  func(childComplexity int, id uuid.UUID) int
 		TreatmentSessions func(childComplexity int, filter *model.SessionFilter, limit *int32, offset *int32) int
 	}
@@ -216,7 +216,7 @@ type QueryResolver interface {
 	Patient(ctx context.Context, id uuid.UUID) (*model.Patient, error)
 	Patients(ctx context.Context, search *string, limit *int32, offset *int32) (*model.PatientConnection, error)
 	Staff(ctx context.Context, id uuid.UUID) (*model.Staff, error)
-	AllStaff(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error)
+	Staffs(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error)
 	Appointment(ctx context.Context, id uuid.UUID) (*model.Appointment, error)
 	Appointments(ctx context.Context, filter *model.AppointmentFilter, limit *int32, offset *int32) (*model.AppointmentConnection, error)
 	TreatmentSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
@@ -620,17 +620,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.PatientConnection.TotalCount(childComplexity), true
 
-	case "Query.allStaff":
-		if e.ComplexityRoot.Query.AllStaff == nil {
-			break
-		}
-
-		args, err := ec.field_Query_allStaff_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Query.AllStaff(childComplexity, args["search"].(*string), args["limit"].(*int32), args["offset"].(*int32)), true
 	case "Query.appointment":
 		if e.ComplexityRoot.Query.Appointment == nil {
 			break
@@ -704,6 +693,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Staff(childComplexity, args["id"].(uuid.UUID)), true
+	case "Query.staffs":
+		if e.ComplexityRoot.Query.Staffs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_staffs_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.Staffs(childComplexity, args["search"].(*string), args["limit"].(*int32), args["offset"].(*int32)), true
 	case "Query.treatmentSession":
 		if e.ComplexityRoot.Query.TreatmentSession == nil {
 			break
@@ -1353,27 +1353,6 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_allStaff_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "search", ec.unmarshalOString2ᚖstring)
-	if err != nil {
-		return nil, err
-	}
-	args["search"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint32)
-	if err != nil {
-		return nil, err
-	}
-	args["limit"] = arg1
-	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint32)
-	if err != nil {
-		return nil, err
-	}
-	args["offset"] = arg2
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_appointment_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1457,6 +1436,27 @@ func (ec *executionContext) field_Query_staff_args(ctx context.Context, rawArgs 
 		return nil, err
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_staffs_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "search", ec.unmarshalOString2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["search"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint32)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint32)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 
@@ -3966,15 +3966,15 @@ func (ec *executionContext) fieldContext_Query_staff(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_allStaff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_staffs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Query_allStaff,
+		ec.fieldContext_Query_staffs,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().AllStaff(ctx, fc.Args["search"].(*string), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32))
+			return ec.Resolvers.Query().Staffs(ctx, fc.Args["search"].(*string), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32))
 		},
 		nil,
 		ec.marshalNStaffConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaffConnection,
@@ -3983,7 +3983,7 @@ func (ec *executionContext) _Query_allStaff(ctx context.Context, field graphql.C
 	)
 }
 
-func (ec *executionContext) fieldContext_Query_allStaff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_staffs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -4006,7 +4006,7 @@ func (ec *executionContext) fieldContext_Query_allStaff(ctx context.Context, fie
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_allStaff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_staffs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8304,7 +8304,7 @@ func (ec *executionContext) unmarshalInputUpdateStaffInput(ctx context.Context, 
 		switch k {
 		case "fullName":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8355,21 +8355,21 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		switch k {
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Email = data
 		case "password":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Password = data
 		case "role":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-			data, err := ec.unmarshalNUserRole2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUserRole(ctx, v)
+			data, err := ec.unmarshalOUserRole2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUserRole(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9051,7 +9051,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "allStaff":
+		case "staffs":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9060,7 +9060,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_allStaff(ctx, field)
+				res = ec._Query_staffs(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10740,6 +10740,22 @@ func (ec *executionContext) marshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(
 	_ = ctx
 	res := graphql.MarshalUUID(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOUserRole2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUserRole(ctx context.Context, v any) (*model.UserRole, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.UserRole)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUserRole2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUserRole(ctx context.Context, sel ast.SelectionSet, v *model.UserRole) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOVitals2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐVitals(ctx context.Context, sel ast.SelectionSet, v *model.Vitals) graphql.Marshaler {

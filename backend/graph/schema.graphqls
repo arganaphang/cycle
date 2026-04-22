@@ -17,7 +17,6 @@ enum UserRole {
 enum Gender {
   MALE
   FEMALE
-  OTHER
 }
 
 enum AppointmentStatus {
@@ -194,9 +193,9 @@ input CreateUserInput {
 }
 
 input UpdateUserInput {
-  email: String!
-  password: String!
-  role: UserRole!
+  email: String
+  password: String
+  role: UserRole
 }
 
 input CreateStaffInput {
@@ -208,7 +207,7 @@ input CreateStaffInput {
 }
 
 input UpdateStaffInput {
-  fullName: String!
+  fullName: String
   specialization: String
   licenseNo: String
   phone: String
@@ -298,7 +297,7 @@ type Query {
   patients(search: String, limit: Int, offset: Int): PatientConnection!
 
   staff(id: UUID!): Staff
-  allStaff(search: String, limit: Int, offset: Int): StaffConnection!
+  staffs(search: String, limit: Int, offset: Int): StaffConnection!
 
   appointment(id: UUID!): Appointment
   appointments(filter: AppointmentFilter, limit: Int, offset: Int): AppointmentConnection!

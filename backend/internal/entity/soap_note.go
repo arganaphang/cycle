@@ -55,6 +55,5 @@ func (s SOAPNote) ToModel() *model.SOAPNote {
 		},
 		CreatedAt: s.CreatedAt,
 		UpdatedAt: s.UpdatedAt,
-		Session:   &model.TreatmentSession{}, // TODO: Complete this
 	}
 }

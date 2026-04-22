@@ -40,9 +40,5 @@ func (t TreatmentSession) ToModel() *model.TreatmentSession {
 		Status:        model.SessionStatus(t.Status),
 		CreatedAt:     t.CreatedAt,
 		UpdatedAt:     t.UpdatedAt,
-		Appointment:   &model.Appointment{}, // TODO: Complete this
-		Patient:       &model.Patient{},     // TODO: Complete this
-		Staff:         &model.Staff{},       // TODO: Complete this
-		SoapNote:      &model.SOAPNote{},    // TODO: Complete this
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type SoapNoteService interface {
-	FindAll(ctx context.Context, limit *int, offset *int) ([]*model.SOAPNote, *int, error)
+	FindAll(ctx context.Context, limit *int32, offset *int32) ([]*model.SOAPNote, *int32, error)
 	FindBySessionID(ctx context.Context, sessionID uuid.UUID) (*model.SOAPNote, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*model.SOAPNote, error)
 	Create(ctx context.Context, input model.CreateSOAPNoteInput) (*model.SOAPNote, error)
@@ -34,7 +34,7 @@ func (s *soapNoteService) Create(ctx context.Context, input model.CreateSOAPNote
 }
 
 // FindAll implements [SoapNoteService].
-func (s *soapNoteService) FindAll(ctx context.Context, limit *int, offset *int) ([]*model.SOAPNote, *int, error) {
+func (s *soapNoteService) FindAll(ctx context.Context, limit *int32, offset *int32) ([]*model.SOAPNote, *int32, error) {
 	result, count, err := s.repositories.SoapNoteRepository.FindAll(ctx, limit, offset)
 	if err != nil {
 		return nil, nil, err

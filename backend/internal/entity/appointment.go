@@ -45,8 +45,5 @@ func (a Appointment) ToModel() *model.Appointment {
 		Notes:          a.Notes,
 		CreatedAt:      a.CreatedAt,
 		UpdatedAt:      a.UpdatedAt,
-		Patient:        &model.Patient{},          // TODO: Complete this
-		Staff:          &model.Staff{},            // TODO: Complete this
-		Session:        &model.TreatmentSession{}, // TODO: Complete this
 	}
 }
