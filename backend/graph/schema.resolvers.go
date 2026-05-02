@@ -95,6 +95,13 @@ func (r *patientResolver) TreatmentSessions(ctx context.Context, obj *model.Pati
 	return GetTreatmentSessionByPatientID(ctx, obj.ID)
 }
 
+// Ping is the resolver for the ping field.
+func (r *queryResolver) Ping(ctx context.Context) (*model.Pong, error) {
+	return &model.Pong{
+		Success: true,
+	}, nil
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	auth := ForAuthContext(ctx)

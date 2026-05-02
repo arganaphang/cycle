@@ -39,6 +39,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Public func(ctx context.Context, obj any, next graphql.Resolver) (res any, err error)
 }
 
 type ComplexityRoot struct {
@@ -87,10 +88,15 @@ type ComplexityRoot struct {
 		TotalCount func(childComplexity int) int
 	}
 
+	Pong struct {
+		Success func(childComplexity int) int
+	}
+
 	Query struct {
 		Me                      func(childComplexity int) int
 		Patient                 func(childComplexity int, id uuid.UUID) int
 		Patients                func(childComplexity int, search *string, limit *int32, offset *int32) int
+		Ping                    func(childComplexity int) int
 		Staff                   func(childComplexity int, id uuid.UUID) int
 		Staffs                  func(childComplexity int, search *string, limit *int32, offset *int32) int
 		TreatmentSession        func(childComplexity int, id uuid.UUID) int
@@ -185,6 +191,7 @@ type PatientResolver interface {
 	TreatmentSessions(ctx context.Context, obj *model.Patient) ([]*model.TreatmentSession, error)
 }
 type QueryResolver interface {
+	Ping(ctx context.Context) (*model.Pong, error)
 	Me(ctx context.Context) (*model.User, error)
 	Patient(ctx context.Context, id uuid.UUID) (*model.Patient, error)
 	Patients(ctx context.Context, search *string, limit *int32, offset *int32) (*model.PatientConnection, error)
@@ -461,6 +468,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.PatientConnection.TotalCount(childComplexity), true
 
+	case "Pong.success":
+		if e.ComplexityRoot.Pong.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Pong.Success(childComplexity), true
+
 	case "Query.me":
 		if e.ComplexityRoot.Query.Me == nil {
 			break
@@ -489,6 +503,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Patients(childComplexity, args["search"].(*string), args["limit"].(*int32), args["offset"].(*int32)), true
+	case "Query.ping":
+		if e.ComplexityRoot.Query.Ping == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Query.Ping(childComplexity), true
 	case "Query.staff":
 		if e.ComplexityRoot.Query.Staff == nil {
 			break
@@ -1469,7 +1489,20 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 			fc := graphql.GetFieldContext(ctx)
 			return ec.Resolvers.Mutation().Login(ctx, fc.Args["input"].(model.LoginInput))
 		},
-		nil,
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Public == nil {
+					var zeroVal *model.AuthPayload
+					return zeroVal, errors.New("directive public is not implemented")
+				}
+				return ec.Directives.Public(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
 		ec.marshalNAuthPayload2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAuthPayload,
 		true,
 		true,
@@ -2609,6 +2642,81 @@ func (ec *executionContext) fieldContext_PatientConnection_total_count(_ context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Pong_success(ctx context.Context, field graphql.CollectedField, obj *model.Pong) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Pong_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Public == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive public is not implemented")
+				}
+				return ec.Directives.Public(ctx, obj, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Pong_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Pong",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_ping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_ping,
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Query().Ping(ctx)
+		},
+		nil,
+		ec.marshalNPong2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPong,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_ping(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_Pong_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Pong", field.Name)
 		},
 	}
 	return fc, nil
@@ -6349,15 +6457,15 @@ func (ec *executionContext) unmarshalInputCreateStaffInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"userId", "full_name", "specialization", "license_no", "phone"}
+	fieldsInOrder := [...]string{"user_id", "full_name", "specialization", "license_no", "phone"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "userId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+		case "user_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
@@ -7371,6 +7479,45 @@ func (ec *executionContext) _PatientConnection(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var pongImplementors = []string{"Pong"}
+
+func (ec *executionContext) _Pong(ctx context.Context, sel ast.SelectionSet, obj *model.Pong) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pongImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Pong")
+		case "success":
+			out.Values[i] = ec._Pong_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -7390,6 +7537,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "ping":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_ping(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "me":
 			field := field
 
@@ -8659,6 +8828,20 @@ func (ec *executionContext) marshalNPatientConnection2ᚖgithubᚗcomᚋarganaph
 		return graphql.Null
 	}
 	return ec._PatientConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPong2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPong(ctx context.Context, sel ast.SelectionSet, v model.Pong) graphql.Marshaler {
+	return ec._Pong(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPong2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPong(ctx context.Context, sel ast.SelectionSet, v *model.Pong) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Pong(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSessionStatus2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSessionStatus(ctx context.Context, v any) (model.SessionStatus, error) {

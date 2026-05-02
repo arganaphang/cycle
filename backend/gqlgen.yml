@@ -117,7 +117,7 @@ resolver:
 # nullable_input_omittable: true
 
 # Optional: enable adding omitempty to the json tag of generated model fields
-# enable_model_json_omitempty_tag: false
+enable_model_json_omitempty_tag: false
 
 # Optional: enable adding omitzero to the json tag of generated model fields
 # enable_model_json_omitzero_tag: false

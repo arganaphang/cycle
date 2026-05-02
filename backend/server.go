@@ -45,9 +45,11 @@ func main() {
 	repositories := repository.NewRepositories(db)
 	services := service.NewServices(repositories)
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		Services: services,
-	}}))
+	conf := graph.Config{Resolvers: &graph.Resolver{Services: services}}
+	conf.Directives.Public = graph.PublicDirective
+	sch := graph.NewExecutableSchema(conf)
+	srv := handler.New(sch)
+	srv.AroundRootFields(graph.RequireAuthRootMiddleware(sch))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})

@@ -3,9 +3,15 @@
 # graph/schema.graphqls
 # ============================================================
 
+# ── Directives ─────────────────────────────────────────────────
+
+directive @public on FIELD_DEFINITION
+
 # ── Scalars ─────────────────────────────────────────────────
+
 scalar Time # maps to time.Time
 scalar UUID # maps to uuid.UUID
+
 # ── Enums ───────────────────────────────────────────────────
 
 enum UserRole {
@@ -41,6 +47,10 @@ input EmergencyContactInput {
 }
 
 # ── Types ────────────────────────────────────────────────────
+
+type Pong {
+  success: Boolean!
+}
 
 type User {
   id: UUID!
@@ -159,7 +169,7 @@ input UpdateUserInput {
 }
 
 input CreateStaffInput {
-  userId: UUID!
+  user_id: UUID!
   full_name: String!
   specialization: String
   license_no: String
@@ -238,6 +248,8 @@ input ReportFilter {
 # ── Root ─────────────────────────────────────────────────────
 
 type Query {
+  ping: Pong! @public
+
   me: User!
 
   patient(id: UUID!): Patient
@@ -254,7 +266,7 @@ type Query {
 }
 
 type Mutation {
-  login(input: LoginInput!): AuthPayload!
+  login(input: LoginInput!): AuthPayload! @public
 
   createUser(input: CreateUserInput!): User!
   updateUser(id: UUID!, input: UpdateUserInput!): User!

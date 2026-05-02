@@ -21,18 +21,18 @@ type CreatePatientInput struct {
 	FullName         string                 `json:"full_name"`
 	DateOfBirth      time.Time              `json:"date_of_birth"`
 	Gender           Gender                 `json:"gender"`
-	Phone            *string                `json:"phone,omitempty"`
-	Email            *string                `json:"email,omitempty"`
-	Address          *string                `json:"address,omitempty"`
-	EmergencyContact *EmergencyContactInput `json:"emergency_contact,omitempty"`
+	Phone            *string                `json:"phone"`
+	Email            *string                `json:"email"`
+	Address          *string                `json:"address"`
+	EmergencyContact *EmergencyContactInput `json:"emergency_contact"`
 }
 
 type CreateStaffInput struct {
-	UserID         uuid.UUID `json:"userId"`
+	UserID         uuid.UUID `json:"user_id"`
 	FullName       string    `json:"full_name"`
-	Specialization *string   `json:"specialization,omitempty"`
-	LicenseNo      *string   `json:"license_no,omitempty"`
-	Phone          *string   `json:"phone,omitempty"`
+	Specialization *string   `json:"specialization"`
+	LicenseNo      *string   `json:"license_no"`
+	Phone          *string   `json:"phone"`
 }
 
 type CreateTreatmentSessionInput struct {
@@ -43,13 +43,13 @@ type CreateTreatmentSessionInput struct {
 
 type CreateTreatmentSessionReportInput struct {
 	SessionID            uuid.UUID `json:"session_id"`
-	Anamnesis            *string   `json:"anamnesis,omitempty"`
-	MechanismOfInjury    *string   `json:"mechanism_of_injury,omitempty"`
-	ActualCondition      *string   `json:"actual_condition,omitempty"`
-	Examination          *string   `json:"examination,omitempty"`
-	Diagnosis            *string   `json:"diagnosis,omitempty"`
-	Intervention         *string   `json:"intervention,omitempty"`
-	PlanningAndEducation *string   `json:"planning_and_education,omitempty"`
+	Anamnesis            *string   `json:"anamnesis"`
+	MechanismOfInjury    *string   `json:"mechanism_of_injury"`
+	ActualCondition      *string   `json:"actual_condition"`
+	Examination          *string   `json:"examination"`
+	Diagnosis            *string   `json:"diagnosis"`
+	Intervention         *string   `json:"intervention"`
+	PlanningAndEducation *string   `json:"planning_and_education"`
 }
 
 type CreateUserInput struct {
@@ -84,10 +84,10 @@ type Patient struct {
 	FullName          string              `json:"full_name"`
 	DateOfBirth       time.Time           `json:"date_of_birth"`
 	Gender            Gender              `json:"gender"`
-	Phone             *string             `json:"phone,omitempty"`
-	Email             *string             `json:"email,omitempty"`
-	Address           *string             `json:"address,omitempty"`
-	EmergencyContact  *EmergencyContact   `json:"emergency_contact,omitempty"`
+	Phone             *string             `json:"phone"`
+	Email             *string             `json:"email"`
+	Address           *string             `json:"address"`
+	EmergencyContact  *EmergencyContact   `json:"emergency_contact"`
 	CreatedAt         time.Time           `json:"created_at"`
 	UpdatedAt         time.Time           `json:"updated_at"`
 	TreatmentSessions []*TreatmentSession `json:"treatment_sessions"`
@@ -98,29 +98,33 @@ type PatientConnection struct {
 	TotalCount int32      `json:"total_count"`
 }
 
+type Pong struct {
+	Success bool `json:"success"`
+}
+
 type Query struct {
 }
 
 type ReportFilter struct {
-	DateFrom *time.Time `json:"date_from,omitempty"`
-	DateTo   *time.Time `json:"date_to,omitempty"`
+	DateFrom *time.Time `json:"date_from"`
+	DateTo   *time.Time `json:"date_to"`
 }
 
 type SessionFilter struct {
-	PatientID *uuid.UUID     `json:"patient_id,omitempty"`
-	StaffID   *uuid.UUID     `json:"staff_id,omitempty"`
-	Status    *SessionStatus `json:"status,omitempty"`
-	DateFrom  *time.Time     `json:"date_from,omitempty"`
-	DateTo    *time.Time     `json:"date_to,omitempty"`
+	PatientID *uuid.UUID     `json:"patient_id"`
+	StaffID   *uuid.UUID     `json:"staff_id"`
+	Status    *SessionStatus `json:"status"`
+	DateFrom  *time.Time     `json:"date_from"`
+	DateTo    *time.Time     `json:"date_to"`
 }
 
 type Staff struct {
 	ID                uuid.UUID           `json:"id"`
 	UserID            uuid.UUID           `json:"user_id"`
 	FullName          string              `json:"full_name"`
-	Specialization    *string             `json:"specialization,omitempty"`
-	LicenseNo         *string             `json:"license_no,omitempty"`
-	Phone             *string             `json:"phone,omitempty"`
+	Specialization    *string             `json:"specialization"`
+	LicenseNo         *string             `json:"license_no"`
+	Phone             *string             `json:"phone"`
 	CreatedAt         time.Time           `json:"created_at"`
 	UpdatedAt         time.Time           `json:"updated_at"`
 	User              *User               `json:"user"`
@@ -139,12 +143,12 @@ type TreatmentSession struct {
 	SessionDate time.Time               `json:"session_date"`
 	SessionNo   int32                   `json:"session_no"`
 	Status      SessionStatus           `json:"status"`
-	Note        *string                 `json:"note,omitempty"`
+	Note        *string                 `json:"note"`
 	CreatedAt   time.Time               `json:"created_at"`
 	UpdatedAt   time.Time               `json:"updated_at"`
 	Patient     *Patient                `json:"patient"`
 	Staff       *Staff                  `json:"staff"`
-	Report      *TreatmentSessionReport `json:"report,omitempty"`
+	Report      *TreatmentSessionReport `json:"report"`
 }
 
 type TreatmentSessionConnection struct {
@@ -155,13 +159,13 @@ type TreatmentSessionConnection struct {
 type TreatmentSessionReport struct {
 	ID                   uuid.UUID         `json:"id"`
 	SessionID            uuid.UUID         `json:"session_id"`
-	Anamnesis            *string           `json:"anamnesis,omitempty"`
-	MechanismOfInjury    *string           `json:"mechanism_of_injury,omitempty"`
-	ActualCondition      *string           `json:"actual_condition,omitempty"`
-	Examination          *string           `json:"examination,omitempty"`
-	Diagnosis            *string           `json:"diagnosis,omitempty"`
-	Intervention         *string           `json:"intervention,omitempty"`
-	PlanningAndEducation *string           `json:"planning_and_education,omitempty"`
+	Anamnesis            *string           `json:"anamnesis"`
+	MechanismOfInjury    *string           `json:"mechanism_of_injury"`
+	ActualCondition      *string           `json:"actual_condition"`
+	Examination          *string           `json:"examination"`
+	Diagnosis            *string           `json:"diagnosis"`
+	Intervention         *string           `json:"intervention"`
+	PlanningAndEducation *string           `json:"planning_and_education"`
 	CreatedAt            time.Time         `json:"created_at"`
 	UpdatedAt            time.Time         `json:"updated_at"`
 	TreatmentSession     *TreatmentSession `json:"treatment_session"`
@@ -173,28 +177,28 @@ type TreatmentSessionReportConnection struct {
 }
 
 type UpdatePatientInput struct {
-	FullName         *string                `json:"full_name,omitempty"`
-	Phone            *string                `json:"phone,omitempty"`
-	Email            *string                `json:"email,omitempty"`
-	Address          *string                `json:"address,omitempty"`
-	EmergencyContact *EmergencyContactInput `json:"emergency_contact,omitempty"`
+	FullName         *string                `json:"full_name"`
+	Phone            *string                `json:"phone"`
+	Email            *string                `json:"email"`
+	Address          *string                `json:"address"`
+	EmergencyContact *EmergencyContactInput `json:"emergency_contact"`
 }
 
 type UpdateStaffInput struct {
-	FullName       *string `json:"full_name,omitempty"`
-	Specialization *string `json:"specialization,omitempty"`
-	LicenseNo      *string `json:"license_no,omitempty"`
-	Phone          *string `json:"phone,omitempty"`
+	FullName       *string `json:"full_name"`
+	Specialization *string `json:"specialization"`
+	LicenseNo      *string `json:"license_no"`
+	Phone          *string `json:"phone"`
 }
 
 type UpdateTreatmentSessionReportInput struct {
-	Anamnesis            *string `json:"anamnesis,omitempty"`
-	MechanismOfInjury    *string `json:"mechanism_of_injury,omitempty"`
-	ActualCondition      *string `json:"actual_condition,omitempty"`
-	Examination          *string `json:"examination,omitempty"`
-	Diagnosis            *string `json:"diagnosis,omitempty"`
-	Intervention         *string `json:"intervention,omitempty"`
-	PlanningAndEducation *string `json:"planning_and_education,omitempty"`
+	Anamnesis            *string `json:"anamnesis"`
+	MechanismOfInjury    *string `json:"mechanism_of_injury"`
+	ActualCondition      *string `json:"actual_condition"`
+	Examination          *string `json:"examination"`
+	Diagnosis            *string `json:"diagnosis"`
+	Intervention         *string `json:"intervention"`
+	PlanningAndEducation *string `json:"planning_and_education"`
 }
 
 type UpdateTreatmentSessionStatusInput struct {
@@ -202,9 +206,9 @@ type UpdateTreatmentSessionStatusInput struct {
 }
 
 type UpdateUserInput struct {
-	Email    *string   `json:"email,omitempty"`
-	Password *string   `json:"password,omitempty"`
-	Role     *UserRole `json:"role,omitempty"`
+	Email    *string   `json:"email"`
+	Password *string   `json:"password"`
+	Role     *UserRole `json:"role"`
 }
 
 type User struct {
@@ -214,7 +218,7 @@ type User struct {
 	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	Staff     *Staff    `json:"staff,omitempty"`
+	Staff     *Staff    `json:"staff"`
 }
 
 type Gender string
