@@ -12,11 +12,10 @@ import (
 
 type TreatmentSessionRepository interface {
 	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.TreatmentSession, []error)
-	LoaderByAppointmentIDs(ctx context.Context, appointmentIDs []uuid.UUID) ([]*model.TreatmentSession, []error)
 	LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([]*model.TreatmentSession, []error)
 	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) ([]*entity.TreatmentSession, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.TreatmentSession, error)
-	Create(ctx context.Context, input model.CreateSessionInput) (*entity.TreatmentSession, error)
+	Create(ctx context.Context, input model.CreateTreatmentSessionInput) (*entity.TreatmentSession, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status model.SessionStatus) (*entity.TreatmentSession, error)
 }
 
@@ -29,21 +28,20 @@ func NewTreatmentSessionRepository(db *sqlx.DB) TreatmentSessionRepository {
 }
 
 // Create implements [TreatmentSessionRepository].
-func (t *treatmentSessionRepository) Create(ctx context.Context, input model.CreateSessionInput) (*entity.TreatmentSession, error) {
+func (t *treatmentSessionRepository) Create(ctx context.Context, input model.CreateTreatmentSessionInput) (*entity.TreatmentSession, error) {
 	stmt := goqu.Insert(entity.TABLE_TREATMENT_SESSION).
 		Rows(goqu.Record{
-			"appointment_id": input.AppointmentID,
-			"patient_id":     input.PatientID,
-			"staff_id":       input.StaffID,
-			"session_date":   input.SessionDate,
+			"patient_id":   input.PatientID,
+			"staff_id":     input.StaffID,
+			"session_date": input.SessionDate,
 		}).
 		Returning("*")
 	sql, _, _ := stmt.ToSQL()
-	treatmentSession := entity.TreatmentSession{}
-	if err := t.db.Get(&treatmentSession, sql); err != nil {
+	session := entity.TreatmentSession{}
+	if err := t.db.Get(&session, sql); err != nil {
 		return nil, err
 	}
-	return &treatmentSession, nil
+	return &session, nil
 }
 
 // Loader implements [TreatmentSessionRepository].
@@ -54,41 +52,26 @@ func (t *treatmentSessionRepository) Loader(ctx context.Context, IDs []uuid.UUID
 	if err := t.db.Select(&results, sql); err != nil {
 		return nil, []error{err}
 	}
-	treatmentSessions := []*model.TreatmentSession{}
+	sessions := []*model.TreatmentSession{}
 	for idx := range results {
-		treatmentSessions = append(treatmentSessions, results[idx].ToModel())
+		sessions = append(sessions, results[idx].ToModel())
 	}
-	return treatmentSessions, nil
-}
-
-// LoaderByAppointmentID implements [TreatmentSessionRepository].
-func (t *treatmentSessionRepository) LoaderByAppointmentIDs(ctx context.Context, appointmentIDs []uuid.UUID) ([]*model.TreatmentSession, []error) {
-	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION)
-	sql, _, _ := stmt.Where(goqu.C("appointment_id").In(appointmentIDs)).ToSQL()
-	results := []*entity.TreatmentSession{}
-	if err := t.db.Select(&results, sql); err != nil {
-		return nil, []error{err}
-	}
-	treatmentSessions := []*model.TreatmentSession{}
-	for idx := range results {
-		treatmentSessions = append(treatmentSessions, results[idx].ToModel())
-	}
-	return treatmentSessions, nil
+	return sessions, nil
 }
 
 // LoaderByPatientIDs implements [TreatmentSessionRepository].
-func (t *treatmentSessionRepository) LoaderByPatientIDs(ctx context.Context, appointmentIDs []uuid.UUID) ([]*model.TreatmentSession, []error) {
+func (t *treatmentSessionRepository) LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([]*model.TreatmentSession, []error) {
 	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION)
-	sql, _, _ := stmt.Where(goqu.C("patient_id").In(appointmentIDs)).ToSQL()
+	sql, _, _ := stmt.Where(goqu.C("patient_id").In(patientIDs)).ToSQL()
 	results := []*entity.TreatmentSession{}
 	if err := t.db.Select(&results, sql); err != nil {
 		return nil, []error{err}
 	}
-	treatmentSessions := []*model.TreatmentSession{}
+	sessions := []*model.TreatmentSession{}
 	for idx := range results {
-		treatmentSessions = append(treatmentSessions, results[idx].ToModel())
+		sessions = append(sessions, results[idx].ToModel())
 	}
-	return treatmentSessions, nil
+	return sessions, nil
 }
 
 // FindAll implements [TreatmentSessionRepository].
@@ -116,12 +99,12 @@ func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.
 		stmt = stmt.Where(goqu.C("session_date").Gte(filter.DateFrom))
 	}
 	if filter != nil && filter.DateTo != nil {
-		stmt = stmt.Where(goqu.C("session_date").Gte(filter.DateTo))
+		stmt = stmt.Where(goqu.C("session_date").Lte(filter.DateTo))
 	}
 
 	sql, _, _ := stmt.Limit(limitFilter).Offset(offsetFilter).ToSQL()
-	treatmentSessions := []*entity.TreatmentSession{}
-	if err := t.db.Select(&treatmentSessions, sql); err != nil {
+	sessions := []*entity.TreatmentSession{}
+	if err := t.db.Select(&sessions, sql); err != nil {
 		return nil, nil, err
 	}
 	sqlCount, _, err := stmt.Select(goqu.COUNT("*")).ToSQL()
@@ -133,22 +116,22 @@ func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.
 	if err := t.db.Get(&count, sqlCount); err != nil {
 		return nil, nil, err
 	}
-	return treatmentSessions, &count, nil
+	return sessions, &count, nil
 }
 
 // FindByID implements [TreatmentSessionRepository].
 func (t *treatmentSessionRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.TreatmentSession, error) {
 	sql, _, _ := goqu.From(entity.TABLE_TREATMENT_SESSION).Where(goqu.C("id").Eq(id)).ToSQL()
-	treatmentSession := entity.TreatmentSession{}
-	if err := t.db.Get(&treatmentSession, sql); err != nil {
+	session := entity.TreatmentSession{}
+	if err := t.db.Get(&session, sql); err != nil {
 		return nil, err
 	}
-	return &treatmentSession, nil
+	return &session, nil
 }
 
 // UpdateStatus implements [TreatmentSessionRepository].
 func (t *treatmentSessionRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status model.SessionStatus) (*entity.TreatmentSession, error) {
-	sql, _, err := goqu.Update(entity.TABLE_APPOINTMENT).
+	sql, _, err := goqu.Update(entity.TABLE_TREATMENT_SESSION).
 		Set(goqu.Record{
 			"status": status,
 		}).
@@ -158,9 +141,9 @@ func (t *treatmentSessionRepository) UpdateStatus(ctx context.Context, id uuid.U
 	if err != nil {
 		return nil, err
 	}
-	treatmentSession := entity.TreatmentSession{}
-	if err := t.db.Get(&treatmentSession, sql); err != nil {
+	session := entity.TreatmentSession{}
+	if err := t.db.Get(&session, sql); err != nil {
 		return nil, err
 	}
-	return &treatmentSession, nil
+	return &session, nil
 }

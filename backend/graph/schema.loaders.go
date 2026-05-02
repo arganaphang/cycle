@@ -19,17 +19,13 @@ const (
 
 // Loaders wrap your data loaders to inject via middleware
 type Loaders struct {
-	UserLoader                            *dataloadgen.Loader[uuid.UUID, *model.User]
-	StaffLoader                           *dataloadgen.Loader[uuid.UUID, *model.Staff]
-	StaffByUserIDLoader                   *dataloadgen.Loader[uuid.UUID, *model.Staff]
-	PatientLoader                         *dataloadgen.Loader[uuid.UUID, *model.Patient]
-	AppointmentLoader                     *dataloadgen.Loader[uuid.UUID, *model.Appointment]
-	AppointmentByPatientIDLoader          *dataloadgen.Loader[uuid.UUID, *model.Appointment]
-	AppointmentByStaffIDLoader            *dataloadgen.Loader[uuid.UUID, *model.Appointment]
-	TreatmentSessionLoader                *dataloadgen.Loader[uuid.UUID, *model.TreatmentSession]
-	TreatmentSessionByAppointmentIDLoader *dataloadgen.Loader[uuid.UUID, *model.TreatmentSession]
-	TreatmentSessionByPatientIDLoader     *dataloadgen.Loader[uuid.UUID, *model.TreatmentSession]
-	SOAPNoteByTreatmentSessionIDLoader    *dataloadgen.Loader[uuid.UUID, *model.SOAPNote]
+	UserLoader                              *dataloadgen.Loader[uuid.UUID, *model.User]
+	StaffLoader                             *dataloadgen.Loader[uuid.UUID, *model.Staff]
+	StaffByUserIDLoader                     *dataloadgen.Loader[uuid.UUID, *model.Staff]
+	PatientLoader                           *dataloadgen.Loader[uuid.UUID, *model.Patient]
+	TreatmentSessionLoader                  *dataloadgen.Loader[uuid.UUID, *model.TreatmentSession]
+	TreatmentSessionReportBySessionIDLoader *dataloadgen.Loader[uuid.UUID, *model.TreatmentSessionReport]
+	TreatmentSessionByPatientIDLoader       *dataloadgen.Loader[uuid.UUID, *model.TreatmentSession]
 }
 
 // NewLoaders instantiates data loaders for the middleware
@@ -39,25 +35,17 @@ func NewLoaders(repositories repository.Repositories) *Loaders {
 	staffLoader := dataloadgen.NewLoader(repositories.StaffRepository.Loader, dataloadgen.WithWait(time.Millisecond))
 	staffByUserIDLoader := dataloadgen.NewLoader(repositories.StaffRepository.LoaderByUserIDs, dataloadgen.WithWait(time.Millisecond))
 	patientLoader := dataloadgen.NewLoader(repositories.PatientRepository.Loader, dataloadgen.WithWait(time.Millisecond))
-	appointmentLoader := dataloadgen.NewLoader(repositories.AppointmentRepository.Loader, dataloadgen.WithWait(time.Millisecond))
 	treatmentSessionLoader := dataloadgen.NewLoader(repositories.TreatmentSessionRepository.Loader, dataloadgen.WithWait(time.Millisecond))
-	treatmentSessionByAppointmentIDLoader := dataloadgen.NewLoader(repositories.TreatmentSessionRepository.LoaderByAppointmentIDs, dataloadgen.WithWait(time.Millisecond))
-	appointmentByPatientIDLoader := dataloadgen.NewLoader(repositories.AppointmentRepository.LoaderByPatientIDs, dataloadgen.WithWait(time.Millisecond))
-	appointmentByStaffIDLoader := dataloadgen.NewLoader(repositories.AppointmentRepository.LoaderByStaffIDs, dataloadgen.WithWait(time.Millisecond))
+	treatmentSessionReportBySessionLoader := dataloadgen.NewLoader(repositories.TreatmentSessionReportRepository.LoaderBySessionIDs, dataloadgen.WithWait(time.Millisecond))
 	treatmentSessionByPatientIDLoader := dataloadgen.NewLoader(repositories.TreatmentSessionRepository.LoaderByPatientIDs, dataloadgen.WithWait(time.Millisecond))
-	sOAPNoteByTreatmentSessionIDLoader := dataloadgen.NewLoader(repositories.SoapNoteRepository.LoaderByTreatmentSessionIDs, dataloadgen.WithWait(time.Millisecond))
 	return &Loaders{
-		UserLoader:                            userLoader,
-		StaffLoader:                           staffLoader,
-		StaffByUserIDLoader:                   staffByUserIDLoader,
-		PatientLoader:                         patientLoader,
-		AppointmentLoader:                     appointmentLoader,
-		TreatmentSessionLoader:                treatmentSessionLoader,
-		TreatmentSessionByAppointmentIDLoader: treatmentSessionByAppointmentIDLoader,
-		AppointmentByPatientIDLoader:          appointmentByPatientIDLoader,
-		AppointmentByStaffIDLoader:            appointmentByStaffIDLoader,
-		TreatmentSessionByPatientIDLoader:     treatmentSessionByPatientIDLoader,
-		SOAPNoteByTreatmentSessionIDLoader:    sOAPNoteByTreatmentSessionIDLoader,
+		UserLoader:                              userLoader,
+		StaffLoader:                             staffLoader,
+		StaffByUserIDLoader:                     staffByUserIDLoader,
+		PatientLoader:                           patientLoader,
+		TreatmentSessionLoader:                  treatmentSessionLoader,
+		TreatmentSessionReportBySessionIDLoader: treatmentSessionReportBySessionLoader,
+		TreatmentSessionByPatientIDLoader:       treatmentSessionByPatientIDLoader,
 	}
 }
 
@@ -93,34 +81,10 @@ func GetStaff(ctx context.Context, ID uuid.UUID) (*model.Staff, error) {
 	return loaders.StaffLoader.Load(ctx, ID)
 }
 
-// GetAppointment returns single appointment by id efficiently
-func GetAppointment(ctx context.Context, ID uuid.UUID) (*model.Appointment, error) {
-	loaders := For(ctx)
-	return loaders.AppointmentLoader.Load(ctx, ID)
-}
-
-// GetAppointmentByPatientID returns single appointment by id efficiently
-func GetAppointmentByPatientID(ctx context.Context, ID uuid.UUID) ([]*model.Appointment, error) {
-	loaders := For(ctx)
-	return loaders.AppointmentByPatientIDLoader.LoadAll(ctx, []uuid.UUID{ID})
-}
-
-// GetAppointmentByStaffID returns single appointment by id efficiently
-func GetAppointmentByStaffID(ctx context.Context, ID uuid.UUID) ([]*model.Appointment, error) {
-	loaders := For(ctx)
-	return loaders.AppointmentByStaffIDLoader.LoadAll(ctx, []uuid.UUID{ID})
-}
-
-// GetPatient returns single appointment by id efficiently
+// GetPatient returns single patient by id efficiently
 func GetPatient(ctx context.Context, ID uuid.UUID) (*model.Patient, error) {
 	loaders := For(ctx)
 	return loaders.PatientLoader.Load(ctx, ID)
-}
-
-// GetTreatmentSessionByAppointmentID returns single treatment session by id efficiently
-func GetTreatmentSessionByAppointmentID(ctx context.Context, ID uuid.UUID) (*model.TreatmentSession, error) {
-	loaders := For(ctx)
-	return loaders.TreatmentSessionByAppointmentIDLoader.Load(ctx, ID)
 }
 
 // GetTreatmentSessionByPatientID returns single treatment session by id efficiently
@@ -135,8 +99,7 @@ func GetTreatmentSession(ctx context.Context, ID uuid.UUID) (*model.TreatmentSes
 	return loaders.TreatmentSessionLoader.Load(ctx, ID)
 }
 
-// GetSOAPNoteByTreatmentSessionID returns single treatment session by id efficiently
-func GetSOAPNoteByTreatmentSessionID(ctx context.Context, ID uuid.UUID) (*model.SOAPNote, error) {
+func GetReportBySessionID(ctx context.Context, ID uuid.UUID) (*model.TreatmentSessionReport, error) {
 	loaders := For(ctx)
-	return loaders.SOAPNoteByTreatmentSessionIDLoader.Load(ctx, ID)
+	return loaders.TreatmentSessionReportBySessionIDLoader.Load(ctx, ID)
 }

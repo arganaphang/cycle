@@ -22,15 +22,8 @@ CREATE TYPE gender AS ENUM (
     'FEMALE'
 );
 
-CREATE TYPE appointment_status AS ENUM (
-    'SCHEDULED',
-    'CONFIRMED',
-    'COMPLETED',
-    'CANCELLED',
-    'NO_SHOW'
-);
-
 CREATE TYPE session_status AS ENUM (
+    'SCHEDULED',
     'IN_PROGRESS',
     'COMPLETED',
     'CANCELLED'
@@ -86,62 +79,39 @@ CREATE TABLE IF NOT EXISTS staffs (
     CONSTRAINT staffs_user_unique  UNIQUE (user_id)
 );
 
--- 4. appointments
-CREATE TABLE IF NOT EXISTS appointments (
-    id               UUID               PRIMARY KEY DEFAULT gen_random_uuid(),
-    patient_id       UUID               NOT NULL,
-    staff_id         UUID               NOT NULL,
-    scheduled_at     TIMESTAMPTZ        NOT NULL,
-    duration_min     INT                NOT NULL DEFAULT 60,
-    status           appointment_status NOT NULL DEFAULT 'SCHEDULED',
-    chief_complaint  TEXT,
-    notes            TEXT,
-    created_at       TIMESTAMPTZ        NOT NULL DEFAULT NOW(),
-    updated_at       TIMESTAMPTZ        NOT NULL DEFAULT NOW(),
-
-    CONSTRAINT appointments_patient_fk FOREIGN KEY (patient_id) REFERENCES patients (id) ON DELETE RESTRICT,
-    CONSTRAINT appointments_staff_fk   FOREIGN KEY (staff_id)   REFERENCES staffs    (id) ON DELETE RESTRICT,
-    CONSTRAINT appointments_duration_check CHECK (duration_min > 0)
-);
-
--- 5. treatment_sessions
+-- 4. treatment_sessions
 CREATE TABLE IF NOT EXISTS treatment_sessions (
     id              UUID           PRIMARY KEY DEFAULT gen_random_uuid(),
-    -- nullable: walk-in patients have no prior appointment
-    appointment_id  UUID,
     patient_id      UUID           NOT NULL,
     staff_id        UUID           NOT NULL,
     session_date    DATE           NOT NULL DEFAULT CURRENT_DATE,
     -- computed on insert: SELECT COUNT(*)+1 FROM treatment_sessions WHERE patient_id = $1
     session_no      INT            NOT NULL,
-    status          session_status NOT NULL DEFAULT 'IN_PROGRESS',
+    status          session_status NOT NULL DEFAULT 'SCHEDULED',
     created_at      TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT ts_appointment_fk FOREIGN KEY (appointment_id) REFERENCES appointments       (id) ON DELETE SET NULL,
     CONSTRAINT ts_patient_fk     FOREIGN KEY (patient_id)     REFERENCES patients           (id) ON DELETE RESTRICT,
     CONSTRAINT ts_staff_fk       FOREIGN KEY (staff_id)       REFERENCES staffs              (id) ON DELETE RESTRICT,
-    CONSTRAINT ts_appointment_unique UNIQUE (appointment_id),
     CONSTRAINT ts_session_no_check   CHECK (session_no > 0)
 );
 
--- 6. soap_notes
-CREATE TABLE IF NOT EXISTS soap_notes (
-    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    session_id  UUID        NOT NULL,
-    subjective  TEXT        NOT NULL,   -- S: patient reports
-    objective   TEXT        NOT NULL,   -- O: therapist findings / measurements
-    assessment  TEXT        NOT NULL,   -- A: diagnosis / interpretation
-    plan        TEXT        NOT NULL,   -- P: treatment plan / next steps
-    pain_scale  INT,                    -- 0-10 NRS
-    -- { "bp": "120/80", "hr": 72, "spo2": 98, "temp": 36.5, "weight": 65 }
-    vitals      JSONB,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+-- 5. treatment_session_reports
+CREATE TABLE IF NOT EXISTS treatment_session_reports (
+    id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id              UUID        NOT NULL,
+    anamnesis               TEXT,
+    mechanism_of_injury     TEXT,
+    actual_condition        TEXT,
+    examination             TEXT,
+    diagnosis               TEXT,
+    intervention            TEXT,
+    planning_and_education  TEXT,
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT soap_session_fk     FOREIGN KEY (session_id) REFERENCES treatment_sessions (id) ON DELETE CASCADE,
-    CONSTRAINT soap_session_unique UNIQUE (session_id),
-    CONSTRAINT soap_pain_scale_check CHECK (pain_scale IS NULL OR (pain_scale >= 0 AND pain_scale <= 10))
+    CONSTRAINT report_session_fk     FOREIGN KEY (session_id) REFERENCES treatment_sessions (id) ON DELETE CASCADE,
+    CONSTRAINT report_session_unique UNIQUE (session_id)
 );
 
 -- ============================================================
@@ -156,20 +126,10 @@ CREATE INDEX idx_users_role       ON users (role);
 CREATE INDEX idx_patients_mrn     ON patients (medical_record_no);
 CREATE INDEX idx_patients_name    ON patients (full_name);
 
--- appointments
-CREATE INDEX idx_appt_patient     ON appointments (patient_id);
-CREATE INDEX idx_appt_staff       ON appointments (staff_id);
-CREATE INDEX idx_appt_scheduled   ON appointments (scheduled_at);
-CREATE INDEX idx_appt_status      ON appointments (status);
-
 -- treatment_sessions
 CREATE INDEX idx_ts_patient       ON treatment_sessions (patient_id);
 CREATE INDEX idx_ts_staff         ON treatment_sessions (staff_id);
 CREATE INDEX idx_ts_date          ON treatment_sessions (session_date);
-CREATE INDEX idx_ts_appointment   ON treatment_sessions (appointment_id);
-
--- soap_notes
-CREATE INDEX idx_soap_session     ON soap_notes (session_id);
 
 -- ============================================================
 -- updated_at TRIGGER (auto-update on row change)
@@ -195,14 +155,10 @@ CREATE TRIGGER trg_staffs_updated_at
     BEFORE UPDATE ON staffs
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-CREATE TRIGGER trg_appointments_updated_at
-    BEFORE UPDATE ON appointments
-    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-
 CREATE TRIGGER trg_ts_updated_at
     BEFORE UPDATE ON treatment_sessions
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-CREATE TRIGGER trg_soap_updated_at
-    BEFORE UPDATE ON soap_notes
+CREATE TRIGGER trg_tsr_updated_at
+    BEFORE UPDATE ON treatment_session_reports
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();

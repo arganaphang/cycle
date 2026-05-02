@@ -15,21 +15,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Patient is the resolver for the patient field.
-func (r *appointmentResolver) Patient(ctx context.Context, obj *model.Appointment) (*model.Patient, error) {
-	return GetPatient(ctx, obj.PatientID)
-}
-
-// Staff is the resolver for the staff field.
-func (r *appointmentResolver) Staff(ctx context.Context, obj *model.Appointment) (*model.Staff, error) {
-	return GetStaff(ctx, obj.StaffID)
-}
-
-// Session is the resolver for the session field.
-func (r *appointmentResolver) Session(ctx context.Context, obj *model.Appointment) (*model.TreatmentSession, error) {
-	return GetTreatmentSessionByAppointmentID(ctx, obj.ID)
-}
-
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error) {
 	result, err := r.Services.UserService.Login(ctx, input)
@@ -85,54 +70,27 @@ func (r *mutationResolver) UpdatePatient(ctx context.Context, id uuid.UUID, inpu
 	return r.Services.PatientService.Update(ctx, id, input)
 }
 
-// CreateAppointment is the resolver for the createAppointment field.
-func (r *mutationResolver) CreateAppointment(ctx context.Context, input model.CreateAppointmentInput) (*model.Appointment, error) {
-	return r.Services.AppointmentService.Create(ctx, input)
-}
-
-// UpdateAppointmentStatus is the resolver for the updateAppointmentStatus field.
-func (r *mutationResolver) UpdateAppointmentStatus(ctx context.Context, id uuid.UUID, input model.UpdateAppointmentStatusInput) (*model.Appointment, error) {
-	return r.Services.AppointmentService.UpdateStatus(ctx, id, input)
-}
-
-// CancelAppointment is the resolver for the cancelAppointment field.
-func (r *mutationResolver) CancelAppointment(ctx context.Context, id uuid.UUID) (*model.Appointment, error) {
-	return r.Services.AppointmentService.UpdateStatus(ctx, id, model.UpdateAppointmentStatusInput{
-		Status: model.AppointmentStatusCancelled,
-	})
-}
-
-// CreateSession is the resolver for the createSession field.
-func (r *mutationResolver) CreateSession(ctx context.Context, input model.CreateSessionInput) (*model.TreatmentSession, error) {
+// CreateTreatmentSession is the resolver for the createTreatmentSession field.
+func (r *mutationResolver) CreateTreatmentSession(ctx context.Context, input model.CreateTreatmentSessionInput) (*model.TreatmentSession, error) {
 	return r.Services.TreatmentSessionService.Create(ctx, input)
 }
 
-// CompleteSession is the resolver for the completeSession field.
-func (r *mutationResolver) CompleteSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error) {
-	return r.Services.TreatmentSessionService.UpdateStatus(ctx, id, model.SessionStatusCompleted)
+// UpdateTreatmentSessionStatus is the resolver for the updateTreatmentSessionStatus field.
+func (r *mutationResolver) UpdateTreatmentSessionStatus(ctx context.Context, id uuid.UUID, input model.UpdateTreatmentSessionStatusInput) (*model.TreatmentSession, error) {
+	return r.Services.TreatmentSessionService.UpdateStatus(ctx, id, input.Status)
 }
 
-// CancelSession is the resolver for the cancelSession field.
-func (r *mutationResolver) CancelSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error) {
-	return r.Services.TreatmentSessionService.UpdateStatus(ctx, id, model.SessionStatusCancelled)
+// CreateTreatmentSessionReport is the resolver for the createTreatmentSessionReport field.
+func (r *mutationResolver) CreateTreatmentSessionReport(ctx context.Context, input model.CreateTreatmentSessionReportInput) (*model.TreatmentSessionReport, error) {
+	return r.Services.TreatmentSessionReportService.Create(ctx, input)
 }
 
-// CreateSOAPNote is the resolver for the createSOAPNote field.
-func (r *mutationResolver) CreateSOAPNote(ctx context.Context, input model.CreateSOAPNoteInput) (*model.SOAPNote, error) {
-	return r.Services.SoapNoteService.Create(ctx, input)
+// UpdateTreatmentSessionReport is the resolver for the updateTreatmentSessionReport field.
+func (r *mutationResolver) UpdateTreatmentSessionReport(ctx context.Context, id uuid.UUID, input model.UpdateTreatmentSessionReportInput) (*model.TreatmentSessionReport, error) {
+	return r.Services.TreatmentSessionReportService.Update(ctx, id, input)
 }
 
-// UpdateSOAPNote is the resolver for the updateSOAPNote field.
-func (r *mutationResolver) UpdateSOAPNote(ctx context.Context, id uuid.UUID, input model.UpdateSOAPNoteInput) (*model.SOAPNote, error) {
-	return r.Services.SoapNoteService.Update(ctx, id, input)
-}
-
-// Appointments is the resolver for the appointments field.
-func (r *patientResolver) Appointments(ctx context.Context, obj *model.Patient) ([]*model.Appointment, error) {
-	return GetAppointmentByPatientID(ctx, obj.ID)
-}
-
-// TreatmentSessions is the resolver for the treatmentSessions field.
+// TreatmentSessions is the resolver for the treatment_sessions field.
 func (r *patientResolver) TreatmentSessions(ctx context.Context, obj *model.Patient) ([]*model.TreatmentSession, error) {
 	return GetTreatmentSessionByPatientID(ctx, obj.ID)
 }
@@ -166,16 +124,6 @@ func (r *queryResolver) Staffs(ctx context.Context, search *string, limit *int32
 	return r.Services.StaffService.FindAll(ctx, search, limit, offset)
 }
 
-// Appointment is the resolver for the appointment field.
-func (r *queryResolver) Appointment(ctx context.Context, id uuid.UUID) (*model.Appointment, error) {
-	return r.Services.AppointmentService.FindByID(ctx, id)
-}
-
-// Appointments is the resolver for the appointments field.
-func (r *queryResolver) Appointments(ctx context.Context, filter *model.AppointmentFilter, limit *int32, offset *int32) (*model.AppointmentConnection, error) {
-	return r.Services.AppointmentService.FindAll(ctx, filter, limit, offset)
-}
-
 // TreatmentSession is the resolver for the treatmentSession field.
 func (r *queryResolver) TreatmentSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error) {
 	return r.Services.TreatmentSessionService.FindByID(ctx, id)
@@ -186,29 +134,19 @@ func (r *queryResolver) TreatmentSessions(ctx context.Context, filter *model.Ses
 	return r.Services.TreatmentSessionService.FindAll(ctx, filter, limit, offset)
 }
 
-// SoapNote is the resolver for the soapNote field.
-func (r *queryResolver) SoapNote(ctx context.Context, sessionID uuid.UUID) (*model.SOAPNote, error) {
-	return r.Services.SoapNoteService.FindBySessionID(ctx, sessionID)
+// TreatmentSessionReport is the resolver for the treatmentSessionReport field.
+func (r *queryResolver) TreatmentSessionReport(ctx context.Context, id uuid.UUID) (*model.TreatmentSessionReport, error) {
+	return r.Services.TreatmentSessionReportService.FindByID(ctx, id)
 }
 
-// Session is the resolver for the session field.
-func (r *sOAPNoteResolver) Session(ctx context.Context, obj *model.SOAPNote) (*model.TreatmentSession, error) {
-	return GetTreatmentSession(ctx, obj.SessionID)
+// TreatmentSessionReports is the resolver for the treatmentSessionReports field.
+func (r *queryResolver) TreatmentSessionReports(ctx context.Context, filter *model.ReportFilter, limit *int32, offset *int32) (*model.TreatmentSessionReportConnection, error) {
+	return r.Services.TreatmentSessionReportService.FindAll(ctx, filter, limit, offset)
 }
 
 // User is the resolver for the user field.
 func (r *staffResolver) User(ctx context.Context, obj *model.Staff) (*model.User, error) {
 	return GetUser(ctx, obj.UserID)
-}
-
-// Appointments is the resolver for the appointments field.
-func (r *staffResolver) Appointments(ctx context.Context, obj *model.Staff) ([]*model.Appointment, error) {
-	return GetAppointmentByStaffID(ctx, obj.ID)
-}
-
-// Appointment is the resolver for the appointment field.
-func (r *treatmentSessionResolver) Appointment(ctx context.Context, obj *model.TreatmentSession) (*model.Appointment, error) {
-	return GetAppointment(ctx, *obj.AppointmentID)
 }
 
 // Patient is the resolver for the patient field.
@@ -221,18 +159,15 @@ func (r *treatmentSessionResolver) Staff(ctx context.Context, obj *model.Treatme
 	return GetStaff(ctx, obj.StaffID)
 }
 
-// SoapNote is the resolver for the soapNote field.
-func (r *treatmentSessionResolver) SoapNote(ctx context.Context, obj *model.TreatmentSession) (*model.SOAPNote, error) {
-	return GetSOAPNoteByTreatmentSessionID(ctx, obj.ID)
+// Report is the resolver for the report field.
+func (r *treatmentSessionResolver) Report(ctx context.Context, obj *model.TreatmentSession) (*model.TreatmentSessionReport, error) {
+	return GetReportBySessionID(ctx, obj.ID)
 }
 
 // Staff is the resolver for the staff field.
 func (r *userResolver) Staff(ctx context.Context, obj *model.User) (*model.Staff, error) {
 	return GetStaffByUserID(ctx, obj.ID)
 }
-
-// Appointment returns AppointmentResolver implementation.
-func (r *Resolver) Appointment() AppointmentResolver { return &appointmentResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -243,9 +178,6 @@ func (r *Resolver) Patient() PatientResolver { return &patientResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-// SOAPNote returns SOAPNoteResolver implementation.
-func (r *Resolver) SOAPNote() SOAPNoteResolver { return &sOAPNoteResolver{r} }
-
 // Staff returns StaffResolver implementation.
 func (r *Resolver) Staff() StaffResolver { return &staffResolver{r} }
 
@@ -255,11 +187,9 @@ func (r *Resolver) TreatmentSession() TreatmentSessionResolver { return &treatme
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
-type appointmentResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type patientResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type sOAPNoteResolver struct{ *Resolver }
 type staffResolver struct{ *Resolver }
 type treatmentSessionResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

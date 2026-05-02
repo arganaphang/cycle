@@ -12,82 +12,44 @@ import (
 	"github.com/google/uuid"
 )
 
-type Appointment struct {
-	ID             uuid.UUID         `json:"id"`
-	PatientID      uuid.UUID         `json:"patientId"`
-	StaffID        uuid.UUID         `json:"staffId"`
-	ScheduledAt    time.Time         `json:"scheduledAt"`
-	DurationMin    int32             `json:"durationMin"`
-	Status         AppointmentStatus `json:"status"`
-	ChiefComplaint *string           `json:"chiefComplaint,omitempty"`
-	Notes          *string           `json:"notes,omitempty"`
-	CreatedAt      time.Time         `json:"createdAt"`
-	UpdatedAt      time.Time         `json:"updatedAt"`
-	Patient        *Patient          `json:"patient"`
-	Staff          *Staff            `json:"staff"`
-	Session        *TreatmentSession `json:"session,omitempty"`
-}
-
-type AppointmentConnection struct {
-	Nodes      []*Appointment `json:"nodes"`
-	TotalCount int32          `json:"totalCount"`
-}
-
-type AppointmentFilter struct {
-	PatientID *uuid.UUID         `json:"patientId,omitempty"`
-	StaffID   *uuid.UUID         `json:"staffId,omitempty"`
-	Status    *AppointmentStatus `json:"status,omitempty"`
-	DateFrom  *time.Time         `json:"dateFrom,omitempty"`
-	DateTo    *time.Time         `json:"dateTo,omitempty"`
-}
-
 type AuthPayload struct {
 	Token string `json:"token"`
 	User  *User  `json:"user"`
 }
 
-type CreateAppointmentInput struct {
-	PatientID      uuid.UUID `json:"patientId"`
-	StaffID        uuid.UUID `json:"staffId"`
-	ScheduledAt    time.Time `json:"scheduledAt"`
-	DurationMin    int32     `json:"durationMin"`
-	ChiefComplaint *string   `json:"chiefComplaint,omitempty"`
-	Notes          *string   `json:"notes,omitempty"`
-}
-
 type CreatePatientInput struct {
-	FullName         string                 `json:"fullName"`
-	DateOfBirth      time.Time              `json:"dateOfBirth"`
+	FullName         string                 `json:"full_name"`
+	DateOfBirth      time.Time              `json:"date_of_birth"`
 	Gender           Gender                 `json:"gender"`
 	Phone            *string                `json:"phone,omitempty"`
 	Email            *string                `json:"email,omitempty"`
 	Address          *string                `json:"address,omitempty"`
-	EmergencyContact *EmergencyContactInput `json:"emergencyContact,omitempty"`
-}
-
-type CreateSOAPNoteInput struct {
-	SessionID  uuid.UUID    `json:"sessionId"`
-	Subjective string       `json:"subjective"`
-	Objective  string       `json:"objective"`
-	Assessment string       `json:"assessment"`
-	Plan       string       `json:"plan"`
-	PainScale  *int32       `json:"painScale,omitempty"`
-	Vitals     *VitalsInput `json:"vitals,omitempty"`
-}
-
-type CreateSessionInput struct {
-	AppointmentID *uuid.UUID `json:"appointmentId,omitempty"`
-	PatientID     uuid.UUID  `json:"patientId"`
-	StaffID       uuid.UUID  `json:"staffId"`
-	SessionDate   time.Time  `json:"sessionDate"`
+	EmergencyContact *EmergencyContactInput `json:"emergency_contact,omitempty"`
 }
 
 type CreateStaffInput struct {
 	UserID         uuid.UUID `json:"userId"`
-	FullName       string    `json:"fullName"`
+	FullName       string    `json:"full_name"`
 	Specialization *string   `json:"specialization,omitempty"`
-	LicenseNo      *string   `json:"licenseNo,omitempty"`
+	LicenseNo      *string   `json:"license_no,omitempty"`
 	Phone          *string   `json:"phone,omitempty"`
+}
+
+type CreateTreatmentSessionInput struct {
+	PatientID   uuid.UUID `json:"patient_id"`
+	StaffID     uuid.UUID `json:"staff_id"`
+	SessionDate time.Time `json:"session_date"`
+}
+
+type CreateTreatmentSessionReportInput struct {
+	SessionID            uuid.UUID `json:"session_id"`
+	Anamnesis            *string   `json:"anamnesis,omitempty"`
+	MechanismOfInjury    *string   `json:"mechanism_of_injury,omitempty"`
+	ActualCondition      *string   `json:"actual_condition,omitempty"`
+	Examination          *string   `json:"examination,omitempty"`
+	Diagnosis            *string   `json:"diagnosis,omitempty"`
+	Intervention         *string   `json:"intervention,omitempty"`
+	PlanningAndEducation *string   `json:"planning_and_education,omitempty"`
 }
 
 type CreateUserInput struct {
@@ -118,115 +80,125 @@ type Mutation struct {
 
 type Patient struct {
 	ID                uuid.UUID           `json:"id"`
-	MedicalRecordNo   string              `json:"medicalRecordNo"`
-	FullName          string              `json:"fullName"`
-	DateOfBirth       time.Time           `json:"dateOfBirth"`
+	MedicalRecordNo   string              `json:"medical_record_no"`
+	FullName          string              `json:"full_name"`
+	DateOfBirth       time.Time           `json:"date_of_birth"`
 	Gender            Gender              `json:"gender"`
 	Phone             *string             `json:"phone,omitempty"`
 	Email             *string             `json:"email,omitempty"`
 	Address           *string             `json:"address,omitempty"`
-	EmergencyContact  *EmergencyContact   `json:"emergencyContact,omitempty"`
-	CreatedAt         time.Time           `json:"createdAt"`
-	UpdatedAt         time.Time           `json:"updatedAt"`
-	Appointments      []*Appointment      `json:"appointments"`
-	TreatmentSessions []*TreatmentSession `json:"treatmentSessions"`
+	EmergencyContact  *EmergencyContact   `json:"emergency_contact,omitempty"`
+	CreatedAt         time.Time           `json:"created_at"`
+	UpdatedAt         time.Time           `json:"updated_at"`
+	TreatmentSessions []*TreatmentSession `json:"treatment_sessions"`
 }
 
 type PatientConnection struct {
 	Nodes      []*Patient `json:"nodes"`
-	TotalCount int32      `json:"totalCount"`
+	TotalCount int32      `json:"total_count"`
 }
 
 type Query struct {
 }
 
-type SOAPNote struct {
-	ID         uuid.UUID         `json:"id"`
-	SessionID  uuid.UUID         `json:"sessionId"`
-	Subjective string            `json:"subjective"`
-	Objective  string            `json:"objective"`
-	Assessment string            `json:"assessment"`
-	Plan       string            `json:"plan"`
-	PainScale  *int32            `json:"painScale,omitempty"`
-	Vitals     *Vitals           `json:"vitals,omitempty"`
-	CreatedAt  time.Time         `json:"createdAt"`
-	UpdatedAt  time.Time         `json:"updatedAt"`
-	Session    *TreatmentSession `json:"session"`
+type ReportFilter struct {
+	DateFrom *time.Time `json:"date_from,omitempty"`
+	DateTo   *time.Time `json:"date_to,omitempty"`
 }
 
 type SessionFilter struct {
-	PatientID *uuid.UUID     `json:"patientId,omitempty"`
-	StaffID   *uuid.UUID     `json:"staffId,omitempty"`
+	PatientID *uuid.UUID     `json:"patient_id,omitempty"`
+	StaffID   *uuid.UUID     `json:"staff_id,omitempty"`
 	Status    *SessionStatus `json:"status,omitempty"`
-	DateFrom  *time.Time     `json:"dateFrom,omitempty"`
-	DateTo    *time.Time     `json:"dateTo,omitempty"`
+	DateFrom  *time.Time     `json:"date_from,omitempty"`
+	DateTo    *time.Time     `json:"date_to,omitempty"`
 }
 
 type Staff struct {
-	ID             uuid.UUID      `json:"id"`
-	UserID         uuid.UUID      `json:"userId"`
-	FullName       string         `json:"fullName"`
-	Specialization *string        `json:"specialization,omitempty"`
-	LicenseNo      *string        `json:"licenseNo,omitempty"`
-	Phone          *string        `json:"phone,omitempty"`
-	CreatedAt      time.Time      `json:"createdAt"`
-	UpdatedAt      time.Time      `json:"updatedAt"`
-	User           *User          `json:"user"`
-	Appointments   []*Appointment `json:"appointments"`
+	ID                uuid.UUID           `json:"id"`
+	UserID            uuid.UUID           `json:"user_id"`
+	FullName          string              `json:"full_name"`
+	Specialization    *string             `json:"specialization,omitempty"`
+	LicenseNo         *string             `json:"license_no,omitempty"`
+	Phone             *string             `json:"phone,omitempty"`
+	CreatedAt         time.Time           `json:"created_at"`
+	UpdatedAt         time.Time           `json:"updated_at"`
+	User              *User               `json:"user"`
+	TreatmentSessions []*TreatmentSession `json:"treatment_sessions"`
 }
 
 type StaffConnection struct {
 	Nodes      []*Staff `json:"nodes"`
-	TotalCount int32    `json:"totalCount"`
+	TotalCount int32    `json:"total_count"`
 }
 
 type TreatmentSession struct {
-	ID            uuid.UUID     `json:"id"`
-	AppointmentID *uuid.UUID    `json:"appointmentId,omitempty"`
-	PatientID     uuid.UUID     `json:"patientId"`
-	StaffID       uuid.UUID     `json:"staffId"`
-	SessionDate   time.Time     `json:"sessionDate"`
-	SessionNo     int32         `json:"sessionNo"`
-	Status        SessionStatus `json:"status"`
-	CreatedAt     time.Time     `json:"createdAt"`
-	UpdatedAt     time.Time     `json:"updatedAt"`
-	Appointment   *Appointment  `json:"appointment,omitempty"`
-	Patient       *Patient      `json:"patient"`
-	Staff         *Staff        `json:"staff"`
-	SoapNote      *SOAPNote     `json:"soapNote,omitempty"`
+	ID          uuid.UUID               `json:"id"`
+	PatientID   uuid.UUID               `json:"patient_id"`
+	StaffID     uuid.UUID               `json:"staff_id"`
+	SessionDate time.Time               `json:"session_date"`
+	SessionNo   int32                   `json:"session_no"`
+	Status      SessionStatus           `json:"status"`
+	Note        *string                 `json:"note,omitempty"`
+	CreatedAt   time.Time               `json:"created_at"`
+	UpdatedAt   time.Time               `json:"updated_at"`
+	Patient     *Patient                `json:"patient"`
+	Staff       *Staff                  `json:"staff"`
+	Report      *TreatmentSessionReport `json:"report,omitempty"`
 }
 
 type TreatmentSessionConnection struct {
 	Nodes      []*TreatmentSession `json:"nodes"`
-	TotalCount int32               `json:"totalCount"`
+	TotalCount int32               `json:"total_count"`
 }
 
-type UpdateAppointmentStatusInput struct {
-	Status AppointmentStatus `json:"status"`
+type TreatmentSessionReport struct {
+	ID                   uuid.UUID         `json:"id"`
+	SessionID            uuid.UUID         `json:"session_id"`
+	Anamnesis            *string           `json:"anamnesis,omitempty"`
+	MechanismOfInjury    *string           `json:"mechanism_of_injury,omitempty"`
+	ActualCondition      *string           `json:"actual_condition,omitempty"`
+	Examination          *string           `json:"examination,omitempty"`
+	Diagnosis            *string           `json:"diagnosis,omitempty"`
+	Intervention         *string           `json:"intervention,omitempty"`
+	PlanningAndEducation *string           `json:"planning_and_education,omitempty"`
+	CreatedAt            time.Time         `json:"created_at"`
+	UpdatedAt            time.Time         `json:"updated_at"`
+	TreatmentSession     *TreatmentSession `json:"treatment_session"`
+}
+
+type TreatmentSessionReportConnection struct {
+	Nodes      []*TreatmentSessionReport `json:"nodes"`
+	TotalCount int32                     `json:"total_count"`
 }
 
 type UpdatePatientInput struct {
-	FullName         *string                `json:"fullName,omitempty"`
+	FullName         *string                `json:"full_name,omitempty"`
 	Phone            *string                `json:"phone,omitempty"`
 	Email            *string                `json:"email,omitempty"`
 	Address          *string                `json:"address,omitempty"`
-	EmergencyContact *EmergencyContactInput `json:"emergencyContact,omitempty"`
-}
-
-type UpdateSOAPNoteInput struct {
-	Subjective *string      `json:"subjective,omitempty"`
-	Objective  *string      `json:"objective,omitempty"`
-	Assessment *string      `json:"assessment,omitempty"`
-	Plan       *string      `json:"plan,omitempty"`
-	PainScale  *int32       `json:"painScale,omitempty"`
-	Vitals     *VitalsInput `json:"vitals,omitempty"`
+	EmergencyContact *EmergencyContactInput `json:"emergency_contact,omitempty"`
 }
 
 type UpdateStaffInput struct {
-	FullName       *string `json:"fullName,omitempty"`
+	FullName       *string `json:"full_name,omitempty"`
 	Specialization *string `json:"specialization,omitempty"`
-	LicenseNo      *string `json:"licenseNo,omitempty"`
+	LicenseNo      *string `json:"license_no,omitempty"`
 	Phone          *string `json:"phone,omitempty"`
+}
+
+type UpdateTreatmentSessionReportInput struct {
+	Anamnesis            *string `json:"anamnesis,omitempty"`
+	MechanismOfInjury    *string `json:"mechanism_of_injury,omitempty"`
+	ActualCondition      *string `json:"actual_condition,omitempty"`
+	Examination          *string `json:"examination,omitempty"`
+	Diagnosis            *string `json:"diagnosis,omitempty"`
+	Intervention         *string `json:"intervention,omitempty"`
+	PlanningAndEducation *string `json:"planning_and_education,omitempty"`
+}
+
+type UpdateTreatmentSessionStatusInput struct {
+	Status SessionStatus `json:"status"`
 }
 
 type UpdateUserInput struct {
@@ -239,87 +211,10 @@ type User struct {
 	ID        uuid.UUID `json:"id"`
 	Email     string    `json:"email"`
 	Role      UserRole  `json:"role"`
-	IsActive  bool      `json:"isActive"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	IsActive  bool      `json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 	Staff     *Staff    `json:"staff,omitempty"`
-}
-
-type Vitals struct {
-	Bp     *string  `json:"bp,omitempty"`
-	Hr     *int32   `json:"hr,omitempty"`
-	Spo2   *int32   `json:"spo2,omitempty"`
-	Temp   *float64 `json:"temp,omitempty"`
-	Weight *float64 `json:"weight,omitempty"`
-}
-
-type VitalsInput struct {
-	Bp     *string  `json:"bp,omitempty"`
-	Hr     *int32   `json:"hr,omitempty"`
-	Spo2   *int32   `json:"spo2,omitempty"`
-	Temp   *float64 `json:"temp,omitempty"`
-	Weight *float64 `json:"weight,omitempty"`
-}
-
-type AppointmentStatus string
-
-const (
-	AppointmentStatusScheduled AppointmentStatus = "SCHEDULED"
-	AppointmentStatusConfirmed AppointmentStatus = "CONFIRMED"
-	AppointmentStatusCompleted AppointmentStatus = "COMPLETED"
-	AppointmentStatusCancelled AppointmentStatus = "CANCELLED"
-	AppointmentStatusNoShow    AppointmentStatus = "NO_SHOW"
-)
-
-var AllAppointmentStatus = []AppointmentStatus{
-	AppointmentStatusScheduled,
-	AppointmentStatusConfirmed,
-	AppointmentStatusCompleted,
-	AppointmentStatusCancelled,
-	AppointmentStatusNoShow,
-}
-
-func (e AppointmentStatus) IsValid() bool {
-	switch e {
-	case AppointmentStatusScheduled, AppointmentStatusConfirmed, AppointmentStatusCompleted, AppointmentStatusCancelled, AppointmentStatusNoShow:
-		return true
-	}
-	return false
-}
-
-func (e AppointmentStatus) String() string {
-	return string(e)
-}
-
-func (e *AppointmentStatus) UnmarshalGQL(v any) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = AppointmentStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid AppointmentStatus", str)
-	}
-	return nil
-}
-
-func (e AppointmentStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-func (e *AppointmentStatus) UnmarshalJSON(b []byte) error {
-	s, err := strconv.Unquote(string(b))
-	if err != nil {
-		return err
-	}
-	return e.UnmarshalGQL(s)
-}
-
-func (e AppointmentStatus) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	e.MarshalGQL(&buf)
-	return buf.Bytes(), nil
 }
 
 type Gender string
@@ -380,12 +275,14 @@ func (e Gender) MarshalJSON() ([]byte, error) {
 type SessionStatus string
 
 const (
+	SessionStatusScheduled  SessionStatus = "SCHEDULED"
 	SessionStatusInProgress SessionStatus = "IN_PROGRESS"
 	SessionStatusCompleted  SessionStatus = "COMPLETED"
 	SessionStatusCancelled  SessionStatus = "CANCELLED"
 )
 
 var AllSessionStatus = []SessionStatus{
+	SessionStatusScheduled,
 	SessionStatusInProgress,
 	SessionStatusCompleted,
 	SessionStatusCancelled,
@@ -393,7 +290,7 @@ var AllSessionStatus = []SessionStatus{
 
 func (e SessionStatus) IsValid() bool {
 	switch e {
-	case SessionStatusInProgress, SessionStatusCompleted, SessionStatusCancelled:
+	case SessionStatusScheduled, SessionStatusInProgress, SessionStatusCompleted, SessionStatusCancelled:
 		return true
 	}
 	return false

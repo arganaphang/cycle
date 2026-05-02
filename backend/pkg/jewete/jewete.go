@@ -33,7 +33,6 @@ func VerifyToken[T any](secret []byte, tokenString string) (T, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims[T]{}, func(t *jwt.Token) (any, error) {
 		return secret, nil
 	})
-
 	if err != nil {
 		return zero, err
 	}

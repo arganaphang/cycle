@@ -3,21 +3,19 @@ package repository
 import "github.com/jmoiron/sqlx"
 
 type Repositories struct {
-	AppointmentRepository      AppointmentRepository
-	PatientRepository          PatientRepository
-	SoapNoteRepository         SoapNoteRepository
-	StaffRepository            StaffRepository
-	TreatmentSessionRepository TreatmentSessionRepository
-	UserRepository             UserRepository
+	PatientRepository                PatientRepository
+	StaffRepository                  StaffRepository
+	TreatmentSessionRepository       TreatmentSessionRepository
+	TreatmentSessionReportRepository TreatmentSessionReportRepository
+	UserRepository                   UserRepository
 }
 
 func NewRepositories(db *sqlx.DB) Repositories {
 	return Repositories{
-		AppointmentRepository:      NewAppointmentRepository(db),
-		PatientRepository:          NewPatientRepository(db),
-		SoapNoteRepository:         NewSoapNoteRepository(db),
-		StaffRepository:            NewStaffRepository(db),
-		TreatmentSessionRepository: NewTreatmentSessionRepository(db),
-		UserRepository:             NewUserRepository(db),
+		PatientRepository:                NewPatientRepository(db),
+		StaffRepository:                  NewStaffRepository(db),
+		TreatmentSessionRepository:       NewTreatmentSessionRepository(db),
+		TreatmentSessionReportRepository: NewTreatmentSessionReportRepository(db),
+		UserRepository:                   NewUserRepository(db),
 	}
 }

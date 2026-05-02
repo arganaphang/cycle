@@ -19,15 +19,8 @@ enum Gender {
   FEMALE
 }
 
-enum AppointmentStatus {
-  SCHEDULED
-  CONFIRMED
-  COMPLETED
-  CANCELLED
-  NO_SHOW
-}
-
 enum SessionStatus {
+  SCHEDULED
   IN_PROGRESS
   COMPLETED
   CANCELLED
@@ -47,107 +40,74 @@ input EmergencyContactInput {
   relation: String!
 }
 
-type Vitals {
-  bp: String # "120/80"
-  hr: Int # bpm
-  spo2: Int # %
-  temp: Float # celsius
-  weight: Float # kg
-}
-
-input VitalsInput {
-  bp: String
-  hr: Int
-  spo2: Int
-  temp: Float
-  weight: Float
-}
-
 # ── Types ────────────────────────────────────────────────────
 
 type User {
   id: UUID!
   email: String!
   role: UserRole!
-  isActive: Boolean!
-  createdAt: Time!
-  updatedAt: Time!
+  is_active: Boolean!
+  created_at: Time!
+  updated_at: Time!
   staff: Staff
 }
 
 type Patient {
   id: UUID!
-  medicalRecordNo: String!
-  fullName: String!
-  dateOfBirth: Time!
+  medical_record_no: String!
+  full_name: String!
+  date_of_birth: Time!
   gender: Gender!
   phone: String
   email: String
   address: String
-  emergencyContact: EmergencyContact
-  createdAt: Time!
-  updatedAt: Time!
-  appointments: [Appointment!]!
-  treatmentSessions: [TreatmentSession!]!
+  emergency_contact: EmergencyContact
+  created_at: Time!
+  updated_at: Time!
+  treatment_sessions: [TreatmentSession!]!
 }
 
 type Staff {
   id: UUID!
-  userId: UUID!
-  fullName: String!
+  user_id: UUID!
+  full_name: String!
   specialization: String
-  licenseNo: String
+  license_no: String
   phone: String
-  createdAt: Time!
-  updatedAt: Time!
+  created_at: Time!
+  updated_at: Time!
   user: User!
-  appointments: [Appointment!]!
-}
-
-type Appointment {
-  id: UUID!
-  patientId: UUID!
-  staffId: UUID!
-  scheduledAt: Time!
-  durationMin: Int!
-  status: AppointmentStatus!
-  chiefComplaint: String
-  notes: String
-  createdAt: Time!
-  updatedAt: Time!
-  patient: Patient!
-  staff: Staff!
-  session: TreatmentSession
+  treatment_sessions: [TreatmentSession!]!
 }
 
 type TreatmentSession {
   id: UUID!
-  appointmentId: UUID
-  patientId: UUID!
-  staffId: UUID!
-  sessionDate: Time!
-  sessionNo: Int!
+  patient_id: UUID!
+  staff_id: UUID!
+  session_date: Time!
+  session_no: Int!
   status: SessionStatus!
-  createdAt: Time!
-  updatedAt: Time!
-  appointment: Appointment
+  note: String
+  created_at: Time!
+  updated_at: Time!
   patient: Patient!
   staff: Staff!
-  soapNote: SOAPNote
+  report: TreatmentSessionReport
 }
 
-type SOAPNote {
+type TreatmentSessionReport {
   id: UUID!
-  sessionId: UUID!
-  subjective: String!
-  objective: String!
-  assessment: String!
-  plan: String!
-  painScale: Int
-  vitals: Vitals
-  createdAt: Time!
-  updatedAt: Time!
-  session: TreatmentSession!
+  session_id: UUID!
+  anamnesis: String
+  mechanism_of_injury: String
+  actual_condition: String
+  examination: String
+  diagnosis: String
+  intervention: String
+  planning_and_education: String
+  created_at: Time!
+  updated_at: Time!
+  treatment_session: TreatmentSession!
 }
 
 # ── Auth ─────────────────────────────────────────────────────
@@ -161,22 +121,22 @@ type AuthPayload {
 
 type PatientConnection {
   nodes: [Patient!]!
-  totalCount: Int!
+  total_count: Int!
 }
 
 type StaffConnection {
   nodes: [Staff!]!
-  totalCount: Int!
-}
-
-type AppointmentConnection {
-  nodes: [Appointment!]!
-  totalCount: Int!
+  total_count: Int!
 }
 
 type TreatmentSessionConnection {
   nodes: [TreatmentSession!]!
-  totalCount: Int!
+  total_count: Int!
+}
+
+type TreatmentSessionReportConnection {
+  nodes: [TreatmentSessionReport!]!
+  total_count: Int!
 }
 
 # ── Inputs ───────────────────────────────────────────────────
@@ -200,92 +160,79 @@ input UpdateUserInput {
 
 input CreateStaffInput {
   userId: UUID!
-  fullName: String!
+  full_name: String!
   specialization: String
-  licenseNo: String
+  license_no: String
   phone: String
 }
 
 input UpdateStaffInput {
-  fullName: String
+  full_name: String
   specialization: String
-  licenseNo: String
+  license_no: String
   phone: String
 }
 
 input CreatePatientInput {
-  fullName: String!
-  dateOfBirth: Time!
+  full_name: String!
+  date_of_birth: Time!
   gender: Gender!
   phone: String
   email: String
   address: String
-  emergencyContact: EmergencyContactInput
+  emergency_contact: EmergencyContactInput
 }
 
 input UpdatePatientInput {
-  fullName: String
+  full_name: String
   phone: String
   email: String
   address: String
-  emergencyContact: EmergencyContactInput
+  emergency_contact: EmergencyContactInput
 }
 
-input CreateAppointmentInput {
-  patientId: UUID!
-  staffId: UUID!
-  scheduledAt: Time!
-  durationMin: Int!
-  chiefComplaint: String
-  notes: String
+input CreateTreatmentSessionInput {
+  patient_id: UUID!
+  staff_id: UUID!
+  session_date: Time!
 }
 
-input UpdateAppointmentStatusInput {
-  status: AppointmentStatus!
+input UpdateTreatmentSessionStatusInput {
+  status: SessionStatus!
 }
 
-input CreateSessionInput {
-  appointmentId: UUID
-  patientId: UUID!
-  staffId: UUID!
-  sessionDate: Time!
+input CreateTreatmentSessionReportInput {
+  session_id: UUID!
+  anamnesis: String
+  mechanism_of_injury: String
+  actual_condition: String
+  examination: String
+  diagnosis: String
+  intervention: String
+  planning_and_education: String
 }
 
-input CreateSOAPNoteInput {
-  sessionId: UUID!
-  subjective: String!
-  objective: String!
-  assessment: String!
-  plan: String!
-  painScale: Int
-  vitals: VitalsInput
-}
-
-input UpdateSOAPNoteInput {
-  subjective: String
-  objective: String
-  assessment: String
-  plan: String
-  painScale: Int
-  vitals: VitalsInput
-}
-
-# ── Filters ──────────────────────────────────────────────────
-
-input AppointmentFilter {
-  patientId: UUID
-  staffId: UUID
-  status: AppointmentStatus
-  dateFrom: Time
-  dateTo: Time
+input UpdateTreatmentSessionReportInput {
+  anamnesis: String
+  mechanism_of_injury: String
+  actual_condition: String
+  examination: String
+  diagnosis: String
+  intervention: String
+  planning_and_education: String
 }
 
 input SessionFilter {
-  patientId: UUID
-  staffId: UUID
+  patient_id: UUID
+  staff_id: UUID
   status: SessionStatus
-  dateFrom: Time
-  dateTo: Time
+  date_from: Time
+  date_to: Time
+}
+
+input ReportFilter {
+  date_from: Time
+  date_to: Time
 }
 
 # ── Root ─────────────────────────────────────────────────────
@@ -299,13 +246,11 @@ type Query {
   staff(id: UUID!): Staff
   staffs(search: String, limit: Int, offset: Int): StaffConnection!
 
-  appointment(id: UUID!): Appointment
-  appointments(filter: AppointmentFilter, limit: Int, offset: Int): AppointmentConnection!
-
   treatmentSession(id: UUID!): TreatmentSession
   treatmentSessions(filter: SessionFilter, limit: Int, offset: Int): TreatmentSessionConnection!
 
-  soapNote(sessionId: UUID!): SOAPNote
+  treatmentSessionReport(id: UUID!): TreatmentSessionReport
+  treatmentSessionReports(filter: ReportFilter, limit: Int, offset: Int): TreatmentSessionReportConnection!
 }
 
 type Mutation {
@@ -320,14 +265,9 @@ type Mutation {
   createPatient(input: CreatePatientInput!): Patient!
   updatePatient(id: UUID!, input: UpdatePatientInput!): Patient!
 
-  createAppointment(input: CreateAppointmentInput!): Appointment!
-  updateAppointmentStatus(id: UUID!, input: UpdateAppointmentStatusInput!): Appointment!
-  cancelAppointment(id: UUID!): Appointment!
+  createTreatmentSession(input: CreateTreatmentSessionInput!): TreatmentSession!
+  updateTreatmentSessionStatus(id: UUID!, input: UpdateTreatmentSessionStatusInput!): TreatmentSession!
 
-  createSession(input: CreateSessionInput!): TreatmentSession!
-  completeSession(id: UUID!): TreatmentSession!
-  cancelSession(id: UUID!): TreatmentSession!
-
-  createSOAPNote(input: CreateSOAPNoteInput!): SOAPNote!
-  updateSOAPNote(id: UUID!, input: UpdateSOAPNoteInput!): SOAPNote!
+  createTreatmentSessionReport(input: CreateTreatmentSessionReportInput!): TreatmentSessionReport!
+  updateTreatmentSessionReport(id: UUID!, input: UpdateTreatmentSessionReportInput!): TreatmentSessionReport!
 }

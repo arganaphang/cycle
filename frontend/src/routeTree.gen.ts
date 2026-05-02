@@ -9,19 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PatientRouteImport } from './routes/patient'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PatientIdRouteImport } from './routes/patient.$id'
+import { Route as AppStaffRouteImport } from './routes/_app.staff'
+import { Route as AppSessionRouteImport } from './routes/_app.session'
+import { Route as AppReportRouteImport } from './routes/_app.report'
+import { Route as AppPatientRouteImport } from './routes/_app.patient'
 
-const PatientRoute = PatientRouteImport.update({
-  id: '/patient',
-  path: '/patient',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -29,59 +31,89 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PatientIdRoute = PatientIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => PatientRoute,
+const AppStaffRoute = AppStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSessionRoute = AppSessionRouteImport.update({
+  id: '/session',
+  path: '/session',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportRoute = AppReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPatientRoute = AppPatientRouteImport.update({
+  id: '/patient',
+  path: '/patient',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/patient': typeof PatientRouteWithChildren
-  '/patient/$id': typeof PatientIdRoute
+  '/patient': typeof AppPatientRoute
+  '/report': typeof AppReportRoute
+  '/session': typeof AppSessionRoute
+  '/staff': typeof AppStaffRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/patient': typeof PatientRouteWithChildren
-  '/patient/$id': typeof PatientIdRoute
+  '/patient': typeof AppPatientRoute
+  '/report': typeof AppReportRoute
+  '/session': typeof AppSessionRoute
+  '/staff': typeof AppStaffRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/patient': typeof PatientRouteWithChildren
-  '/patient/$id': typeof PatientIdRoute
+  '/_app/patient': typeof AppPatientRoute
+  '/_app/report': typeof AppReportRoute
+  '/_app/session': typeof AppSessionRoute
+  '/_app/staff': typeof AppStaffRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/patient' | '/patient/$id'
+  fullPaths: '/' | '/login' | '/patient' | '/report' | '/session' | '/staff'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/patient' | '/patient/$id'
-  id: '__root__' | '/' | '/login' | '/patient' | '/patient/$id'
+  to: '/' | '/login' | '/patient' | '/report' | '/session' | '/staff'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/login'
+    | '/_app/patient'
+    | '/_app/report'
+    | '/_app/session'
+    | '/_app/staff'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
-  PatientRoute: typeof PatientRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/patient': {
-      id: '/patient'
-      path: '/patient'
-      fullPath: '/patient'
-      preLoaderRoute: typeof PatientRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -91,31 +123,57 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/patient/$id': {
-      id: '/patient/$id'
-      path: '/$id'
-      fullPath: '/patient/$id'
-      preLoaderRoute: typeof PatientIdRouteImport
-      parentRoute: typeof PatientRoute
+    '/_app/staff': {
+      id: '/_app/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof AppStaffRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/session': {
+      id: '/_app/session'
+      path: '/session'
+      fullPath: '/session'
+      preLoaderRoute: typeof AppSessionRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/report': {
+      id: '/_app/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof AppReportRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/patient': {
+      id: '/_app/patient'
+      path: '/patient'
+      fullPath: '/patient'
+      preLoaderRoute: typeof AppPatientRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
-interface PatientRouteChildren {
-  PatientIdRoute: typeof PatientIdRoute
+interface AppRouteChildren {
+  AppPatientRoute: typeof AppPatientRoute
+  AppReportRoute: typeof AppReportRoute
+  AppSessionRoute: typeof AppSessionRoute
+  AppStaffRoute: typeof AppStaffRoute
 }
 
-const PatientRouteChildren: PatientRouteChildren = {
-  PatientIdRoute: PatientIdRoute,
+const AppRouteChildren: AppRouteChildren = {
+  AppPatientRoute: AppPatientRoute,
+  AppReportRoute: AppReportRoute,
+  AppSessionRoute: AppSessionRoute,
+  AppStaffRoute: AppStaffRoute,
 }
 
-const PatientRouteWithChildren =
-  PatientRoute._addFileChildren(PatientRouteChildren)
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
-  PatientRoute: PatientRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

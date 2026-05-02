@@ -197,35 +197,21 @@ models:
         resolver: true
   Patient:
     fields:
-      appointments:
-        resolver: true
-      treatmentSessions:
+      treatment_sessions:
         resolver: true
   Staff:
     fields:
       user:
         resolver: true
-      appointments:
-        resolver: true
-  Appointment:
-    fields:
-      patient:
-        resolver: true
-      staff:
-        resolver: true
-      session:
-        resolver: true
   TreatmentSession:
     fields:
-      appointment:
-        resolver: true
       patient:
         resolver: true
       staff:
         resolver: true
-      soapNote:
+      report:
         resolver: true
-  SOAPNote:
+  report:
     fields:
       session:
         resolver: true

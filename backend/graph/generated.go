@@ -30,11 +30,9 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 type Config = graphql.Config[ResolverRoot, DirectiveRoot, ComplexityRoot]
 
 type ResolverRoot interface {
-	Appointment() AppointmentResolver
 	Mutation() MutationResolver
 	Patient() PatientResolver
 	Query() QueryResolver
-	SOAPNote() SOAPNoteResolver
 	Staff() StaffResolver
 	TreatmentSession() TreatmentSessionResolver
 	User() UserResolver
@@ -44,27 +42,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Appointment struct {
-		ChiefComplaint func(childComplexity int) int
-		CreatedAt      func(childComplexity int) int
-		DurationMin    func(childComplexity int) int
-		ID             func(childComplexity int) int
-		Notes          func(childComplexity int) int
-		Patient        func(childComplexity int) int
-		PatientID      func(childComplexity int) int
-		ScheduledAt    func(childComplexity int) int
-		Session        func(childComplexity int) int
-		Staff          func(childComplexity int) int
-		StaffID        func(childComplexity int) int
-		Status         func(childComplexity int) int
-		UpdatedAt      func(childComplexity int) int
-	}
-
-	AppointmentConnection struct {
-		Nodes      func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
 	AuthPayload struct {
 		Token func(childComplexity int) int
 		User  func(childComplexity int) int
@@ -77,26 +54,21 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CancelAppointment       func(childComplexity int, id uuid.UUID) int
-		CancelSession           func(childComplexity int, id uuid.UUID) int
-		CompleteSession         func(childComplexity int, id uuid.UUID) int
-		CreateAppointment       func(childComplexity int, input model.CreateAppointmentInput) int
-		CreatePatient           func(childComplexity int, input model.CreatePatientInput) int
-		CreateSOAPNote          func(childComplexity int, input model.CreateSOAPNoteInput) int
-		CreateSession           func(childComplexity int, input model.CreateSessionInput) int
-		CreateStaff             func(childComplexity int, input model.CreateStaffInput) int
-		CreateUser              func(childComplexity int, input model.CreateUserInput) int
-		Login                   func(childComplexity int, input model.LoginInput) int
-		UpdateAppointmentStatus func(childComplexity int, id uuid.UUID, input model.UpdateAppointmentStatusInput) int
-		UpdatePatient           func(childComplexity int, id uuid.UUID, input model.UpdatePatientInput) int
-		UpdateSOAPNote          func(childComplexity int, id uuid.UUID, input model.UpdateSOAPNoteInput) int
-		UpdateStaff             func(childComplexity int, id uuid.UUID, input model.UpdateStaffInput) int
-		UpdateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
+		CreatePatient                func(childComplexity int, input model.CreatePatientInput) int
+		CreateStaff                  func(childComplexity int, input model.CreateStaffInput) int
+		CreateTreatmentSession       func(childComplexity int, input model.CreateTreatmentSessionInput) int
+		CreateTreatmentSessionReport func(childComplexity int, input model.CreateTreatmentSessionReportInput) int
+		CreateUser                   func(childComplexity int, input model.CreateUserInput) int
+		Login                        func(childComplexity int, input model.LoginInput) int
+		UpdatePatient                func(childComplexity int, id uuid.UUID, input model.UpdatePatientInput) int
+		UpdateStaff                  func(childComplexity int, id uuid.UUID, input model.UpdateStaffInput) int
+		UpdateTreatmentSessionReport func(childComplexity int, id uuid.UUID, input model.UpdateTreatmentSessionReportInput) int
+		UpdateTreatmentSessionStatus func(childComplexity int, id uuid.UUID, input model.UpdateTreatmentSessionStatusInput) int
+		UpdateUser                   func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 	}
 
 	Patient struct {
 		Address           func(childComplexity int) int
-		Appointments      func(childComplexity int) int
 		CreatedAt         func(childComplexity int) int
 		DateOfBirth       func(childComplexity int) int
 		Email             func(childComplexity int) int
@@ -116,43 +88,28 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Appointment       func(childComplexity int, id uuid.UUID) int
-		Appointments      func(childComplexity int, filter *model.AppointmentFilter, limit *int32, offset *int32) int
-		Me                func(childComplexity int) int
-		Patient           func(childComplexity int, id uuid.UUID) int
-		Patients          func(childComplexity int, search *string, limit *int32, offset *int32) int
-		SoapNote          func(childComplexity int, sessionID uuid.UUID) int
-		Staff             func(childComplexity int, id uuid.UUID) int
-		Staffs            func(childComplexity int, search *string, limit *int32, offset *int32) int
-		TreatmentSession  func(childComplexity int, id uuid.UUID) int
-		TreatmentSessions func(childComplexity int, filter *model.SessionFilter, limit *int32, offset *int32) int
-	}
-
-	SOAPNote struct {
-		Assessment func(childComplexity int) int
-		CreatedAt  func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Objective  func(childComplexity int) int
-		PainScale  func(childComplexity int) int
-		Plan       func(childComplexity int) int
-		Session    func(childComplexity int) int
-		SessionID  func(childComplexity int) int
-		Subjective func(childComplexity int) int
-		UpdatedAt  func(childComplexity int) int
-		Vitals     func(childComplexity int) int
+		Me                      func(childComplexity int) int
+		Patient                 func(childComplexity int, id uuid.UUID) int
+		Patients                func(childComplexity int, search *string, limit *int32, offset *int32) int
+		Staff                   func(childComplexity int, id uuid.UUID) int
+		Staffs                  func(childComplexity int, search *string, limit *int32, offset *int32) int
+		TreatmentSession        func(childComplexity int, id uuid.UUID) int
+		TreatmentSessionReport  func(childComplexity int, id uuid.UUID) int
+		TreatmentSessionReports func(childComplexity int, filter *model.ReportFilter, limit *int32, offset *int32) int
+		TreatmentSessions       func(childComplexity int, filter *model.SessionFilter, limit *int32, offset *int32) int
 	}
 
 	Staff struct {
-		Appointments   func(childComplexity int) int
-		CreatedAt      func(childComplexity int) int
-		FullName       func(childComplexity int) int
-		ID             func(childComplexity int) int
-		LicenseNo      func(childComplexity int) int
-		Phone          func(childComplexity int) int
-		Specialization func(childComplexity int) int
-		UpdatedAt      func(childComplexity int) int
-		User           func(childComplexity int) int
-		UserID         func(childComplexity int) int
+		CreatedAt         func(childComplexity int) int
+		FullName          func(childComplexity int) int
+		ID                func(childComplexity int) int
+		LicenseNo         func(childComplexity int) int
+		Phone             func(childComplexity int) int
+		Specialization    func(childComplexity int) int
+		TreatmentSessions func(childComplexity int) int
+		UpdatedAt         func(childComplexity int) int
+		User              func(childComplexity int) int
+		UserID            func(childComplexity int) int
 	}
 
 	StaffConnection struct {
@@ -161,22 +118,41 @@ type ComplexityRoot struct {
 	}
 
 	TreatmentSession struct {
-		Appointment   func(childComplexity int) int
-		AppointmentID func(childComplexity int) int
-		CreatedAt     func(childComplexity int) int
-		ID            func(childComplexity int) int
-		Patient       func(childComplexity int) int
-		PatientID     func(childComplexity int) int
-		SessionDate   func(childComplexity int) int
-		SessionNo     func(childComplexity int) int
-		SoapNote      func(childComplexity int) int
-		Staff         func(childComplexity int) int
-		StaffID       func(childComplexity int) int
-		Status        func(childComplexity int) int
-		UpdatedAt     func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Note        func(childComplexity int) int
+		Patient     func(childComplexity int) int
+		PatientID   func(childComplexity int) int
+		Report      func(childComplexity int) int
+		SessionDate func(childComplexity int) int
+		SessionNo   func(childComplexity int) int
+		Staff       func(childComplexity int) int
+		StaffID     func(childComplexity int) int
+		Status      func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 
 	TreatmentSessionConnection struct {
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	TreatmentSessionReport struct {
+		ActualCondition      func(childComplexity int) int
+		Anamnesis            func(childComplexity int) int
+		CreatedAt            func(childComplexity int) int
+		Diagnosis            func(childComplexity int) int
+		Examination          func(childComplexity int) int
+		ID                   func(childComplexity int) int
+		Intervention         func(childComplexity int) int
+		MechanismOfInjury    func(childComplexity int) int
+		PlanningAndEducation func(childComplexity int) int
+		SessionID            func(childComplexity int) int
+		TreatmentSession     func(childComplexity int) int
+		UpdatedAt            func(childComplexity int) int
+	}
+
+	TreatmentSessionReportConnection struct {
 		Nodes      func(childComplexity int) int
 		TotalCount func(childComplexity int) int
 	}
@@ -190,21 +166,8 @@ type ComplexityRoot struct {
 		Staff     func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 	}
-
-	Vitals struct {
-		Bp     func(childComplexity int) int
-		Hr     func(childComplexity int) int
-		Spo2   func(childComplexity int) int
-		Temp   func(childComplexity int) int
-		Weight func(childComplexity int) int
-	}
 }
 
-type AppointmentResolver interface {
-	Patient(ctx context.Context, obj *model.Appointment) (*model.Patient, error)
-	Staff(ctx context.Context, obj *model.Appointment) (*model.Staff, error)
-	Session(ctx context.Context, obj *model.Appointment) (*model.TreatmentSession, error)
-}
 type MutationResolver interface {
 	Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error)
 	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
@@ -213,17 +176,12 @@ type MutationResolver interface {
 	UpdateStaff(ctx context.Context, id uuid.UUID, input model.UpdateStaffInput) (*model.Staff, error)
 	CreatePatient(ctx context.Context, input model.CreatePatientInput) (*model.Patient, error)
 	UpdatePatient(ctx context.Context, id uuid.UUID, input model.UpdatePatientInput) (*model.Patient, error)
-	CreateAppointment(ctx context.Context, input model.CreateAppointmentInput) (*model.Appointment, error)
-	UpdateAppointmentStatus(ctx context.Context, id uuid.UUID, input model.UpdateAppointmentStatusInput) (*model.Appointment, error)
-	CancelAppointment(ctx context.Context, id uuid.UUID) (*model.Appointment, error)
-	CreateSession(ctx context.Context, input model.CreateSessionInput) (*model.TreatmentSession, error)
-	CompleteSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
-	CancelSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
-	CreateSOAPNote(ctx context.Context, input model.CreateSOAPNoteInput) (*model.SOAPNote, error)
-	UpdateSOAPNote(ctx context.Context, id uuid.UUID, input model.UpdateSOAPNoteInput) (*model.SOAPNote, error)
+	CreateTreatmentSession(ctx context.Context, input model.CreateTreatmentSessionInput) (*model.TreatmentSession, error)
+	UpdateTreatmentSessionStatus(ctx context.Context, id uuid.UUID, input model.UpdateTreatmentSessionStatusInput) (*model.TreatmentSession, error)
+	CreateTreatmentSessionReport(ctx context.Context, input model.CreateTreatmentSessionReportInput) (*model.TreatmentSessionReport, error)
+	UpdateTreatmentSessionReport(ctx context.Context, id uuid.UUID, input model.UpdateTreatmentSessionReportInput) (*model.TreatmentSessionReport, error)
 }
 type PatientResolver interface {
-	Appointments(ctx context.Context, obj *model.Patient) ([]*model.Appointment, error)
 	TreatmentSessions(ctx context.Context, obj *model.Patient) ([]*model.TreatmentSession, error)
 }
 type QueryResolver interface {
@@ -232,24 +190,18 @@ type QueryResolver interface {
 	Patients(ctx context.Context, search *string, limit *int32, offset *int32) (*model.PatientConnection, error)
 	Staff(ctx context.Context, id uuid.UUID) (*model.Staff, error)
 	Staffs(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error)
-	Appointment(ctx context.Context, id uuid.UUID) (*model.Appointment, error)
-	Appointments(ctx context.Context, filter *model.AppointmentFilter, limit *int32, offset *int32) (*model.AppointmentConnection, error)
 	TreatmentSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
 	TreatmentSessions(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error)
-	SoapNote(ctx context.Context, sessionID uuid.UUID) (*model.SOAPNote, error)
-}
-type SOAPNoteResolver interface {
-	Session(ctx context.Context, obj *model.SOAPNote) (*model.TreatmentSession, error)
+	TreatmentSessionReport(ctx context.Context, id uuid.UUID) (*model.TreatmentSessionReport, error)
+	TreatmentSessionReports(ctx context.Context, filter *model.ReportFilter, limit *int32, offset *int32) (*model.TreatmentSessionReportConnection, error)
 }
 type StaffResolver interface {
 	User(ctx context.Context, obj *model.Staff) (*model.User, error)
-	Appointments(ctx context.Context, obj *model.Staff) ([]*model.Appointment, error)
 }
 type TreatmentSessionResolver interface {
-	Appointment(ctx context.Context, obj *model.TreatmentSession) (*model.Appointment, error)
 	Patient(ctx context.Context, obj *model.TreatmentSession) (*model.Patient, error)
 	Staff(ctx context.Context, obj *model.TreatmentSession) (*model.Staff, error)
-	SoapNote(ctx context.Context, obj *model.TreatmentSession) (*model.SOAPNote, error)
+	Report(ctx context.Context, obj *model.TreatmentSession) (*model.TreatmentSessionReport, error)
 }
 type UserResolver interface {
 	Staff(ctx context.Context, obj *model.User) (*model.Staff, error)
@@ -268,98 +220,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := newExecutionContext(nil, e, nil)
 	_ = ec
 	switch typeName + "." + field {
-
-	case "Appointment.chiefComplaint":
-		if e.ComplexityRoot.Appointment.ChiefComplaint == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.ChiefComplaint(childComplexity), true
-	case "Appointment.createdAt":
-		if e.ComplexityRoot.Appointment.CreatedAt == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.CreatedAt(childComplexity), true
-	case "Appointment.durationMin":
-		if e.ComplexityRoot.Appointment.DurationMin == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.DurationMin(childComplexity), true
-	case "Appointment.id":
-		if e.ComplexityRoot.Appointment.ID == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.ID(childComplexity), true
-	case "Appointment.notes":
-		if e.ComplexityRoot.Appointment.Notes == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.Notes(childComplexity), true
-	case "Appointment.patient":
-		if e.ComplexityRoot.Appointment.Patient == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.Patient(childComplexity), true
-	case "Appointment.patientId":
-		if e.ComplexityRoot.Appointment.PatientID == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.PatientID(childComplexity), true
-	case "Appointment.scheduledAt":
-		if e.ComplexityRoot.Appointment.ScheduledAt == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.ScheduledAt(childComplexity), true
-	case "Appointment.session":
-		if e.ComplexityRoot.Appointment.Session == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.Session(childComplexity), true
-	case "Appointment.staff":
-		if e.ComplexityRoot.Appointment.Staff == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.Staff(childComplexity), true
-	case "Appointment.staffId":
-		if e.ComplexityRoot.Appointment.StaffID == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.StaffID(childComplexity), true
-	case "Appointment.status":
-		if e.ComplexityRoot.Appointment.Status == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.Status(childComplexity), true
-	case "Appointment.updatedAt":
-		if e.ComplexityRoot.Appointment.UpdatedAt == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Appointment.UpdatedAt(childComplexity), true
-
-	case "AppointmentConnection.nodes":
-		if e.ComplexityRoot.AppointmentConnection.Nodes == nil {
-			break
-		}
-
-		return e.ComplexityRoot.AppointmentConnection.Nodes(childComplexity), true
-	case "AppointmentConnection.totalCount":
-		if e.ComplexityRoot.AppointmentConnection.TotalCount == nil {
-			break
-		}
-
-		return e.ComplexityRoot.AppointmentConnection.TotalCount(childComplexity), true
 
 	case "AuthPayload.token":
 		if e.ComplexityRoot.AuthPayload.Token == nil {
@@ -393,50 +253,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.EmergencyContact.Relation(childComplexity), true
 
-	case "Mutation.cancelAppointment":
-		if e.ComplexityRoot.Mutation.CancelAppointment == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_cancelAppointment_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.CancelAppointment(childComplexity, args["id"].(uuid.UUID)), true
-	case "Mutation.cancelSession":
-		if e.ComplexityRoot.Mutation.CancelSession == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_cancelSession_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.CancelSession(childComplexity, args["id"].(uuid.UUID)), true
-	case "Mutation.completeSession":
-		if e.ComplexityRoot.Mutation.CompleteSession == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_completeSession_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.CompleteSession(childComplexity, args["id"].(uuid.UUID)), true
-	case "Mutation.createAppointment":
-		if e.ComplexityRoot.Mutation.CreateAppointment == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createAppointment_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.CreateAppointment(childComplexity, args["input"].(model.CreateAppointmentInput)), true
 	case "Mutation.createPatient":
 		if e.ComplexityRoot.Mutation.CreatePatient == nil {
 			break
@@ -448,28 +264,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.CreatePatient(childComplexity, args["input"].(model.CreatePatientInput)), true
-	case "Mutation.createSOAPNote":
-		if e.ComplexityRoot.Mutation.CreateSOAPNote == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createSOAPNote_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.CreateSOAPNote(childComplexity, args["input"].(model.CreateSOAPNoteInput)), true
-	case "Mutation.createSession":
-		if e.ComplexityRoot.Mutation.CreateSession == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createSession_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.CreateSession(childComplexity, args["input"].(model.CreateSessionInput)), true
 	case "Mutation.createStaff":
 		if e.ComplexityRoot.Mutation.CreateStaff == nil {
 			break
@@ -481,6 +275,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.CreateStaff(childComplexity, args["input"].(model.CreateStaffInput)), true
+	case "Mutation.createTreatmentSession":
+		if e.ComplexityRoot.Mutation.CreateTreatmentSession == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTreatmentSession_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CreateTreatmentSession(childComplexity, args["input"].(model.CreateTreatmentSessionInput)), true
+	case "Mutation.createTreatmentSessionReport":
+		if e.ComplexityRoot.Mutation.CreateTreatmentSessionReport == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTreatmentSessionReport_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CreateTreatmentSessionReport(childComplexity, args["input"].(model.CreateTreatmentSessionReportInput)), true
 	case "Mutation.createUser":
 		if e.ComplexityRoot.Mutation.CreateUser == nil {
 			break
@@ -503,17 +319,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.Login(childComplexity, args["input"].(model.LoginInput)), true
-	case "Mutation.updateAppointmentStatus":
-		if e.ComplexityRoot.Mutation.UpdateAppointmentStatus == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateAppointmentStatus_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.UpdateAppointmentStatus(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateAppointmentStatusInput)), true
 	case "Mutation.updatePatient":
 		if e.ComplexityRoot.Mutation.UpdatePatient == nil {
 			break
@@ -525,17 +330,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.UpdatePatient(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdatePatientInput)), true
-	case "Mutation.updateSOAPNote":
-		if e.ComplexityRoot.Mutation.UpdateSOAPNote == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateSOAPNote_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.UpdateSOAPNote(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateSOAPNoteInput)), true
 	case "Mutation.updateStaff":
 		if e.ComplexityRoot.Mutation.UpdateStaff == nil {
 			break
@@ -547,6 +341,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.UpdateStaff(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateStaffInput)), true
+	case "Mutation.updateTreatmentSessionReport":
+		if e.ComplexityRoot.Mutation.UpdateTreatmentSessionReport == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTreatmentSessionReport_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UpdateTreatmentSessionReport(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateTreatmentSessionReportInput)), true
+	case "Mutation.updateTreatmentSessionStatus":
+		if e.ComplexityRoot.Mutation.UpdateTreatmentSessionStatus == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTreatmentSessionStatus_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UpdateTreatmentSessionStatus(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateTreatmentSessionStatusInput)), true
 	case "Mutation.updateUser":
 		if e.ComplexityRoot.Mutation.UpdateUser == nil {
 			break
@@ -565,19 +381,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Patient.Address(childComplexity), true
-	case "Patient.appointments":
-		if e.ComplexityRoot.Patient.Appointments == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Patient.Appointments(childComplexity), true
-	case "Patient.createdAt":
+	case "Patient.created_at":
 		if e.ComplexityRoot.Patient.CreatedAt == nil {
 			break
 		}
 
 		return e.ComplexityRoot.Patient.CreatedAt(childComplexity), true
-	case "Patient.dateOfBirth":
+	case "Patient.date_of_birth":
 		if e.ComplexityRoot.Patient.DateOfBirth == nil {
 			break
 		}
@@ -589,13 +399,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Patient.Email(childComplexity), true
-	case "Patient.emergencyContact":
+	case "Patient.emergency_contact":
 		if e.ComplexityRoot.Patient.EmergencyContact == nil {
 			break
 		}
 
 		return e.ComplexityRoot.Patient.EmergencyContact(childComplexity), true
-	case "Patient.fullName":
+	case "Patient.full_name":
 		if e.ComplexityRoot.Patient.FullName == nil {
 			break
 		}
@@ -613,7 +423,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Patient.ID(childComplexity), true
-	case "Patient.medicalRecordNo":
+	case "Patient.medical_record_no":
 		if e.ComplexityRoot.Patient.MedicalRecordNo == nil {
 			break
 		}
@@ -625,13 +435,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Patient.Phone(childComplexity), true
-	case "Patient.treatmentSessions":
+	case "Patient.treatment_sessions":
 		if e.ComplexityRoot.Patient.TreatmentSessions == nil {
 			break
 		}
 
 		return e.ComplexityRoot.Patient.TreatmentSessions(childComplexity), true
-	case "Patient.updatedAt":
+	case "Patient.updated_at":
 		if e.ComplexityRoot.Patient.UpdatedAt == nil {
 			break
 		}
@@ -644,35 +454,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.PatientConnection.Nodes(childComplexity), true
-	case "PatientConnection.totalCount":
+	case "PatientConnection.total_count":
 		if e.ComplexityRoot.PatientConnection.TotalCount == nil {
 			break
 		}
 
 		return e.ComplexityRoot.PatientConnection.TotalCount(childComplexity), true
-
-	case "Query.appointment":
-		if e.ComplexityRoot.Query.Appointment == nil {
-			break
-		}
-
-		args, err := ec.field_Query_appointment_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Query.Appointment(childComplexity, args["id"].(uuid.UUID)), true
-	case "Query.appointments":
-		if e.ComplexityRoot.Query.Appointments == nil {
-			break
-		}
-
-		args, err := ec.field_Query_appointments_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Query.Appointments(childComplexity, args["filter"].(*model.AppointmentFilter), args["limit"].(*int32), args["offset"].(*int32)), true
 
 	case "Query.me":
 		if e.ComplexityRoot.Query.Me == nil {
@@ -702,17 +489,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Patients(childComplexity, args["search"].(*string), args["limit"].(*int32), args["offset"].(*int32)), true
-	case "Query.soapNote":
-		if e.ComplexityRoot.Query.SoapNote == nil {
-			break
-		}
-
-		args, err := ec.field_Query_soapNote_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Query.SoapNote(childComplexity, args["sessionId"].(uuid.UUID)), true
 	case "Query.staff":
 		if e.ComplexityRoot.Query.Staff == nil {
 			break
@@ -746,6 +522,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.TreatmentSession(childComplexity, args["id"].(uuid.UUID)), true
+	case "Query.treatmentSessionReport":
+		if e.ComplexityRoot.Query.TreatmentSessionReport == nil {
+			break
+		}
+
+		args, err := ec.field_Query_treatmentSessionReport_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.TreatmentSessionReport(childComplexity, args["id"].(uuid.UUID)), true
+	case "Query.treatmentSessionReports":
+		if e.ComplexityRoot.Query.TreatmentSessionReports == nil {
+			break
+		}
+
+		args, err := ec.field_Query_treatmentSessionReports_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.TreatmentSessionReports(childComplexity, args["filter"].(*model.ReportFilter), args["limit"].(*int32), args["offset"].(*int32)), true
 	case "Query.treatmentSessions":
 		if e.ComplexityRoot.Query.TreatmentSessions == nil {
 			break
@@ -758,86 +556,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.Query.TreatmentSessions(childComplexity, args["filter"].(*model.SessionFilter), args["limit"].(*int32), args["offset"].(*int32)), true
 
-	case "SOAPNote.assessment":
-		if e.ComplexityRoot.SOAPNote.Assessment == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.Assessment(childComplexity), true
-	case "SOAPNote.createdAt":
-		if e.ComplexityRoot.SOAPNote.CreatedAt == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.CreatedAt(childComplexity), true
-	case "SOAPNote.id":
-		if e.ComplexityRoot.SOAPNote.ID == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.ID(childComplexity), true
-	case "SOAPNote.objective":
-		if e.ComplexityRoot.SOAPNote.Objective == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.Objective(childComplexity), true
-	case "SOAPNote.painScale":
-		if e.ComplexityRoot.SOAPNote.PainScale == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.PainScale(childComplexity), true
-	case "SOAPNote.plan":
-		if e.ComplexityRoot.SOAPNote.Plan == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.Plan(childComplexity), true
-	case "SOAPNote.session":
-		if e.ComplexityRoot.SOAPNote.Session == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.Session(childComplexity), true
-	case "SOAPNote.sessionId":
-		if e.ComplexityRoot.SOAPNote.SessionID == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.SessionID(childComplexity), true
-	case "SOAPNote.subjective":
-		if e.ComplexityRoot.SOAPNote.Subjective == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.Subjective(childComplexity), true
-	case "SOAPNote.updatedAt":
-		if e.ComplexityRoot.SOAPNote.UpdatedAt == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.UpdatedAt(childComplexity), true
-	case "SOAPNote.vitals":
-		if e.ComplexityRoot.SOAPNote.Vitals == nil {
-			break
-		}
-
-		return e.ComplexityRoot.SOAPNote.Vitals(childComplexity), true
-
-	case "Staff.appointments":
-		if e.ComplexityRoot.Staff.Appointments == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Staff.Appointments(childComplexity), true
-	case "Staff.createdAt":
+	case "Staff.created_at":
 		if e.ComplexityRoot.Staff.CreatedAt == nil {
 			break
 		}
 
 		return e.ComplexityRoot.Staff.CreatedAt(childComplexity), true
-	case "Staff.fullName":
+	case "Staff.full_name":
 		if e.ComplexityRoot.Staff.FullName == nil {
 			break
 		}
@@ -849,7 +574,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Staff.ID(childComplexity), true
-	case "Staff.licenseNo":
+	case "Staff.license_no":
 		if e.ComplexityRoot.Staff.LicenseNo == nil {
 			break
 		}
@@ -867,7 +592,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Staff.Specialization(childComplexity), true
-	case "Staff.updatedAt":
+	case "Staff.treatment_sessions":
+		if e.ComplexityRoot.Staff.TreatmentSessions == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Staff.TreatmentSessions(childComplexity), true
+	case "Staff.updated_at":
 		if e.ComplexityRoot.Staff.UpdatedAt == nil {
 			break
 		}
@@ -879,7 +610,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Staff.User(childComplexity), true
-	case "Staff.userId":
+	case "Staff.user_id":
 		if e.ComplexityRoot.Staff.UserID == nil {
 			break
 		}
@@ -892,26 +623,14 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.StaffConnection.Nodes(childComplexity), true
-	case "StaffConnection.totalCount":
+	case "StaffConnection.total_count":
 		if e.ComplexityRoot.StaffConnection.TotalCount == nil {
 			break
 		}
 
 		return e.ComplexityRoot.StaffConnection.TotalCount(childComplexity), true
 
-	case "TreatmentSession.appointment":
-		if e.ComplexityRoot.TreatmentSession.Appointment == nil {
-			break
-		}
-
-		return e.ComplexityRoot.TreatmentSession.Appointment(childComplexity), true
-	case "TreatmentSession.appointmentId":
-		if e.ComplexityRoot.TreatmentSession.AppointmentID == nil {
-			break
-		}
-
-		return e.ComplexityRoot.TreatmentSession.AppointmentID(childComplexity), true
-	case "TreatmentSession.createdAt":
+	case "TreatmentSession.created_at":
 		if e.ComplexityRoot.TreatmentSession.CreatedAt == nil {
 			break
 		}
@@ -923,43 +642,49 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.TreatmentSession.ID(childComplexity), true
+	case "TreatmentSession.note":
+		if e.ComplexityRoot.TreatmentSession.Note == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSession.Note(childComplexity), true
 	case "TreatmentSession.patient":
 		if e.ComplexityRoot.TreatmentSession.Patient == nil {
 			break
 		}
 
 		return e.ComplexityRoot.TreatmentSession.Patient(childComplexity), true
-	case "TreatmentSession.patientId":
+	case "TreatmentSession.patient_id":
 		if e.ComplexityRoot.TreatmentSession.PatientID == nil {
 			break
 		}
 
 		return e.ComplexityRoot.TreatmentSession.PatientID(childComplexity), true
-	case "TreatmentSession.sessionDate":
+	case "TreatmentSession.report":
+		if e.ComplexityRoot.TreatmentSession.Report == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSession.Report(childComplexity), true
+	case "TreatmentSession.session_date":
 		if e.ComplexityRoot.TreatmentSession.SessionDate == nil {
 			break
 		}
 
 		return e.ComplexityRoot.TreatmentSession.SessionDate(childComplexity), true
-	case "TreatmentSession.sessionNo":
+	case "TreatmentSession.session_no":
 		if e.ComplexityRoot.TreatmentSession.SessionNo == nil {
 			break
 		}
 
 		return e.ComplexityRoot.TreatmentSession.SessionNo(childComplexity), true
-	case "TreatmentSession.soapNote":
-		if e.ComplexityRoot.TreatmentSession.SoapNote == nil {
-			break
-		}
-
-		return e.ComplexityRoot.TreatmentSession.SoapNote(childComplexity), true
 	case "TreatmentSession.staff":
 		if e.ComplexityRoot.TreatmentSession.Staff == nil {
 			break
 		}
 
 		return e.ComplexityRoot.TreatmentSession.Staff(childComplexity), true
-	case "TreatmentSession.staffId":
+	case "TreatmentSession.staff_id":
 		if e.ComplexityRoot.TreatmentSession.StaffID == nil {
 			break
 		}
@@ -971,7 +696,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.TreatmentSession.Status(childComplexity), true
-	case "TreatmentSession.updatedAt":
+	case "TreatmentSession.updated_at":
 		if e.ComplexityRoot.TreatmentSession.UpdatedAt == nil {
 			break
 		}
@@ -984,14 +709,100 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.TreatmentSessionConnection.Nodes(childComplexity), true
-	case "TreatmentSessionConnection.totalCount":
+	case "TreatmentSessionConnection.total_count":
 		if e.ComplexityRoot.TreatmentSessionConnection.TotalCount == nil {
 			break
 		}
 
 		return e.ComplexityRoot.TreatmentSessionConnection.TotalCount(childComplexity), true
 
-	case "User.createdAt":
+	case "TreatmentSessionReport.actual_condition":
+		if e.ComplexityRoot.TreatmentSessionReport.ActualCondition == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.ActualCondition(childComplexity), true
+	case "TreatmentSessionReport.anamnesis":
+		if e.ComplexityRoot.TreatmentSessionReport.Anamnesis == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.Anamnesis(childComplexity), true
+	case "TreatmentSessionReport.created_at":
+		if e.ComplexityRoot.TreatmentSessionReport.CreatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.CreatedAt(childComplexity), true
+	case "TreatmentSessionReport.diagnosis":
+		if e.ComplexityRoot.TreatmentSessionReport.Diagnosis == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.Diagnosis(childComplexity), true
+	case "TreatmentSessionReport.examination":
+		if e.ComplexityRoot.TreatmentSessionReport.Examination == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.Examination(childComplexity), true
+	case "TreatmentSessionReport.id":
+		if e.ComplexityRoot.TreatmentSessionReport.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.ID(childComplexity), true
+	case "TreatmentSessionReport.intervention":
+		if e.ComplexityRoot.TreatmentSessionReport.Intervention == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.Intervention(childComplexity), true
+	case "TreatmentSessionReport.mechanism_of_injury":
+		if e.ComplexityRoot.TreatmentSessionReport.MechanismOfInjury == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.MechanismOfInjury(childComplexity), true
+	case "TreatmentSessionReport.planning_and_education":
+		if e.ComplexityRoot.TreatmentSessionReport.PlanningAndEducation == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.PlanningAndEducation(childComplexity), true
+	case "TreatmentSessionReport.session_id":
+		if e.ComplexityRoot.TreatmentSessionReport.SessionID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.SessionID(childComplexity), true
+	case "TreatmentSessionReport.treatment_session":
+		if e.ComplexityRoot.TreatmentSessionReport.TreatmentSession == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.TreatmentSession(childComplexity), true
+	case "TreatmentSessionReport.updated_at":
+		if e.ComplexityRoot.TreatmentSessionReport.UpdatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReport.UpdatedAt(childComplexity), true
+
+	case "TreatmentSessionReportConnection.nodes":
+		if e.ComplexityRoot.TreatmentSessionReportConnection.Nodes == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReportConnection.Nodes(childComplexity), true
+	case "TreatmentSessionReportConnection.total_count":
+		if e.ComplexityRoot.TreatmentSessionReportConnection.TotalCount == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TreatmentSessionReportConnection.TotalCount(childComplexity), true
+
+	case "User.created_at":
 		if e.ComplexityRoot.User.CreatedAt == nil {
 			break
 		}
@@ -1009,7 +820,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.User.ID(childComplexity), true
-	case "User.isActive":
+	case "User.is_active":
 		if e.ComplexityRoot.User.IsActive == nil {
 			break
 		}
@@ -1027,43 +838,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.User.Staff(childComplexity), true
-	case "User.updatedAt":
+	case "User.updated_at":
 		if e.ComplexityRoot.User.UpdatedAt == nil {
 			break
 		}
 
 		return e.ComplexityRoot.User.UpdatedAt(childComplexity), true
-
-	case "Vitals.bp":
-		if e.ComplexityRoot.Vitals.Bp == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Vitals.Bp(childComplexity), true
-	case "Vitals.hr":
-		if e.ComplexityRoot.Vitals.Hr == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Vitals.Hr(childComplexity), true
-	case "Vitals.spo2":
-		if e.ComplexityRoot.Vitals.Spo2 == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Vitals.Spo2(childComplexity), true
-	case "Vitals.temp":
-		if e.ComplexityRoot.Vitals.Temp == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Vitals.Temp(childComplexity), true
-	case "Vitals.weight":
-		if e.ComplexityRoot.Vitals.Weight == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Vitals.Weight(childComplexity), true
 
 	}
 	return 0, false
@@ -1073,22 +853,20 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := newExecutionContext(opCtx, e, make(chan graphql.DeferredResult))
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputAppointmentFilter,
-		ec.unmarshalInputCreateAppointmentInput,
 		ec.unmarshalInputCreatePatientInput,
-		ec.unmarshalInputCreateSOAPNoteInput,
-		ec.unmarshalInputCreateSessionInput,
 		ec.unmarshalInputCreateStaffInput,
+		ec.unmarshalInputCreateTreatmentSessionInput,
+		ec.unmarshalInputCreateTreatmentSessionReportInput,
 		ec.unmarshalInputCreateUserInput,
 		ec.unmarshalInputEmergencyContactInput,
 		ec.unmarshalInputLoginInput,
+		ec.unmarshalInputReportFilter,
 		ec.unmarshalInputSessionFilter,
-		ec.unmarshalInputUpdateAppointmentStatusInput,
 		ec.unmarshalInputUpdatePatientInput,
-		ec.unmarshalInputUpdateSOAPNoteInput,
 		ec.unmarshalInputUpdateStaffInput,
+		ec.unmarshalInputUpdateTreatmentSessionReportInput,
+		ec.unmarshalInputUpdateTreatmentSessionStatusInput,
 		ec.unmarshalInputUpdateUserInput,
-		ec.unmarshalInputVitalsInput,
 	)
 	first := true
 
@@ -1183,50 +961,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_cancelAppointment_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_cancelSession_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_completeSession_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createAppointment_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateAppointmentInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateAppointmentInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createPatient_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1238,32 +972,32 @@ func (ec *executionContext) field_Mutation_createPatient_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createSOAPNote_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateSOAPNoteInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateSOAPNoteInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createSession_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateSessionInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateSessionInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createStaff_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateStaffInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateStaffInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTreatmentSessionReport_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateTreatmentSessionReportInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateTreatmentSessionReportInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTreatmentSession_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateTreatmentSessionInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateTreatmentSessionInput)
 	if err != nil {
 		return nil, err
 	}
@@ -1293,22 +1027,6 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateAppointmentStatus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateAppointmentStatusInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateAppointmentStatusInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updatePatient_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1325,22 +1043,6 @@ func (ec *executionContext) field_Mutation_updatePatient_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateSOAPNote_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateSOAPNoteInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateSOAPNoteInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updateStaff_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1350,6 +1052,38 @@ func (ec *executionContext) field_Mutation_updateStaff_args(ctx context.Context,
 	}
 	args["id"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateStaffInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateStaffInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTreatmentSessionReport_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateTreatmentSessionReportInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateTreatmentSessionReportInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTreatmentSessionStatus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateTreatmentSessionStatusInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateTreatmentSessionStatusInput)
 	if err != nil {
 		return nil, err
 	}
@@ -1381,38 +1115,6 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["name"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_appointment_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_appointments_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "filter", ec.unmarshalOAppointmentFilter2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentFilter)
-	if err != nil {
-		return nil, err
-	}
-	args["filter"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint32)
-	if err != nil {
-		return nil, err
-	}
-	args["limit"] = arg1
-	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint32)
-	if err != nil {
-		return nil, err
-	}
-	args["offset"] = arg2
 	return args, nil
 }
 
@@ -1448,17 +1150,6 @@ func (ec *executionContext) field_Query_patients_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_soapNote_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "sessionId", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
-	if err != nil {
-		return nil, err
-	}
-	args["sessionId"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_staff_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1478,6 +1169,38 @@ func (ec *executionContext) field_Query_staffs_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["search"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint32)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint32)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_treatmentSessionReport_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_treatmentSessionReports_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "filter", ec.unmarshalOReportFilter2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐReportFilter)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint32)
 	if err != nil {
 		return nil, err
@@ -1575,547 +1298,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Appointment_id(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_id,
-		func(ctx context.Context) (any, error) {
-			return obj.ID, nil
-		},
-		nil,
-		ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UUID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_patientId(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_patientId,
-		func(ctx context.Context) (any, error) {
-			return obj.PatientID, nil
-		},
-		nil,
-		ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_patientId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UUID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_staffId(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_staffId,
-		func(ctx context.Context) (any, error) {
-			return obj.StaffID, nil
-		},
-		nil,
-		ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_staffId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UUID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_scheduledAt(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_scheduledAt,
-		func(ctx context.Context) (any, error) {
-			return obj.ScheduledAt, nil
-		},
-		nil,
-		ec.marshalNTime2timeᚐTime,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_scheduledAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_durationMin(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_durationMin,
-		func(ctx context.Context) (any, error) {
-			return obj.DurationMin, nil
-		},
-		nil,
-		ec.marshalNInt2int32,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_durationMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_status(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_status,
-		func(ctx context.Context) (any, error) {
-			return obj.Status, nil
-		},
-		nil,
-		ec.marshalNAppointmentStatus2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentStatus,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type AppointmentStatus does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_chiefComplaint(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_chiefComplaint,
-		func(ctx context.Context) (any, error) {
-			return obj.ChiefComplaint, nil
-		},
-		nil,
-		ec.marshalOString2ᚖstring,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_chiefComplaint(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_notes(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_notes,
-		func(ctx context.Context) (any, error) {
-			return obj.Notes, nil
-		},
-		nil,
-		ec.marshalOString2ᚖstring,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_notes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_createdAt,
-		func(ctx context.Context) (any, error) {
-			return obj.CreatedAt, nil
-		},
-		nil,
-		ec.marshalNTime2timeᚐTime,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_updatedAt,
-		func(ctx context.Context) (any, error) {
-			return obj.UpdatedAt, nil
-		},
-		nil,
-		ec.marshalNTime2timeᚐTime,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_patient(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_patient,
-		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.Appointment().Patient(ctx, obj)
-		},
-		nil,
-		ec.marshalNPatient2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPatient,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_patient(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Patient_id(ctx, field)
-			case "medicalRecordNo":
-				return ec.fieldContext_Patient_medicalRecordNo(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Patient_fullName(ctx, field)
-			case "dateOfBirth":
-				return ec.fieldContext_Patient_dateOfBirth(ctx, field)
-			case "gender":
-				return ec.fieldContext_Patient_gender(ctx, field)
-			case "phone":
-				return ec.fieldContext_Patient_phone(ctx, field)
-			case "email":
-				return ec.fieldContext_Patient_email(ctx, field)
-			case "address":
-				return ec.fieldContext_Patient_address(ctx, field)
-			case "emergencyContact":
-				return ec.fieldContext_Patient_emergencyContact(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Patient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Patient_updatedAt(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Patient_appointments(ctx, field)
-			case "treatmentSessions":
-				return ec.fieldContext_Patient_treatmentSessions(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Patient", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_staff(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_staff,
-		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.Appointment().Staff(ctx, obj)
-		},
-		nil,
-		ec.marshalNStaff2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaff,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_staff(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Staff_id(ctx, field)
-			case "userId":
-				return ec.fieldContext_Staff_userId(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Staff_fullName(ctx, field)
-			case "specialization":
-				return ec.fieldContext_Staff_specialization(ctx, field)
-			case "licenseNo":
-				return ec.fieldContext_Staff_licenseNo(ctx, field)
-			case "phone":
-				return ec.fieldContext_Staff_phone(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Staff_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Staff_updatedAt(ctx, field)
-			case "user":
-				return ec.fieldContext_Staff_user(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Staff_appointments(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Staff", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Appointment_session(ctx context.Context, field graphql.CollectedField, obj *model.Appointment) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Appointment_session,
-		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.Appointment().Session(ctx, obj)
-		},
-		nil,
-		ec.marshalOTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Appointment_session(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Appointment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_TreatmentSession_id(ctx, field)
-			case "appointmentId":
-				return ec.fieldContext_TreatmentSession_appointmentId(ctx, field)
-			case "patientId":
-				return ec.fieldContext_TreatmentSession_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_TreatmentSession_staffId(ctx, field)
-			case "sessionDate":
-				return ec.fieldContext_TreatmentSession_sessionDate(ctx, field)
-			case "sessionNo":
-				return ec.fieldContext_TreatmentSession_sessionNo(ctx, field)
-			case "status":
-				return ec.fieldContext_TreatmentSession_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_TreatmentSession_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_TreatmentSession_updatedAt(ctx, field)
-			case "appointment":
-				return ec.fieldContext_TreatmentSession_appointment(ctx, field)
-			case "patient":
-				return ec.fieldContext_TreatmentSession_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_TreatmentSession_staff(ctx, field)
-			case "soapNote":
-				return ec.fieldContext_TreatmentSession_soapNote(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AppointmentConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.AppointmentConnection) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_AppointmentConnection_nodes,
-		func(ctx context.Context) (any, error) {
-			return obj.Nodes, nil
-		},
-		nil,
-		ec.marshalNAppointment2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentᚄ,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_AppointmentConnection_nodes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AppointmentConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Appointment_id(ctx, field)
-			case "patientId":
-				return ec.fieldContext_Appointment_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_Appointment_staffId(ctx, field)
-			case "scheduledAt":
-				return ec.fieldContext_Appointment_scheduledAt(ctx, field)
-			case "durationMin":
-				return ec.fieldContext_Appointment_durationMin(ctx, field)
-			case "status":
-				return ec.fieldContext_Appointment_status(ctx, field)
-			case "chiefComplaint":
-				return ec.fieldContext_Appointment_chiefComplaint(ctx, field)
-			case "notes":
-				return ec.fieldContext_Appointment_notes(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Appointment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Appointment_updatedAt(ctx, field)
-			case "patient":
-				return ec.fieldContext_Appointment_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_Appointment_staff(ctx, field)
-			case "session":
-				return ec.fieldContext_Appointment_session(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Appointment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AppointmentConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.AppointmentConnection) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_AppointmentConnection_totalCount,
-		func(ctx context.Context) (any, error) {
-			return obj.TotalCount, nil
-		},
-		nil,
-		ec.marshalNInt2int32,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_AppointmentConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AppointmentConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _AuthPayload_token(ctx context.Context, field graphql.CollectedField, obj *model.AuthPayload) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -2175,12 +1357,12 @@ func (ec *executionContext) fieldContext_AuthPayload_user(_ context.Context, fie
 				return ec.fieldContext_User_email(ctx, field)
 			case "role":
 				return ec.fieldContext_User_role(ctx, field)
-			case "isActive":
-				return ec.fieldContext_User_isActive(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "is_active":
+				return ec.fieldContext_User_is_active(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
 			case "staff":
 				return ec.fieldContext_User_staff(ctx, field)
 			}
@@ -2355,12 +1537,12 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_email(ctx, field)
 			case "role":
 				return ec.fieldContext_User_role(ctx, field)
-			case "isActive":
-				return ec.fieldContext_User_isActive(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "is_active":
+				return ec.fieldContext_User_is_active(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
 			case "staff":
 				return ec.fieldContext_User_staff(ctx, field)
 			}
@@ -2412,12 +1594,12 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_email(ctx, field)
 			case "role":
 				return ec.fieldContext_User_role(ctx, field)
-			case "isActive":
-				return ec.fieldContext_User_isActive(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "is_active":
+				return ec.fieldContext_User_is_active(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
 			case "staff":
 				return ec.fieldContext_User_staff(ctx, field)
 			}
@@ -2465,24 +1647,24 @@ func (ec *executionContext) fieldContext_Mutation_createStaff(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Staff_id(ctx, field)
-			case "userId":
-				return ec.fieldContext_Staff_userId(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Staff_fullName(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Staff_user_id(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Staff_full_name(ctx, field)
 			case "specialization":
 				return ec.fieldContext_Staff_specialization(ctx, field)
-			case "licenseNo":
-				return ec.fieldContext_Staff_licenseNo(ctx, field)
+			case "license_no":
+				return ec.fieldContext_Staff_license_no(ctx, field)
 			case "phone":
 				return ec.fieldContext_Staff_phone(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Staff_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Staff_updatedAt(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Staff_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Staff_updated_at(ctx, field)
 			case "user":
 				return ec.fieldContext_Staff_user(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Staff_appointments(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Staff_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Staff", field.Name)
 		},
@@ -2528,24 +1710,24 @@ func (ec *executionContext) fieldContext_Mutation_updateStaff(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Staff_id(ctx, field)
-			case "userId":
-				return ec.fieldContext_Staff_userId(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Staff_fullName(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Staff_user_id(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Staff_full_name(ctx, field)
 			case "specialization":
 				return ec.fieldContext_Staff_specialization(ctx, field)
-			case "licenseNo":
-				return ec.fieldContext_Staff_licenseNo(ctx, field)
+			case "license_no":
+				return ec.fieldContext_Staff_license_no(ctx, field)
 			case "phone":
 				return ec.fieldContext_Staff_phone(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Staff_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Staff_updatedAt(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Staff_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Staff_updated_at(ctx, field)
 			case "user":
 				return ec.fieldContext_Staff_user(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Staff_appointments(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Staff_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Staff", field.Name)
 		},
@@ -2591,12 +1773,12 @@ func (ec *executionContext) fieldContext_Mutation_createPatient(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Patient_id(ctx, field)
-			case "medicalRecordNo":
-				return ec.fieldContext_Patient_medicalRecordNo(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Patient_fullName(ctx, field)
-			case "dateOfBirth":
-				return ec.fieldContext_Patient_dateOfBirth(ctx, field)
+			case "medical_record_no":
+				return ec.fieldContext_Patient_medical_record_no(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Patient_full_name(ctx, field)
+			case "date_of_birth":
+				return ec.fieldContext_Patient_date_of_birth(ctx, field)
 			case "gender":
 				return ec.fieldContext_Patient_gender(ctx, field)
 			case "phone":
@@ -2605,16 +1787,14 @@ func (ec *executionContext) fieldContext_Mutation_createPatient(ctx context.Cont
 				return ec.fieldContext_Patient_email(ctx, field)
 			case "address":
 				return ec.fieldContext_Patient_address(ctx, field)
-			case "emergencyContact":
-				return ec.fieldContext_Patient_emergencyContact(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Patient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Patient_updatedAt(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Patient_appointments(ctx, field)
-			case "treatmentSessions":
-				return ec.fieldContext_Patient_treatmentSessions(ctx, field)
+			case "emergency_contact":
+				return ec.fieldContext_Patient_emergency_contact(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Patient_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Patient_updated_at(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Patient_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Patient", field.Name)
 		},
@@ -2660,12 +1840,12 @@ func (ec *executionContext) fieldContext_Mutation_updatePatient(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Patient_id(ctx, field)
-			case "medicalRecordNo":
-				return ec.fieldContext_Patient_medicalRecordNo(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Patient_fullName(ctx, field)
-			case "dateOfBirth":
-				return ec.fieldContext_Patient_dateOfBirth(ctx, field)
+			case "medical_record_no":
+				return ec.fieldContext_Patient_medical_record_no(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Patient_full_name(ctx, field)
+			case "date_of_birth":
+				return ec.fieldContext_Patient_date_of_birth(ctx, field)
 			case "gender":
 				return ec.fieldContext_Patient_gender(ctx, field)
 			case "phone":
@@ -2674,16 +1854,14 @@ func (ec *executionContext) fieldContext_Mutation_updatePatient(ctx context.Cont
 				return ec.fieldContext_Patient_email(ctx, field)
 			case "address":
 				return ec.fieldContext_Patient_address(ctx, field)
-			case "emergencyContact":
-				return ec.fieldContext_Patient_emergencyContact(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Patient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Patient_updatedAt(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Patient_appointments(ctx, field)
-			case "treatmentSessions":
-				return ec.fieldContext_Patient_treatmentSessions(ctx, field)
+			case "emergency_contact":
+				return ec.fieldContext_Patient_emergency_contact(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Patient_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Patient_updated_at(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Patient_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Patient", field.Name)
 		},
@@ -2702,222 +1880,15 @@ func (ec *executionContext) fieldContext_Mutation_updatePatient(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createAppointment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_createTreatmentSession(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Mutation_createAppointment,
+		ec.fieldContext_Mutation_createTreatmentSession,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateAppointment(ctx, fc.Args["input"].(model.CreateAppointmentInput))
-		},
-		nil,
-		ec.marshalNAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createAppointment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Appointment_id(ctx, field)
-			case "patientId":
-				return ec.fieldContext_Appointment_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_Appointment_staffId(ctx, field)
-			case "scheduledAt":
-				return ec.fieldContext_Appointment_scheduledAt(ctx, field)
-			case "durationMin":
-				return ec.fieldContext_Appointment_durationMin(ctx, field)
-			case "status":
-				return ec.fieldContext_Appointment_status(ctx, field)
-			case "chiefComplaint":
-				return ec.fieldContext_Appointment_chiefComplaint(ctx, field)
-			case "notes":
-				return ec.fieldContext_Appointment_notes(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Appointment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Appointment_updatedAt(ctx, field)
-			case "patient":
-				return ec.fieldContext_Appointment_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_Appointment_staff(ctx, field)
-			case "session":
-				return ec.fieldContext_Appointment_session(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Appointment", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createAppointment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateAppointmentStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_updateAppointmentStatus,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().UpdateAppointmentStatus(ctx, fc.Args["id"].(uuid.UUID), fc.Args["input"].(model.UpdateAppointmentStatusInput))
-		},
-		nil,
-		ec.marshalNAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateAppointmentStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Appointment_id(ctx, field)
-			case "patientId":
-				return ec.fieldContext_Appointment_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_Appointment_staffId(ctx, field)
-			case "scheduledAt":
-				return ec.fieldContext_Appointment_scheduledAt(ctx, field)
-			case "durationMin":
-				return ec.fieldContext_Appointment_durationMin(ctx, field)
-			case "status":
-				return ec.fieldContext_Appointment_status(ctx, field)
-			case "chiefComplaint":
-				return ec.fieldContext_Appointment_chiefComplaint(ctx, field)
-			case "notes":
-				return ec.fieldContext_Appointment_notes(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Appointment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Appointment_updatedAt(ctx, field)
-			case "patient":
-				return ec.fieldContext_Appointment_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_Appointment_staff(ctx, field)
-			case "session":
-				return ec.fieldContext_Appointment_session(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Appointment", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateAppointmentStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_cancelAppointment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_cancelAppointment,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CancelAppointment(ctx, fc.Args["id"].(uuid.UUID))
-		},
-		nil,
-		ec.marshalNAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_cancelAppointment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Appointment_id(ctx, field)
-			case "patientId":
-				return ec.fieldContext_Appointment_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_Appointment_staffId(ctx, field)
-			case "scheduledAt":
-				return ec.fieldContext_Appointment_scheduledAt(ctx, field)
-			case "durationMin":
-				return ec.fieldContext_Appointment_durationMin(ctx, field)
-			case "status":
-				return ec.fieldContext_Appointment_status(ctx, field)
-			case "chiefComplaint":
-				return ec.fieldContext_Appointment_chiefComplaint(ctx, field)
-			case "notes":
-				return ec.fieldContext_Appointment_notes(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Appointment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Appointment_updatedAt(ctx, field)
-			case "patient":
-				return ec.fieldContext_Appointment_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_Appointment_staff(ctx, field)
-			case "session":
-				return ec.fieldContext_Appointment_session(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Appointment", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_cancelAppointment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createSession(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_createSession,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateSession(ctx, fc.Args["input"].(model.CreateSessionInput))
+			return ec.Resolvers.Mutation().CreateTreatmentSession(ctx, fc.Args["input"].(model.CreateTreatmentSessionInput))
 		},
 		nil,
 		ec.marshalNTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
@@ -2926,7 +1897,7 @@ func (ec *executionContext) _Mutation_createSession(ctx context.Context, field g
 	)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createSession(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createTreatmentSession(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2936,30 +1907,28 @@ func (ec *executionContext) fieldContext_Mutation_createSession(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_TreatmentSession_id(ctx, field)
-			case "appointmentId":
-				return ec.fieldContext_TreatmentSession_appointmentId(ctx, field)
-			case "patientId":
-				return ec.fieldContext_TreatmentSession_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_TreatmentSession_staffId(ctx, field)
-			case "sessionDate":
-				return ec.fieldContext_TreatmentSession_sessionDate(ctx, field)
-			case "sessionNo":
-				return ec.fieldContext_TreatmentSession_sessionNo(ctx, field)
+			case "patient_id":
+				return ec.fieldContext_TreatmentSession_patient_id(ctx, field)
+			case "staff_id":
+				return ec.fieldContext_TreatmentSession_staff_id(ctx, field)
+			case "session_date":
+				return ec.fieldContext_TreatmentSession_session_date(ctx, field)
+			case "session_no":
+				return ec.fieldContext_TreatmentSession_session_no(ctx, field)
 			case "status":
 				return ec.fieldContext_TreatmentSession_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_TreatmentSession_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_TreatmentSession_updatedAt(ctx, field)
-			case "appointment":
-				return ec.fieldContext_TreatmentSession_appointment(ctx, field)
+			case "note":
+				return ec.fieldContext_TreatmentSession_note(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSession_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSession_updated_at(ctx, field)
 			case "patient":
 				return ec.fieldContext_TreatmentSession_patient(ctx, field)
 			case "staff":
 				return ec.fieldContext_TreatmentSession_staff(ctx, field)
-			case "soapNote":
-				return ec.fieldContext_TreatmentSession_soapNote(ctx, field)
+			case "report":
+				return ec.fieldContext_TreatmentSession_report(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
 		},
@@ -2971,22 +1940,22 @@ func (ec *executionContext) fieldContext_Mutation_createSession(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createSession_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createTreatmentSession_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_completeSession(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateTreatmentSessionStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Mutation_completeSession,
+		ec.fieldContext_Mutation_updateTreatmentSessionStatus,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CompleteSession(ctx, fc.Args["id"].(uuid.UUID))
+			return ec.Resolvers.Mutation().UpdateTreatmentSessionStatus(ctx, fc.Args["id"].(uuid.UUID), fc.Args["input"].(model.UpdateTreatmentSessionStatusInput))
 		},
 		nil,
 		ec.marshalNTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
@@ -2995,7 +1964,7 @@ func (ec *executionContext) _Mutation_completeSession(ctx context.Context, field
 	)
 }
 
-func (ec *executionContext) fieldContext_Mutation_completeSession(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_updateTreatmentSessionStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3005,30 +1974,28 @@ func (ec *executionContext) fieldContext_Mutation_completeSession(ctx context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_TreatmentSession_id(ctx, field)
-			case "appointmentId":
-				return ec.fieldContext_TreatmentSession_appointmentId(ctx, field)
-			case "patientId":
-				return ec.fieldContext_TreatmentSession_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_TreatmentSession_staffId(ctx, field)
-			case "sessionDate":
-				return ec.fieldContext_TreatmentSession_sessionDate(ctx, field)
-			case "sessionNo":
-				return ec.fieldContext_TreatmentSession_sessionNo(ctx, field)
+			case "patient_id":
+				return ec.fieldContext_TreatmentSession_patient_id(ctx, field)
+			case "staff_id":
+				return ec.fieldContext_TreatmentSession_staff_id(ctx, field)
+			case "session_date":
+				return ec.fieldContext_TreatmentSession_session_date(ctx, field)
+			case "session_no":
+				return ec.fieldContext_TreatmentSession_session_no(ctx, field)
 			case "status":
 				return ec.fieldContext_TreatmentSession_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_TreatmentSession_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_TreatmentSession_updatedAt(ctx, field)
-			case "appointment":
-				return ec.fieldContext_TreatmentSession_appointment(ctx, field)
+			case "note":
+				return ec.fieldContext_TreatmentSession_note(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSession_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSession_updated_at(ctx, field)
 			case "patient":
 				return ec.fieldContext_TreatmentSession_patient(ctx, field)
 			case "staff":
 				return ec.fieldContext_TreatmentSession_staff(ctx, field)
-			case "soapNote":
-				return ec.fieldContext_TreatmentSession_soapNote(ctx, field)
+			case "report":
+				return ec.fieldContext_TreatmentSession_report(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
 		},
@@ -3040,31 +2007,31 @@ func (ec *executionContext) fieldContext_Mutation_completeSession(ctx context.Co
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_completeSession_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_updateTreatmentSessionStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_cancelSession(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_createTreatmentSessionReport(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Mutation_cancelSession,
+		ec.fieldContext_Mutation_createTreatmentSessionReport,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CancelSession(ctx, fc.Args["id"].(uuid.UUID))
+			return ec.Resolvers.Mutation().CreateTreatmentSessionReport(ctx, fc.Args["input"].(model.CreateTreatmentSessionReportInput))
 		},
 		nil,
-		ec.marshalNTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
+		ec.marshalNTreatmentSessionReport2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReport,
 		true,
 		true,
 	)
 }
 
-func (ec *executionContext) fieldContext_Mutation_cancelSession(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createTreatmentSessionReport(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3073,33 +2040,31 @@ func (ec *executionContext) fieldContext_Mutation_cancelSession(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_TreatmentSession_id(ctx, field)
-			case "appointmentId":
-				return ec.fieldContext_TreatmentSession_appointmentId(ctx, field)
-			case "patientId":
-				return ec.fieldContext_TreatmentSession_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_TreatmentSession_staffId(ctx, field)
-			case "sessionDate":
-				return ec.fieldContext_TreatmentSession_sessionDate(ctx, field)
-			case "sessionNo":
-				return ec.fieldContext_TreatmentSession_sessionNo(ctx, field)
-			case "status":
-				return ec.fieldContext_TreatmentSession_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_TreatmentSession_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_TreatmentSession_updatedAt(ctx, field)
-			case "appointment":
-				return ec.fieldContext_TreatmentSession_appointment(ctx, field)
-			case "patient":
-				return ec.fieldContext_TreatmentSession_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_TreatmentSession_staff(ctx, field)
-			case "soapNote":
-				return ec.fieldContext_TreatmentSession_soapNote(ctx, field)
+				return ec.fieldContext_TreatmentSessionReport_id(ctx, field)
+			case "session_id":
+				return ec.fieldContext_TreatmentSessionReport_session_id(ctx, field)
+			case "anamnesis":
+				return ec.fieldContext_TreatmentSessionReport_anamnesis(ctx, field)
+			case "mechanism_of_injury":
+				return ec.fieldContext_TreatmentSessionReport_mechanism_of_injury(ctx, field)
+			case "actual_condition":
+				return ec.fieldContext_TreatmentSessionReport_actual_condition(ctx, field)
+			case "examination":
+				return ec.fieldContext_TreatmentSessionReport_examination(ctx, field)
+			case "diagnosis":
+				return ec.fieldContext_TreatmentSessionReport_diagnosis(ctx, field)
+			case "intervention":
+				return ec.fieldContext_TreatmentSessionReport_intervention(ctx, field)
+			case "planning_and_education":
+				return ec.fieldContext_TreatmentSessionReport_planning_and_education(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSessionReport_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSessionReport_updated_at(ctx, field)
+			case "treatment_session":
+				return ec.fieldContext_TreatmentSessionReport_treatment_session(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TreatmentSessionReport", field.Name)
 		},
 	}
 	defer func() {
@@ -3109,31 +2074,31 @@ func (ec *executionContext) fieldContext_Mutation_cancelSession(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_cancelSession_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createTreatmentSessionReport_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createSOAPNote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateTreatmentSessionReport(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Mutation_createSOAPNote,
+		ec.fieldContext_Mutation_updateTreatmentSessionReport,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateSOAPNote(ctx, fc.Args["input"].(model.CreateSOAPNoteInput))
+			return ec.Resolvers.Mutation().UpdateTreatmentSessionReport(ctx, fc.Args["id"].(uuid.UUID), fc.Args["input"].(model.UpdateTreatmentSessionReportInput))
 		},
 		nil,
-		ec.marshalNSOAPNote2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSOAPNote,
+		ec.marshalNTreatmentSessionReport2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReport,
 		true,
 		true,
 	)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createSOAPNote(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_updateTreatmentSessionReport(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3142,29 +2107,31 @@ func (ec *executionContext) fieldContext_Mutation_createSOAPNote(ctx context.Con
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_SOAPNote_id(ctx, field)
-			case "sessionId":
-				return ec.fieldContext_SOAPNote_sessionId(ctx, field)
-			case "subjective":
-				return ec.fieldContext_SOAPNote_subjective(ctx, field)
-			case "objective":
-				return ec.fieldContext_SOAPNote_objective(ctx, field)
-			case "assessment":
-				return ec.fieldContext_SOAPNote_assessment(ctx, field)
-			case "plan":
-				return ec.fieldContext_SOAPNote_plan(ctx, field)
-			case "painScale":
-				return ec.fieldContext_SOAPNote_painScale(ctx, field)
-			case "vitals":
-				return ec.fieldContext_SOAPNote_vitals(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_SOAPNote_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_SOAPNote_updatedAt(ctx, field)
-			case "session":
-				return ec.fieldContext_SOAPNote_session(ctx, field)
+				return ec.fieldContext_TreatmentSessionReport_id(ctx, field)
+			case "session_id":
+				return ec.fieldContext_TreatmentSessionReport_session_id(ctx, field)
+			case "anamnesis":
+				return ec.fieldContext_TreatmentSessionReport_anamnesis(ctx, field)
+			case "mechanism_of_injury":
+				return ec.fieldContext_TreatmentSessionReport_mechanism_of_injury(ctx, field)
+			case "actual_condition":
+				return ec.fieldContext_TreatmentSessionReport_actual_condition(ctx, field)
+			case "examination":
+				return ec.fieldContext_TreatmentSessionReport_examination(ctx, field)
+			case "diagnosis":
+				return ec.fieldContext_TreatmentSessionReport_diagnosis(ctx, field)
+			case "intervention":
+				return ec.fieldContext_TreatmentSessionReport_intervention(ctx, field)
+			case "planning_and_education":
+				return ec.fieldContext_TreatmentSessionReport_planning_and_education(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSessionReport_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSessionReport_updated_at(ctx, field)
+			case "treatment_session":
+				return ec.fieldContext_TreatmentSessionReport_treatment_session(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type SOAPNote", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TreatmentSessionReport", field.Name)
 		},
 	}
 	defer func() {
@@ -3174,72 +2141,7 @@ func (ec *executionContext) fieldContext_Mutation_createSOAPNote(ctx context.Con
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createSOAPNote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateSOAPNote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_updateSOAPNote,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().UpdateSOAPNote(ctx, fc.Args["id"].(uuid.UUID), fc.Args["input"].(model.UpdateSOAPNoteInput))
-		},
-		nil,
-		ec.marshalNSOAPNote2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSOAPNote,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateSOAPNote(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_SOAPNote_id(ctx, field)
-			case "sessionId":
-				return ec.fieldContext_SOAPNote_sessionId(ctx, field)
-			case "subjective":
-				return ec.fieldContext_SOAPNote_subjective(ctx, field)
-			case "objective":
-				return ec.fieldContext_SOAPNote_objective(ctx, field)
-			case "assessment":
-				return ec.fieldContext_SOAPNote_assessment(ctx, field)
-			case "plan":
-				return ec.fieldContext_SOAPNote_plan(ctx, field)
-			case "painScale":
-				return ec.fieldContext_SOAPNote_painScale(ctx, field)
-			case "vitals":
-				return ec.fieldContext_SOAPNote_vitals(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_SOAPNote_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_SOAPNote_updatedAt(ctx, field)
-			case "session":
-				return ec.fieldContext_SOAPNote_session(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SOAPNote", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateSOAPNote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_updateTreatmentSessionReport_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3275,12 +2177,12 @@ func (ec *executionContext) fieldContext_Patient_id(_ context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Patient_medicalRecordNo(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
+func (ec *executionContext) _Patient_medical_record_no(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Patient_medicalRecordNo,
+		ec.fieldContext_Patient_medical_record_no,
 		func(ctx context.Context) (any, error) {
 			return obj.MedicalRecordNo, nil
 		},
@@ -3291,7 +2193,7 @@ func (ec *executionContext) _Patient_medicalRecordNo(ctx context.Context, field 
 	)
 }
 
-func (ec *executionContext) fieldContext_Patient_medicalRecordNo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Patient_medical_record_no(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
@@ -3304,12 +2206,12 @@ func (ec *executionContext) fieldContext_Patient_medicalRecordNo(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Patient_fullName(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
+func (ec *executionContext) _Patient_full_name(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Patient_fullName,
+		ec.fieldContext_Patient_full_name,
 		func(ctx context.Context) (any, error) {
 			return obj.FullName, nil
 		},
@@ -3320,7 +2222,7 @@ func (ec *executionContext) _Patient_fullName(ctx context.Context, field graphql
 	)
 }
 
-func (ec *executionContext) fieldContext_Patient_fullName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Patient_full_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
@@ -3333,12 +2235,12 @@ func (ec *executionContext) fieldContext_Patient_fullName(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Patient_dateOfBirth(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
+func (ec *executionContext) _Patient_date_of_birth(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Patient_dateOfBirth,
+		ec.fieldContext_Patient_date_of_birth,
 		func(ctx context.Context) (any, error) {
 			return obj.DateOfBirth, nil
 		},
@@ -3349,7 +2251,7 @@ func (ec *executionContext) _Patient_dateOfBirth(ctx context.Context, field grap
 	)
 }
 
-func (ec *executionContext) fieldContext_Patient_dateOfBirth(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Patient_date_of_birth(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
@@ -3478,12 +2380,12 @@ func (ec *executionContext) fieldContext_Patient_address(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Patient_emergencyContact(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
+func (ec *executionContext) _Patient_emergency_contact(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Patient_emergencyContact,
+		ec.fieldContext_Patient_emergency_contact,
 		func(ctx context.Context) (any, error) {
 			return obj.EmergencyContact, nil
 		},
@@ -3494,7 +2396,7 @@ func (ec *executionContext) _Patient_emergencyContact(ctx context.Context, field
 	)
 }
 
-func (ec *executionContext) fieldContext_Patient_emergencyContact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Patient_emergency_contact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
@@ -3515,12 +2417,12 @@ func (ec *executionContext) fieldContext_Patient_emergencyContact(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Patient_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
+func (ec *executionContext) _Patient_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Patient_createdAt,
+		ec.fieldContext_Patient_created_at,
 		func(ctx context.Context) (any, error) {
 			return obj.CreatedAt, nil
 		},
@@ -3531,7 +2433,7 @@ func (ec *executionContext) _Patient_createdAt(ctx context.Context, field graphq
 	)
 }
 
-func (ec *executionContext) fieldContext_Patient_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Patient_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
@@ -3544,12 +2446,12 @@ func (ec *executionContext) fieldContext_Patient_createdAt(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Patient_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
+func (ec *executionContext) _Patient_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Patient_updatedAt,
+		ec.fieldContext_Patient_updated_at,
 		func(ctx context.Context) (any, error) {
 			return obj.UpdatedAt, nil
 		},
@@ -3560,7 +2462,7 @@ func (ec *executionContext) _Patient_updatedAt(ctx context.Context, field graphq
 	)
 }
 
-func (ec *executionContext) fieldContext_Patient_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Patient_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
@@ -3573,69 +2475,12 @@ func (ec *executionContext) fieldContext_Patient_updatedAt(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Patient_appointments(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
+func (ec *executionContext) _Patient_treatment_sessions(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Patient_appointments,
-		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.Patient().Appointments(ctx, obj)
-		},
-		nil,
-		ec.marshalNAppointment2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentᚄ,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Patient_appointments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Patient",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Appointment_id(ctx, field)
-			case "patientId":
-				return ec.fieldContext_Appointment_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_Appointment_staffId(ctx, field)
-			case "scheduledAt":
-				return ec.fieldContext_Appointment_scheduledAt(ctx, field)
-			case "durationMin":
-				return ec.fieldContext_Appointment_durationMin(ctx, field)
-			case "status":
-				return ec.fieldContext_Appointment_status(ctx, field)
-			case "chiefComplaint":
-				return ec.fieldContext_Appointment_chiefComplaint(ctx, field)
-			case "notes":
-				return ec.fieldContext_Appointment_notes(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Appointment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Appointment_updatedAt(ctx, field)
-			case "patient":
-				return ec.fieldContext_Appointment_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_Appointment_staff(ctx, field)
-			case "session":
-				return ec.fieldContext_Appointment_session(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Appointment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Patient_treatmentSessions(ctx context.Context, field graphql.CollectedField, obj *model.Patient) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Patient_treatmentSessions,
+		ec.fieldContext_Patient_treatment_sessions,
 		func(ctx context.Context) (any, error) {
 			return ec.Resolvers.Patient().TreatmentSessions(ctx, obj)
 		},
@@ -3646,7 +2491,7 @@ func (ec *executionContext) _Patient_treatmentSessions(ctx context.Context, fiel
 	)
 }
 
-func (ec *executionContext) fieldContext_Patient_treatmentSessions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Patient_treatment_sessions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Patient",
 		Field:      field,
@@ -3656,30 +2501,28 @@ func (ec *executionContext) fieldContext_Patient_treatmentSessions(_ context.Con
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_TreatmentSession_id(ctx, field)
-			case "appointmentId":
-				return ec.fieldContext_TreatmentSession_appointmentId(ctx, field)
-			case "patientId":
-				return ec.fieldContext_TreatmentSession_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_TreatmentSession_staffId(ctx, field)
-			case "sessionDate":
-				return ec.fieldContext_TreatmentSession_sessionDate(ctx, field)
-			case "sessionNo":
-				return ec.fieldContext_TreatmentSession_sessionNo(ctx, field)
+			case "patient_id":
+				return ec.fieldContext_TreatmentSession_patient_id(ctx, field)
+			case "staff_id":
+				return ec.fieldContext_TreatmentSession_staff_id(ctx, field)
+			case "session_date":
+				return ec.fieldContext_TreatmentSession_session_date(ctx, field)
+			case "session_no":
+				return ec.fieldContext_TreatmentSession_session_no(ctx, field)
 			case "status":
 				return ec.fieldContext_TreatmentSession_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_TreatmentSession_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_TreatmentSession_updatedAt(ctx, field)
-			case "appointment":
-				return ec.fieldContext_TreatmentSession_appointment(ctx, field)
+			case "note":
+				return ec.fieldContext_TreatmentSession_note(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSession_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSession_updated_at(ctx, field)
 			case "patient":
 				return ec.fieldContext_TreatmentSession_patient(ctx, field)
 			case "staff":
 				return ec.fieldContext_TreatmentSession_staff(ctx, field)
-			case "soapNote":
-				return ec.fieldContext_TreatmentSession_soapNote(ctx, field)
+			case "report":
+				return ec.fieldContext_TreatmentSession_report(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
 		},
@@ -3713,12 +2556,12 @@ func (ec *executionContext) fieldContext_PatientConnection_nodes(_ context.Conte
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Patient_id(ctx, field)
-			case "medicalRecordNo":
-				return ec.fieldContext_Patient_medicalRecordNo(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Patient_fullName(ctx, field)
-			case "dateOfBirth":
-				return ec.fieldContext_Patient_dateOfBirth(ctx, field)
+			case "medical_record_no":
+				return ec.fieldContext_Patient_medical_record_no(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Patient_full_name(ctx, field)
+			case "date_of_birth":
+				return ec.fieldContext_Patient_date_of_birth(ctx, field)
 			case "gender":
 				return ec.fieldContext_Patient_gender(ctx, field)
 			case "phone":
@@ -3727,16 +2570,14 @@ func (ec *executionContext) fieldContext_PatientConnection_nodes(_ context.Conte
 				return ec.fieldContext_Patient_email(ctx, field)
 			case "address":
 				return ec.fieldContext_Patient_address(ctx, field)
-			case "emergencyContact":
-				return ec.fieldContext_Patient_emergencyContact(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Patient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Patient_updatedAt(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Patient_appointments(ctx, field)
-			case "treatmentSessions":
-				return ec.fieldContext_Patient_treatmentSessions(ctx, field)
+			case "emergency_contact":
+				return ec.fieldContext_Patient_emergency_contact(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Patient_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Patient_updated_at(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Patient_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Patient", field.Name)
 		},
@@ -3744,12 +2585,12 @@ func (ec *executionContext) fieldContext_PatientConnection_nodes(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _PatientConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.PatientConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _PatientConnection_total_count(ctx context.Context, field graphql.CollectedField, obj *model.PatientConnection) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_PatientConnection_totalCount,
+		ec.fieldContext_PatientConnection_total_count,
 		func(ctx context.Context) (any, error) {
 			return obj.TotalCount, nil
 		},
@@ -3760,7 +2601,7 @@ func (ec *executionContext) _PatientConnection_totalCount(ctx context.Context, f
 	)
 }
 
-func (ec *executionContext) fieldContext_PatientConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PatientConnection_total_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PatientConnection",
 		Field:      field,
@@ -3803,12 +2644,12 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 				return ec.fieldContext_User_email(ctx, field)
 			case "role":
 				return ec.fieldContext_User_role(ctx, field)
-			case "isActive":
-				return ec.fieldContext_User_isActive(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "is_active":
+				return ec.fieldContext_User_is_active(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
 			case "staff":
 				return ec.fieldContext_User_staff(ctx, field)
 			}
@@ -3845,12 +2686,12 @@ func (ec *executionContext) fieldContext_Query_patient(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Patient_id(ctx, field)
-			case "medicalRecordNo":
-				return ec.fieldContext_Patient_medicalRecordNo(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Patient_fullName(ctx, field)
-			case "dateOfBirth":
-				return ec.fieldContext_Patient_dateOfBirth(ctx, field)
+			case "medical_record_no":
+				return ec.fieldContext_Patient_medical_record_no(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Patient_full_name(ctx, field)
+			case "date_of_birth":
+				return ec.fieldContext_Patient_date_of_birth(ctx, field)
 			case "gender":
 				return ec.fieldContext_Patient_gender(ctx, field)
 			case "phone":
@@ -3859,16 +2700,14 @@ func (ec *executionContext) fieldContext_Query_patient(ctx context.Context, fiel
 				return ec.fieldContext_Patient_email(ctx, field)
 			case "address":
 				return ec.fieldContext_Patient_address(ctx, field)
-			case "emergencyContact":
-				return ec.fieldContext_Patient_emergencyContact(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Patient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Patient_updatedAt(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Patient_appointments(ctx, field)
-			case "treatmentSessions":
-				return ec.fieldContext_Patient_treatmentSessions(ctx, field)
+			case "emergency_contact":
+				return ec.fieldContext_Patient_emergency_contact(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Patient_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Patient_updated_at(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Patient_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Patient", field.Name)
 		},
@@ -3914,8 +2753,8 @@ func (ec *executionContext) fieldContext_Query_patients(ctx context.Context, fie
 			switch field.Name {
 			case "nodes":
 				return ec.fieldContext_PatientConnection_nodes(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_PatientConnection_totalCount(ctx, field)
+			case "total_count":
+				return ec.fieldContext_PatientConnection_total_count(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PatientConnection", field.Name)
 		},
@@ -3961,24 +2800,24 @@ func (ec *executionContext) fieldContext_Query_staff(ctx context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Staff_id(ctx, field)
-			case "userId":
-				return ec.fieldContext_Staff_userId(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Staff_fullName(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Staff_user_id(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Staff_full_name(ctx, field)
 			case "specialization":
 				return ec.fieldContext_Staff_specialization(ctx, field)
-			case "licenseNo":
-				return ec.fieldContext_Staff_licenseNo(ctx, field)
+			case "license_no":
+				return ec.fieldContext_Staff_license_no(ctx, field)
 			case "phone":
 				return ec.fieldContext_Staff_phone(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Staff_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Staff_updatedAt(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Staff_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Staff_updated_at(ctx, field)
 			case "user":
 				return ec.fieldContext_Staff_user(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Staff_appointments(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Staff_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Staff", field.Name)
 		},
@@ -4024,8 +2863,8 @@ func (ec *executionContext) fieldContext_Query_staffs(ctx context.Context, field
 			switch field.Name {
 			case "nodes":
 				return ec.fieldContext_StaffConnection_nodes(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_StaffConnection_totalCount(ctx, field)
+			case "total_count":
+				return ec.fieldContext_StaffConnection_total_count(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type StaffConnection", field.Name)
 		},
@@ -4038,122 +2877,6 @@ func (ec *executionContext) fieldContext_Query_staffs(ctx context.Context, field
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_staffs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_appointment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Query_appointment,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Appointment(ctx, fc.Args["id"].(uuid.UUID))
-		},
-		nil,
-		ec.marshalOAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Query_appointment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Appointment_id(ctx, field)
-			case "patientId":
-				return ec.fieldContext_Appointment_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_Appointment_staffId(ctx, field)
-			case "scheduledAt":
-				return ec.fieldContext_Appointment_scheduledAt(ctx, field)
-			case "durationMin":
-				return ec.fieldContext_Appointment_durationMin(ctx, field)
-			case "status":
-				return ec.fieldContext_Appointment_status(ctx, field)
-			case "chiefComplaint":
-				return ec.fieldContext_Appointment_chiefComplaint(ctx, field)
-			case "notes":
-				return ec.fieldContext_Appointment_notes(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Appointment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Appointment_updatedAt(ctx, field)
-			case "patient":
-				return ec.fieldContext_Appointment_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_Appointment_staff(ctx, field)
-			case "session":
-				return ec.fieldContext_Appointment_session(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Appointment", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_appointment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_appointments(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Query_appointments,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Appointments(ctx, fc.Args["filter"].(*model.AppointmentFilter), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32))
-		},
-		nil,
-		ec.marshalNAppointmentConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentConnection,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Query_appointments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "nodes":
-				return ec.fieldContext_AppointmentConnection_nodes(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_AppointmentConnection_totalCount(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AppointmentConnection", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_appointments_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4187,30 +2910,28 @@ func (ec *executionContext) fieldContext_Query_treatmentSession(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_TreatmentSession_id(ctx, field)
-			case "appointmentId":
-				return ec.fieldContext_TreatmentSession_appointmentId(ctx, field)
-			case "patientId":
-				return ec.fieldContext_TreatmentSession_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_TreatmentSession_staffId(ctx, field)
-			case "sessionDate":
-				return ec.fieldContext_TreatmentSession_sessionDate(ctx, field)
-			case "sessionNo":
-				return ec.fieldContext_TreatmentSession_sessionNo(ctx, field)
+			case "patient_id":
+				return ec.fieldContext_TreatmentSession_patient_id(ctx, field)
+			case "staff_id":
+				return ec.fieldContext_TreatmentSession_staff_id(ctx, field)
+			case "session_date":
+				return ec.fieldContext_TreatmentSession_session_date(ctx, field)
+			case "session_no":
+				return ec.fieldContext_TreatmentSession_session_no(ctx, field)
 			case "status":
 				return ec.fieldContext_TreatmentSession_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_TreatmentSession_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_TreatmentSession_updatedAt(ctx, field)
-			case "appointment":
-				return ec.fieldContext_TreatmentSession_appointment(ctx, field)
+			case "note":
+				return ec.fieldContext_TreatmentSession_note(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSession_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSession_updated_at(ctx, field)
 			case "patient":
 				return ec.fieldContext_TreatmentSession_patient(ctx, field)
 			case "staff":
 				return ec.fieldContext_TreatmentSession_staff(ctx, field)
-			case "soapNote":
-				return ec.fieldContext_TreatmentSession_soapNote(ctx, field)
+			case "report":
+				return ec.fieldContext_TreatmentSession_report(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
 		},
@@ -4256,8 +2977,8 @@ func (ec *executionContext) fieldContext_Query_treatmentSessions(ctx context.Con
 			switch field.Name {
 			case "nodes":
 				return ec.fieldContext_TreatmentSessionConnection_nodes(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_TreatmentSessionConnection_totalCount(ctx, field)
+			case "total_count":
+				return ec.fieldContext_TreatmentSessionConnection_total_count(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TreatmentSessionConnection", field.Name)
 		},
@@ -4276,24 +2997,24 @@ func (ec *executionContext) fieldContext_Query_treatmentSessions(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_soapNote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_treatmentSessionReport(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Query_soapNote,
+		ec.fieldContext_Query_treatmentSessionReport,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().SoapNote(ctx, fc.Args["sessionId"].(uuid.UUID))
+			return ec.Resolvers.Query().TreatmentSessionReport(ctx, fc.Args["id"].(uuid.UUID))
 		},
 		nil,
-		ec.marshalOSOAPNote2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSOAPNote,
+		ec.marshalOTreatmentSessionReport2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReport,
 		true,
 		false,
 	)
 }
 
-func (ec *executionContext) fieldContext_Query_soapNote(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_treatmentSessionReport(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -4302,29 +3023,31 @@ func (ec *executionContext) fieldContext_Query_soapNote(ctx context.Context, fie
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_SOAPNote_id(ctx, field)
-			case "sessionId":
-				return ec.fieldContext_SOAPNote_sessionId(ctx, field)
-			case "subjective":
-				return ec.fieldContext_SOAPNote_subjective(ctx, field)
-			case "objective":
-				return ec.fieldContext_SOAPNote_objective(ctx, field)
-			case "assessment":
-				return ec.fieldContext_SOAPNote_assessment(ctx, field)
-			case "plan":
-				return ec.fieldContext_SOAPNote_plan(ctx, field)
-			case "painScale":
-				return ec.fieldContext_SOAPNote_painScale(ctx, field)
-			case "vitals":
-				return ec.fieldContext_SOAPNote_vitals(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_SOAPNote_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_SOAPNote_updatedAt(ctx, field)
-			case "session":
-				return ec.fieldContext_SOAPNote_session(ctx, field)
+				return ec.fieldContext_TreatmentSessionReport_id(ctx, field)
+			case "session_id":
+				return ec.fieldContext_TreatmentSessionReport_session_id(ctx, field)
+			case "anamnesis":
+				return ec.fieldContext_TreatmentSessionReport_anamnesis(ctx, field)
+			case "mechanism_of_injury":
+				return ec.fieldContext_TreatmentSessionReport_mechanism_of_injury(ctx, field)
+			case "actual_condition":
+				return ec.fieldContext_TreatmentSessionReport_actual_condition(ctx, field)
+			case "examination":
+				return ec.fieldContext_TreatmentSessionReport_examination(ctx, field)
+			case "diagnosis":
+				return ec.fieldContext_TreatmentSessionReport_diagnosis(ctx, field)
+			case "intervention":
+				return ec.fieldContext_TreatmentSessionReport_intervention(ctx, field)
+			case "planning_and_education":
+				return ec.fieldContext_TreatmentSessionReport_planning_and_education(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSessionReport_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSessionReport_updated_at(ctx, field)
+			case "treatment_session":
+				return ec.fieldContext_TreatmentSessionReport_treatment_session(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type SOAPNote", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TreatmentSessionReport", field.Name)
 		},
 	}
 	defer func() {
@@ -4334,7 +3057,54 @@ func (ec *executionContext) fieldContext_Query_soapNote(ctx context.Context, fie
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_soapNote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_treatmentSessionReport_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_treatmentSessionReports(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_treatmentSessionReports,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().TreatmentSessionReports(ctx, fc.Args["filter"].(*model.ReportFilter), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32))
+		},
+		nil,
+		ec.marshalNTreatmentSessionReportConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportConnection,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_treatmentSessionReports(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "nodes":
+				return ec.fieldContext_TreatmentSessionReportConnection_nodes(ctx, field)
+			case "total_count":
+				return ec.fieldContext_TreatmentSessionReportConnection_total_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TreatmentSessionReportConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_treatmentSessionReports_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4449,365 +3219,6 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _SOAPNote_id(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_id,
-		func(ctx context.Context) (any, error) {
-			return obj.ID, nil
-		},
-		nil,
-		ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UUID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_sessionId(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_sessionId,
-		func(ctx context.Context) (any, error) {
-			return obj.SessionID, nil
-		},
-		nil,
-		ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_sessionId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UUID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_subjective(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_subjective,
-		func(ctx context.Context) (any, error) {
-			return obj.Subjective, nil
-		},
-		nil,
-		ec.marshalNString2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_subjective(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_objective(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_objective,
-		func(ctx context.Context) (any, error) {
-			return obj.Objective, nil
-		},
-		nil,
-		ec.marshalNString2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_objective(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_assessment(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_assessment,
-		func(ctx context.Context) (any, error) {
-			return obj.Assessment, nil
-		},
-		nil,
-		ec.marshalNString2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_assessment(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_plan(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_plan,
-		func(ctx context.Context) (any, error) {
-			return obj.Plan, nil
-		},
-		nil,
-		ec.marshalNString2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_plan(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_painScale(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_painScale,
-		func(ctx context.Context) (any, error) {
-			return obj.PainScale, nil
-		},
-		nil,
-		ec.marshalOInt2ᚖint32,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_painScale(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_vitals(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_vitals,
-		func(ctx context.Context) (any, error) {
-			return obj.Vitals, nil
-		},
-		nil,
-		ec.marshalOVitals2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐVitals,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_vitals(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "bp":
-				return ec.fieldContext_Vitals_bp(ctx, field)
-			case "hr":
-				return ec.fieldContext_Vitals_hr(ctx, field)
-			case "spo2":
-				return ec.fieldContext_Vitals_spo2(ctx, field)
-			case "temp":
-				return ec.fieldContext_Vitals_temp(ctx, field)
-			case "weight":
-				return ec.fieldContext_Vitals_weight(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Vitals", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_createdAt,
-		func(ctx context.Context) (any, error) {
-			return obj.CreatedAt, nil
-		},
-		nil,
-		ec.marshalNTime2timeᚐTime,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_updatedAt,
-		func(ctx context.Context) (any, error) {
-			return obj.UpdatedAt, nil
-		},
-		nil,
-		ec.marshalNTime2timeᚐTime,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SOAPNote_session(ctx context.Context, field graphql.CollectedField, obj *model.SOAPNote) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_SOAPNote_session,
-		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.SOAPNote().Session(ctx, obj)
-		},
-		nil,
-		ec.marshalNTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_SOAPNote_session(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SOAPNote",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_TreatmentSession_id(ctx, field)
-			case "appointmentId":
-				return ec.fieldContext_TreatmentSession_appointmentId(ctx, field)
-			case "patientId":
-				return ec.fieldContext_TreatmentSession_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_TreatmentSession_staffId(ctx, field)
-			case "sessionDate":
-				return ec.fieldContext_TreatmentSession_sessionDate(ctx, field)
-			case "sessionNo":
-				return ec.fieldContext_TreatmentSession_sessionNo(ctx, field)
-			case "status":
-				return ec.fieldContext_TreatmentSession_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_TreatmentSession_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_TreatmentSession_updatedAt(ctx, field)
-			case "appointment":
-				return ec.fieldContext_TreatmentSession_appointment(ctx, field)
-			case "patient":
-				return ec.fieldContext_TreatmentSession_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_TreatmentSession_staff(ctx, field)
-			case "soapNote":
-				return ec.fieldContext_TreatmentSession_soapNote(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Staff_id(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -4837,12 +3248,12 @@ func (ec *executionContext) fieldContext_Staff_id(_ context.Context, field graph
 	return fc, nil
 }
 
-func (ec *executionContext) _Staff_userId(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
+func (ec *executionContext) _Staff_user_id(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Staff_userId,
+		ec.fieldContext_Staff_user_id,
 		func(ctx context.Context) (any, error) {
 			return obj.UserID, nil
 		},
@@ -4853,7 +3264,7 @@ func (ec *executionContext) _Staff_userId(ctx context.Context, field graphql.Col
 	)
 }
 
-func (ec *executionContext) fieldContext_Staff_userId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Staff_user_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Staff",
 		Field:      field,
@@ -4866,12 +3277,12 @@ func (ec *executionContext) fieldContext_Staff_userId(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Staff_fullName(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
+func (ec *executionContext) _Staff_full_name(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Staff_fullName,
+		ec.fieldContext_Staff_full_name,
 		func(ctx context.Context) (any, error) {
 			return obj.FullName, nil
 		},
@@ -4882,7 +3293,7 @@ func (ec *executionContext) _Staff_fullName(ctx context.Context, field graphql.C
 	)
 }
 
-func (ec *executionContext) fieldContext_Staff_fullName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Staff_full_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Staff",
 		Field:      field,
@@ -4924,12 +3335,12 @@ func (ec *executionContext) fieldContext_Staff_specialization(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Staff_licenseNo(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
+func (ec *executionContext) _Staff_license_no(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Staff_licenseNo,
+		ec.fieldContext_Staff_license_no,
 		func(ctx context.Context) (any, error) {
 			return obj.LicenseNo, nil
 		},
@@ -4940,7 +3351,7 @@ func (ec *executionContext) _Staff_licenseNo(ctx context.Context, field graphql.
 	)
 }
 
-func (ec *executionContext) fieldContext_Staff_licenseNo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Staff_license_no(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Staff",
 		Field:      field,
@@ -4982,12 +3393,12 @@ func (ec *executionContext) fieldContext_Staff_phone(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Staff_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
+func (ec *executionContext) _Staff_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Staff_createdAt,
+		ec.fieldContext_Staff_created_at,
 		func(ctx context.Context) (any, error) {
 			return obj.CreatedAt, nil
 		},
@@ -4998,7 +3409,7 @@ func (ec *executionContext) _Staff_createdAt(ctx context.Context, field graphql.
 	)
 }
 
-func (ec *executionContext) fieldContext_Staff_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Staff_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Staff",
 		Field:      field,
@@ -5011,12 +3422,12 @@ func (ec *executionContext) fieldContext_Staff_createdAt(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Staff_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
+func (ec *executionContext) _Staff_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Staff_updatedAt,
+		ec.fieldContext_Staff_updated_at,
 		func(ctx context.Context) (any, error) {
 			return obj.UpdatedAt, nil
 		},
@@ -5027,7 +3438,7 @@ func (ec *executionContext) _Staff_updatedAt(ctx context.Context, field graphql.
 	)
 }
 
-func (ec *executionContext) fieldContext_Staff_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Staff_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Staff",
 		Field:      field,
@@ -5070,12 +3481,12 @@ func (ec *executionContext) fieldContext_Staff_user(_ context.Context, field gra
 				return ec.fieldContext_User_email(ctx, field)
 			case "role":
 				return ec.fieldContext_User_role(ctx, field)
-			case "isActive":
-				return ec.fieldContext_User_isActive(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "is_active":
+				return ec.fieldContext_User_is_active(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
 			case "staff":
 				return ec.fieldContext_User_staff(ctx, field)
 			}
@@ -5085,58 +3496,56 @@ func (ec *executionContext) fieldContext_Staff_user(_ context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Staff_appointments(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
+func (ec *executionContext) _Staff_treatment_sessions(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Staff_appointments,
+		ec.fieldContext_Staff_treatment_sessions,
 		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.Staff().Appointments(ctx, obj)
+			return obj.TreatmentSessions, nil
 		},
 		nil,
-		ec.marshalNAppointment2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentᚄ,
+		ec.marshalNTreatmentSession2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionᚄ,
 		true,
 		true,
 	)
 }
 
-func (ec *executionContext) fieldContext_Staff_appointments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Staff_treatment_sessions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Staff",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Appointment_id(ctx, field)
-			case "patientId":
-				return ec.fieldContext_Appointment_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_Appointment_staffId(ctx, field)
-			case "scheduledAt":
-				return ec.fieldContext_Appointment_scheduledAt(ctx, field)
-			case "durationMin":
-				return ec.fieldContext_Appointment_durationMin(ctx, field)
+				return ec.fieldContext_TreatmentSession_id(ctx, field)
+			case "patient_id":
+				return ec.fieldContext_TreatmentSession_patient_id(ctx, field)
+			case "staff_id":
+				return ec.fieldContext_TreatmentSession_staff_id(ctx, field)
+			case "session_date":
+				return ec.fieldContext_TreatmentSession_session_date(ctx, field)
+			case "session_no":
+				return ec.fieldContext_TreatmentSession_session_no(ctx, field)
 			case "status":
-				return ec.fieldContext_Appointment_status(ctx, field)
-			case "chiefComplaint":
-				return ec.fieldContext_Appointment_chiefComplaint(ctx, field)
-			case "notes":
-				return ec.fieldContext_Appointment_notes(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Appointment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Appointment_updatedAt(ctx, field)
+				return ec.fieldContext_TreatmentSession_status(ctx, field)
+			case "note":
+				return ec.fieldContext_TreatmentSession_note(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSession_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSession_updated_at(ctx, field)
 			case "patient":
-				return ec.fieldContext_Appointment_patient(ctx, field)
+				return ec.fieldContext_TreatmentSession_patient(ctx, field)
 			case "staff":
-				return ec.fieldContext_Appointment_staff(ctx, field)
-			case "session":
-				return ec.fieldContext_Appointment_session(ctx, field)
+				return ec.fieldContext_TreatmentSession_staff(ctx, field)
+			case "report":
+				return ec.fieldContext_TreatmentSession_report(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Appointment", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
 		},
 	}
 	return fc, nil
@@ -5168,24 +3577,24 @@ func (ec *executionContext) fieldContext_StaffConnection_nodes(_ context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Staff_id(ctx, field)
-			case "userId":
-				return ec.fieldContext_Staff_userId(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Staff_fullName(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Staff_user_id(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Staff_full_name(ctx, field)
 			case "specialization":
 				return ec.fieldContext_Staff_specialization(ctx, field)
-			case "licenseNo":
-				return ec.fieldContext_Staff_licenseNo(ctx, field)
+			case "license_no":
+				return ec.fieldContext_Staff_license_no(ctx, field)
 			case "phone":
 				return ec.fieldContext_Staff_phone(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Staff_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Staff_updatedAt(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Staff_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Staff_updated_at(ctx, field)
 			case "user":
 				return ec.fieldContext_Staff_user(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Staff_appointments(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Staff_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Staff", field.Name)
 		},
@@ -5193,12 +3602,12 @@ func (ec *executionContext) fieldContext_StaffConnection_nodes(_ context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _StaffConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.StaffConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _StaffConnection_total_count(ctx context.Context, field graphql.CollectedField, obj *model.StaffConnection) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_StaffConnection_totalCount,
+		ec.fieldContext_StaffConnection_total_count,
 		func(ctx context.Context) (any, error) {
 			return obj.TotalCount, nil
 		},
@@ -5209,7 +3618,7 @@ func (ec *executionContext) _StaffConnection_totalCount(ctx context.Context, fie
 	)
 }
 
-func (ec *executionContext) fieldContext_StaffConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_StaffConnection_total_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "StaffConnection",
 		Field:      field,
@@ -5251,41 +3660,12 @@ func (ec *executionContext) fieldContext_TreatmentSession_id(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _TreatmentSession_appointmentId(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
+func (ec *executionContext) _TreatmentSession_patient_id(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TreatmentSession_appointmentId,
-		func(ctx context.Context) (any, error) {
-			return obj.AppointmentID, nil
-		},
-		nil,
-		ec.marshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_TreatmentSession_appointmentId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TreatmentSession",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UUID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TreatmentSession_patientId(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_TreatmentSession_patientId,
+		ec.fieldContext_TreatmentSession_patient_id,
 		func(ctx context.Context) (any, error) {
 			return obj.PatientID, nil
 		},
@@ -5296,7 +3676,7 @@ func (ec *executionContext) _TreatmentSession_patientId(ctx context.Context, fie
 	)
 }
 
-func (ec *executionContext) fieldContext_TreatmentSession_patientId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TreatmentSession_patient_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
@@ -5309,12 +3689,12 @@ func (ec *executionContext) fieldContext_TreatmentSession_patientId(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _TreatmentSession_staffId(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
+func (ec *executionContext) _TreatmentSession_staff_id(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TreatmentSession_staffId,
+		ec.fieldContext_TreatmentSession_staff_id,
 		func(ctx context.Context) (any, error) {
 			return obj.StaffID, nil
 		},
@@ -5325,7 +3705,7 @@ func (ec *executionContext) _TreatmentSession_staffId(ctx context.Context, field
 	)
 }
 
-func (ec *executionContext) fieldContext_TreatmentSession_staffId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TreatmentSession_staff_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
@@ -5338,12 +3718,12 @@ func (ec *executionContext) fieldContext_TreatmentSession_staffId(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _TreatmentSession_sessionDate(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
+func (ec *executionContext) _TreatmentSession_session_date(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TreatmentSession_sessionDate,
+		ec.fieldContext_TreatmentSession_session_date,
 		func(ctx context.Context) (any, error) {
 			return obj.SessionDate, nil
 		},
@@ -5354,7 +3734,7 @@ func (ec *executionContext) _TreatmentSession_sessionDate(ctx context.Context, f
 	)
 }
 
-func (ec *executionContext) fieldContext_TreatmentSession_sessionDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TreatmentSession_session_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
@@ -5367,12 +3747,12 @@ func (ec *executionContext) fieldContext_TreatmentSession_sessionDate(_ context.
 	return fc, nil
 }
 
-func (ec *executionContext) _TreatmentSession_sessionNo(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
+func (ec *executionContext) _TreatmentSession_session_no(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TreatmentSession_sessionNo,
+		ec.fieldContext_TreatmentSession_session_no,
 		func(ctx context.Context) (any, error) {
 			return obj.SessionNo, nil
 		},
@@ -5383,7 +3763,7 @@ func (ec *executionContext) _TreatmentSession_sessionNo(ctx context.Context, fie
 	)
 }
 
-func (ec *executionContext) fieldContext_TreatmentSession_sessionNo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TreatmentSession_session_no(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
@@ -5425,12 +3805,41 @@ func (ec *executionContext) fieldContext_TreatmentSession_status(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _TreatmentSession_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
+func (ec *executionContext) _TreatmentSession_note(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TreatmentSession_createdAt,
+		ec.fieldContext_TreatmentSession_note,
+		func(ctx context.Context) (any, error) {
+			return obj.Note, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSession_note(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSession",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSession_created_at(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSession_created_at,
 		func(ctx context.Context) (any, error) {
 			return obj.CreatedAt, nil
 		},
@@ -5441,7 +3850,7 @@ func (ec *executionContext) _TreatmentSession_createdAt(ctx context.Context, fie
 	)
 }
 
-func (ec *executionContext) fieldContext_TreatmentSession_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TreatmentSession_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
@@ -5454,12 +3863,12 @@ func (ec *executionContext) fieldContext_TreatmentSession_createdAt(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _TreatmentSession_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
+func (ec *executionContext) _TreatmentSession_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TreatmentSession_updatedAt,
+		ec.fieldContext_TreatmentSession_updated_at,
 		func(ctx context.Context) (any, error) {
 			return obj.UpdatedAt, nil
 		},
@@ -5470,7 +3879,7 @@ func (ec *executionContext) _TreatmentSession_updatedAt(ctx context.Context, fie
 	)
 }
 
-func (ec *executionContext) fieldContext_TreatmentSession_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TreatmentSession_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
@@ -5478,63 +3887,6 @@ func (ec *executionContext) fieldContext_TreatmentSession_updatedAt(_ context.Co
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TreatmentSession_appointment(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_TreatmentSession_appointment,
-		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.TreatmentSession().Appointment(ctx, obj)
-		},
-		nil,
-		ec.marshalOAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_TreatmentSession_appointment(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TreatmentSession",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Appointment_id(ctx, field)
-			case "patientId":
-				return ec.fieldContext_Appointment_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_Appointment_staffId(ctx, field)
-			case "scheduledAt":
-				return ec.fieldContext_Appointment_scheduledAt(ctx, field)
-			case "durationMin":
-				return ec.fieldContext_Appointment_durationMin(ctx, field)
-			case "status":
-				return ec.fieldContext_Appointment_status(ctx, field)
-			case "chiefComplaint":
-				return ec.fieldContext_Appointment_chiefComplaint(ctx, field)
-			case "notes":
-				return ec.fieldContext_Appointment_notes(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Appointment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Appointment_updatedAt(ctx, field)
-			case "patient":
-				return ec.fieldContext_Appointment_patient(ctx, field)
-			case "staff":
-				return ec.fieldContext_Appointment_staff(ctx, field)
-			case "session":
-				return ec.fieldContext_Appointment_session(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Appointment", field.Name)
 		},
 	}
 	return fc, nil
@@ -5566,12 +3918,12 @@ func (ec *executionContext) fieldContext_TreatmentSession_patient(_ context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Patient_id(ctx, field)
-			case "medicalRecordNo":
-				return ec.fieldContext_Patient_medicalRecordNo(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Patient_fullName(ctx, field)
-			case "dateOfBirth":
-				return ec.fieldContext_Patient_dateOfBirth(ctx, field)
+			case "medical_record_no":
+				return ec.fieldContext_Patient_medical_record_no(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Patient_full_name(ctx, field)
+			case "date_of_birth":
+				return ec.fieldContext_Patient_date_of_birth(ctx, field)
 			case "gender":
 				return ec.fieldContext_Patient_gender(ctx, field)
 			case "phone":
@@ -5580,16 +3932,14 @@ func (ec *executionContext) fieldContext_TreatmentSession_patient(_ context.Cont
 				return ec.fieldContext_Patient_email(ctx, field)
 			case "address":
 				return ec.fieldContext_Patient_address(ctx, field)
-			case "emergencyContact":
-				return ec.fieldContext_Patient_emergencyContact(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Patient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Patient_updatedAt(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Patient_appointments(ctx, field)
-			case "treatmentSessions":
-				return ec.fieldContext_Patient_treatmentSessions(ctx, field)
+			case "emergency_contact":
+				return ec.fieldContext_Patient_emergency_contact(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Patient_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Patient_updated_at(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Patient_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Patient", field.Name)
 		},
@@ -5623,24 +3973,24 @@ func (ec *executionContext) fieldContext_TreatmentSession_staff(_ context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Staff_id(ctx, field)
-			case "userId":
-				return ec.fieldContext_Staff_userId(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Staff_fullName(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Staff_user_id(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Staff_full_name(ctx, field)
 			case "specialization":
 				return ec.fieldContext_Staff_specialization(ctx, field)
-			case "licenseNo":
-				return ec.fieldContext_Staff_licenseNo(ctx, field)
+			case "license_no":
+				return ec.fieldContext_Staff_license_no(ctx, field)
 			case "phone":
 				return ec.fieldContext_Staff_phone(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Staff_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Staff_updatedAt(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Staff_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Staff_updated_at(ctx, field)
 			case "user":
 				return ec.fieldContext_Staff_user(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Staff_appointments(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Staff_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Staff", field.Name)
 		},
@@ -5648,23 +3998,23 @@ func (ec *executionContext) fieldContext_TreatmentSession_staff(_ context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _TreatmentSession_soapNote(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
+func (ec *executionContext) _TreatmentSession_report(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSession) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TreatmentSession_soapNote,
+		ec.fieldContext_TreatmentSession_report,
 		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.TreatmentSession().SoapNote(ctx, obj)
+			return ec.Resolvers.TreatmentSession().Report(ctx, obj)
 		},
 		nil,
-		ec.marshalOSOAPNote2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSOAPNote,
+		ec.marshalOTreatmentSessionReport2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReport,
 		true,
 		false,
 	)
 }
 
-func (ec *executionContext) fieldContext_TreatmentSession_soapNote(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TreatmentSession_report(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSession",
 		Field:      field,
@@ -5673,29 +4023,31 @@ func (ec *executionContext) fieldContext_TreatmentSession_soapNote(_ context.Con
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_SOAPNote_id(ctx, field)
-			case "sessionId":
-				return ec.fieldContext_SOAPNote_sessionId(ctx, field)
-			case "subjective":
-				return ec.fieldContext_SOAPNote_subjective(ctx, field)
-			case "objective":
-				return ec.fieldContext_SOAPNote_objective(ctx, field)
-			case "assessment":
-				return ec.fieldContext_SOAPNote_assessment(ctx, field)
-			case "plan":
-				return ec.fieldContext_SOAPNote_plan(ctx, field)
-			case "painScale":
-				return ec.fieldContext_SOAPNote_painScale(ctx, field)
-			case "vitals":
-				return ec.fieldContext_SOAPNote_vitals(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_SOAPNote_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_SOAPNote_updatedAt(ctx, field)
-			case "session":
-				return ec.fieldContext_SOAPNote_session(ctx, field)
+				return ec.fieldContext_TreatmentSessionReport_id(ctx, field)
+			case "session_id":
+				return ec.fieldContext_TreatmentSessionReport_session_id(ctx, field)
+			case "anamnesis":
+				return ec.fieldContext_TreatmentSessionReport_anamnesis(ctx, field)
+			case "mechanism_of_injury":
+				return ec.fieldContext_TreatmentSessionReport_mechanism_of_injury(ctx, field)
+			case "actual_condition":
+				return ec.fieldContext_TreatmentSessionReport_actual_condition(ctx, field)
+			case "examination":
+				return ec.fieldContext_TreatmentSessionReport_examination(ctx, field)
+			case "diagnosis":
+				return ec.fieldContext_TreatmentSessionReport_diagnosis(ctx, field)
+			case "intervention":
+				return ec.fieldContext_TreatmentSessionReport_intervention(ctx, field)
+			case "planning_and_education":
+				return ec.fieldContext_TreatmentSessionReport_planning_and_education(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSessionReport_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSessionReport_updated_at(ctx, field)
+			case "treatment_session":
+				return ec.fieldContext_TreatmentSessionReport_treatment_session(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type SOAPNote", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TreatmentSessionReport", field.Name)
 		},
 	}
 	return fc, nil
@@ -5727,30 +4079,28 @@ func (ec *executionContext) fieldContext_TreatmentSessionConnection_nodes(_ cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_TreatmentSession_id(ctx, field)
-			case "appointmentId":
-				return ec.fieldContext_TreatmentSession_appointmentId(ctx, field)
-			case "patientId":
-				return ec.fieldContext_TreatmentSession_patientId(ctx, field)
-			case "staffId":
-				return ec.fieldContext_TreatmentSession_staffId(ctx, field)
-			case "sessionDate":
-				return ec.fieldContext_TreatmentSession_sessionDate(ctx, field)
-			case "sessionNo":
-				return ec.fieldContext_TreatmentSession_sessionNo(ctx, field)
+			case "patient_id":
+				return ec.fieldContext_TreatmentSession_patient_id(ctx, field)
+			case "staff_id":
+				return ec.fieldContext_TreatmentSession_staff_id(ctx, field)
+			case "session_date":
+				return ec.fieldContext_TreatmentSession_session_date(ctx, field)
+			case "session_no":
+				return ec.fieldContext_TreatmentSession_session_no(ctx, field)
 			case "status":
 				return ec.fieldContext_TreatmentSession_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_TreatmentSession_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_TreatmentSession_updatedAt(ctx, field)
-			case "appointment":
-				return ec.fieldContext_TreatmentSession_appointment(ctx, field)
+			case "note":
+				return ec.fieldContext_TreatmentSession_note(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSession_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSession_updated_at(ctx, field)
 			case "patient":
 				return ec.fieldContext_TreatmentSession_patient(ctx, field)
 			case "staff":
 				return ec.fieldContext_TreatmentSession_staff(ctx, field)
-			case "soapNote":
-				return ec.fieldContext_TreatmentSession_soapNote(ctx, field)
+			case "report":
+				return ec.fieldContext_TreatmentSession_report(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
 		},
@@ -5758,12 +4108,12 @@ func (ec *executionContext) fieldContext_TreatmentSessionConnection_nodes(_ cont
 	return fc, nil
 }
 
-func (ec *executionContext) _TreatmentSessionConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _TreatmentSessionConnection_total_count(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionConnection) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_TreatmentSessionConnection_totalCount,
+		ec.fieldContext_TreatmentSessionConnection_total_count,
 		func(ctx context.Context) (any, error) {
 			return obj.TotalCount, nil
 		},
@@ -5774,9 +4124,467 @@ func (ec *executionContext) _TreatmentSessionConnection_totalCount(ctx context.C
 	)
 }
 
-func (ec *executionContext) fieldContext_TreatmentSessionConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_TreatmentSessionConnection_total_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSessionConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_id(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UUID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_session_id(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_session_id,
+		func(ctx context.Context) (any, error) {
+			return obj.SessionID, nil
+		},
+		nil,
+		ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_session_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UUID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_anamnesis(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_anamnesis,
+		func(ctx context.Context) (any, error) {
+			return obj.Anamnesis, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_anamnesis(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_mechanism_of_injury(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_mechanism_of_injury,
+		func(ctx context.Context) (any, error) {
+			return obj.MechanismOfInjury, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_mechanism_of_injury(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_actual_condition(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_actual_condition,
+		func(ctx context.Context) (any, error) {
+			return obj.ActualCondition, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_actual_condition(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_examination(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_examination,
+		func(ctx context.Context) (any, error) {
+			return obj.Examination, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_examination(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_diagnosis(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_diagnosis,
+		func(ctx context.Context) (any, error) {
+			return obj.Diagnosis, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_diagnosis(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_intervention(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_intervention,
+		func(ctx context.Context) (any, error) {
+			return obj.Intervention, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_intervention(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_planning_and_education(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_planning_and_education,
+		func(ctx context.Context) (any, error) {
+			return obj.PlanningAndEducation, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_planning_and_education(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_created_at(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_updated_at,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReport_treatment_session(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReport) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReport_treatment_session,
+		func(ctx context.Context) (any, error) {
+			return obj.TreatmentSession, nil
+		},
+		nil,
+		ec.marshalNTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReport_treatment_session(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReport",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TreatmentSession_id(ctx, field)
+			case "patient_id":
+				return ec.fieldContext_TreatmentSession_patient_id(ctx, field)
+			case "staff_id":
+				return ec.fieldContext_TreatmentSession_staff_id(ctx, field)
+			case "session_date":
+				return ec.fieldContext_TreatmentSession_session_date(ctx, field)
+			case "session_no":
+				return ec.fieldContext_TreatmentSession_session_no(ctx, field)
+			case "status":
+				return ec.fieldContext_TreatmentSession_status(ctx, field)
+			case "note":
+				return ec.fieldContext_TreatmentSession_note(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSession_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSession_updated_at(ctx, field)
+			case "patient":
+				return ec.fieldContext_TreatmentSession_patient(ctx, field)
+			case "staff":
+				return ec.fieldContext_TreatmentSession_staff(ctx, field)
+			case "report":
+				return ec.fieldContext_TreatmentSession_report(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TreatmentSession", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReportConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReportConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReportConnection_nodes,
+		func(ctx context.Context) (any, error) {
+			return obj.Nodes, nil
+		},
+		nil,
+		ec.marshalNTreatmentSessionReport2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReportConnection_nodes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReportConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TreatmentSessionReport_id(ctx, field)
+			case "session_id":
+				return ec.fieldContext_TreatmentSessionReport_session_id(ctx, field)
+			case "anamnesis":
+				return ec.fieldContext_TreatmentSessionReport_anamnesis(ctx, field)
+			case "mechanism_of_injury":
+				return ec.fieldContext_TreatmentSessionReport_mechanism_of_injury(ctx, field)
+			case "actual_condition":
+				return ec.fieldContext_TreatmentSessionReport_actual_condition(ctx, field)
+			case "examination":
+				return ec.fieldContext_TreatmentSessionReport_examination(ctx, field)
+			case "diagnosis":
+				return ec.fieldContext_TreatmentSessionReport_diagnosis(ctx, field)
+			case "intervention":
+				return ec.fieldContext_TreatmentSessionReport_intervention(ctx, field)
+			case "planning_and_education":
+				return ec.fieldContext_TreatmentSessionReport_planning_and_education(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TreatmentSessionReport_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_TreatmentSessionReport_updated_at(ctx, field)
+			case "treatment_session":
+				return ec.fieldContext_TreatmentSessionReport_treatment_session(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TreatmentSessionReport", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TreatmentSessionReportConnection_total_count(ctx context.Context, field graphql.CollectedField, obj *model.TreatmentSessionReportConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TreatmentSessionReportConnection_total_count,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalCount, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TreatmentSessionReportConnection_total_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TreatmentSessionReportConnection",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -5874,12 +4682,12 @@ func (ec *executionContext) fieldContext_User_role(_ context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _User_isActive(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_is_active(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_User_isActive,
+		ec.fieldContext_User_is_active,
 		func(ctx context.Context) (any, error) {
 			return obj.IsActive, nil
 		},
@@ -5890,7 +4698,7 @@ func (ec *executionContext) _User_isActive(ctx context.Context, field graphql.Co
 	)
 }
 
-func (ec *executionContext) fieldContext_User_isActive(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_is_active(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -5903,12 +4711,12 @@ func (ec *executionContext) fieldContext_User_isActive(_ context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _User_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_created_at(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_User_createdAt,
+		ec.fieldContext_User_created_at,
 		func(ctx context.Context) (any, error) {
 			return obj.CreatedAt, nil
 		},
@@ -5919,7 +4727,7 @@ func (ec *executionContext) _User_createdAt(ctx context.Context, field graphql.C
 	)
 }
 
-func (ec *executionContext) fieldContext_User_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -5932,12 +4740,12 @@ func (ec *executionContext) fieldContext_User_createdAt(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _User_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_User_updatedAt,
+		ec.fieldContext_User_updated_at,
 		func(ctx context.Context) (any, error) {
 			return obj.UpdatedAt, nil
 		},
@@ -5948,7 +4756,7 @@ func (ec *executionContext) _User_updatedAt(ctx context.Context, field graphql.C
 	)
 }
 
-func (ec *executionContext) fieldContext_User_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -5987,171 +4795,26 @@ func (ec *executionContext) fieldContext_User_staff(_ context.Context, field gra
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Staff_id(ctx, field)
-			case "userId":
-				return ec.fieldContext_Staff_userId(ctx, field)
-			case "fullName":
-				return ec.fieldContext_Staff_fullName(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Staff_user_id(ctx, field)
+			case "full_name":
+				return ec.fieldContext_Staff_full_name(ctx, field)
 			case "specialization":
 				return ec.fieldContext_Staff_specialization(ctx, field)
-			case "licenseNo":
-				return ec.fieldContext_Staff_licenseNo(ctx, field)
+			case "license_no":
+				return ec.fieldContext_Staff_license_no(ctx, field)
 			case "phone":
 				return ec.fieldContext_Staff_phone(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Staff_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Staff_updatedAt(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Staff_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Staff_updated_at(ctx, field)
 			case "user":
 				return ec.fieldContext_Staff_user(ctx, field)
-			case "appointments":
-				return ec.fieldContext_Staff_appointments(ctx, field)
+			case "treatment_sessions":
+				return ec.fieldContext_Staff_treatment_sessions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Staff", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vitals_bp(ctx context.Context, field graphql.CollectedField, obj *model.Vitals) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Vitals_bp,
-		func(ctx context.Context) (any, error) {
-			return obj.Bp, nil
-		},
-		nil,
-		ec.marshalOString2ᚖstring,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Vitals_bp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vitals",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vitals_hr(ctx context.Context, field graphql.CollectedField, obj *model.Vitals) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Vitals_hr,
-		func(ctx context.Context) (any, error) {
-			return obj.Hr, nil
-		},
-		nil,
-		ec.marshalOInt2ᚖint32,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Vitals_hr(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vitals",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vitals_spo2(ctx context.Context, field graphql.CollectedField, obj *model.Vitals) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Vitals_spo2,
-		func(ctx context.Context) (any, error) {
-			return obj.Spo2, nil
-		},
-		nil,
-		ec.marshalOInt2ᚖint32,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Vitals_spo2(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vitals",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vitals_temp(ctx context.Context, field graphql.CollectedField, obj *model.Vitals) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Vitals_temp,
-		func(ctx context.Context) (any, error) {
-			return obj.Temp, nil
-		},
-		nil,
-		ec.marshalOFloat2ᚖfloat64,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Vitals_temp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vitals",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Vitals_weight(ctx context.Context, field graphql.CollectedField, obj *model.Vitals) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Vitals_weight,
-		func(ctx context.Context) (any, error) {
-			return obj.Weight, nil
-		},
-		nil,
-		ec.marshalOFloat2ᚖfloat64,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Vitals_weight(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Vitals",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7603,129 +6266,6 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputAppointmentFilter(ctx context.Context, obj any) (model.AppointmentFilter, error) {
-	var it model.AppointmentFilter
-	if obj == nil {
-		return it, nil
-	}
-
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"patientId", "staffId", "status", "dateFrom", "dateTo"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "patientId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patientId"))
-			data, err := ec.unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PatientID = data
-		case "staffId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("staffId"))
-			data, err := ec.unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.StaffID = data
-		case "status":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOAppointmentStatus2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Status = data
-		case "dateFrom":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateFrom"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DateFrom = data
-		case "dateTo":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateTo"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DateTo = data
-		}
-	}
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateAppointmentInput(ctx context.Context, obj any) (model.CreateAppointmentInput, error) {
-	var it model.CreateAppointmentInput
-	if obj == nil {
-		return it, nil
-	}
-
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"patientId", "staffId", "scheduledAt", "durationMin", "chiefComplaint", "notes"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "patientId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patientId"))
-			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PatientID = data
-		case "staffId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("staffId"))
-			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.StaffID = data
-		case "scheduledAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scheduledAt"))
-			data, err := ec.unmarshalNTime2timeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ScheduledAt = data
-		case "durationMin":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("durationMin"))
-			data, err := ec.unmarshalNInt2int32(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.DurationMin = data
-		case "chiefComplaint":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chiefComplaint"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ChiefComplaint = data
-		case "notes":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notes"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Notes = data
-		}
-	}
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputCreatePatientInput(ctx context.Context, obj any) (model.CreatePatientInput, error) {
 	var it model.CreatePatientInput
 	if obj == nil {
@@ -7737,22 +6277,22 @@ func (ec *executionContext) unmarshalInputCreatePatientInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"fullName", "dateOfBirth", "gender", "phone", "email", "address", "emergencyContact"}
+	fieldsInOrder := [...]string{"full_name", "date_of_birth", "gender", "phone", "email", "address", "emergency_contact"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "fullName":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+		case "full_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("full_name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.FullName = data
-		case "dateOfBirth":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateOfBirth"))
+		case "date_of_birth":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date_of_birth"))
 			data, err := ec.unmarshalNTime2timeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
@@ -7786,136 +6326,13 @@ func (ec *executionContext) unmarshalInputCreatePatientInput(ctx context.Context
 				return it, err
 			}
 			it.Address = data
-		case "emergencyContact":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emergencyContact"))
+		case "emergency_contact":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emergency_contact"))
 			data, err := ec.unmarshalOEmergencyContactInput2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐEmergencyContactInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.EmergencyContact = data
-		}
-	}
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateSOAPNoteInput(ctx context.Context, obj any) (model.CreateSOAPNoteInput, error) {
-	var it model.CreateSOAPNoteInput
-	if obj == nil {
-		return it, nil
-	}
-
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"sessionId", "subjective", "objective", "assessment", "plan", "painScale", "vitals"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "sessionId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sessionId"))
-			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.SessionID = data
-		case "subjective":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subjective"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Subjective = data
-		case "objective":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("objective"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Objective = data
-		case "assessment":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assessment"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Assessment = data
-		case "plan":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("plan"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Plan = data
-		case "painScale":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("painScale"))
-			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PainScale = data
-		case "vitals":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vitals"))
-			data, err := ec.unmarshalOVitalsInput2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐVitalsInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Vitals = data
-		}
-	}
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateSessionInput(ctx context.Context, obj any) (model.CreateSessionInput, error) {
-	var it model.CreateSessionInput
-	if obj == nil {
-		return it, nil
-	}
-
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"appointmentId", "patientId", "staffId", "sessionDate"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "appointmentId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appointmentId"))
-			data, err := ec.unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AppointmentID = data
-		case "patientId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patientId"))
-			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PatientID = data
-		case "staffId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("staffId"))
-			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.StaffID = data
-		case "sessionDate":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sessionDate"))
-			data, err := ec.unmarshalNTime2timeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.SessionDate = data
 		}
 	}
 	return it, nil
@@ -7932,7 +6349,7 @@ func (ec *executionContext) unmarshalInputCreateStaffInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"userId", "fullName", "specialization", "licenseNo", "phone"}
+	fieldsInOrder := [...]string{"userId", "full_name", "specialization", "license_no", "phone"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7946,8 +6363,8 @@ func (ec *executionContext) unmarshalInputCreateStaffInput(ctx context.Context, 
 				return it, err
 			}
 			it.UserID = data
-		case "fullName":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+		case "full_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("full_name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
@@ -7960,8 +6377,8 @@ func (ec *executionContext) unmarshalInputCreateStaffInput(ctx context.Context, 
 				return it, err
 			}
 			it.Specialization = data
-		case "licenseNo":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("licenseNo"))
+		case "license_no":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("license_no"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
@@ -7974,6 +6391,129 @@ func (ec *executionContext) unmarshalInputCreateStaffInput(ctx context.Context, 
 				return it, err
 			}
 			it.Phone = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateTreatmentSessionInput(ctx context.Context, obj any) (model.CreateTreatmentSessionInput, error) {
+	var it model.CreateTreatmentSessionInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"patient_id", "staff_id", "session_date"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "patient_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patient_id"))
+			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PatientID = data
+		case "staff_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("staff_id"))
+			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StaffID = data
+		case "session_date":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("session_date"))
+			data, err := ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SessionDate = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateTreatmentSessionReportInput(ctx context.Context, obj any) (model.CreateTreatmentSessionReportInput, error) {
+	var it model.CreateTreatmentSessionReportInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"session_id", "anamnesis", "mechanism_of_injury", "actual_condition", "examination", "diagnosis", "intervention", "planning_and_education"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "session_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("session_id"))
+			data, err := ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SessionID = data
+		case "anamnesis":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anamnesis"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Anamnesis = data
+		case "mechanism_of_injury":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mechanism_of_injury"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MechanismOfInjury = data
+		case "actual_condition":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("actual_condition"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ActualCondition = data
+		case "examination":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("examination"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Examination = data
+		case "diagnosis":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("diagnosis"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Diagnosis = data
+		case "intervention":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("intervention"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Intervention = data
+		case "planning_and_education":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("planning_and_education"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PlanningAndEducation = data
 		}
 	}
 	return it, nil
@@ -8104,6 +6644,43 @@ func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj an
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputReportFilter(ctx context.Context, obj any) (model.ReportFilter, error) {
+	var it model.ReportFilter
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"date_from", "date_to"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "date_from":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date_from"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DateFrom = data
+		case "date_to":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date_to"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DateTo = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputSessionFilter(ctx context.Context, obj any) (model.SessionFilter, error) {
 	var it model.SessionFilter
 	if obj == nil {
@@ -8115,22 +6692,22 @@ func (ec *executionContext) unmarshalInputSessionFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"patientId", "staffId", "status", "dateFrom", "dateTo"}
+	fieldsInOrder := [...]string{"patient_id", "staff_id", "status", "date_from", "date_to"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "patientId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patientId"))
+		case "patient_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patient_id"))
 			data, err := ec.unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.PatientID = data
-		case "staffId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("staffId"))
+		case "staff_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("staff_id"))
 			data, err := ec.unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
@@ -8143,50 +6720,20 @@ func (ec *executionContext) unmarshalInputSessionFilter(ctx context.Context, obj
 				return it, err
 			}
 			it.Status = data
-		case "dateFrom":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateFrom"))
+		case "date_from":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date_from"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.DateFrom = data
-		case "dateTo":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateTo"))
+		case "date_to":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date_to"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.DateTo = data
-		}
-	}
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateAppointmentStatusInput(ctx context.Context, obj any) (model.UpdateAppointmentStatusInput, error) {
-	var it model.UpdateAppointmentStatusInput
-	if obj == nil {
-		return it, nil
-	}
-
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"status"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "status":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalNAppointmentStatus2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Status = data
 		}
 	}
 	return it, nil
@@ -8203,15 +6750,15 @@ func (ec *executionContext) unmarshalInputUpdatePatientInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"fullName", "phone", "email", "address", "emergencyContact"}
+	fieldsInOrder := [...]string{"full_name", "phone", "email", "address", "emergency_contact"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "fullName":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+		case "full_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("full_name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
@@ -8238,78 +6785,13 @@ func (ec *executionContext) unmarshalInputUpdatePatientInput(ctx context.Context
 				return it, err
 			}
 			it.Address = data
-		case "emergencyContact":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emergencyContact"))
+		case "emergency_contact":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emergency_contact"))
 			data, err := ec.unmarshalOEmergencyContactInput2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐEmergencyContactInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.EmergencyContact = data
-		}
-	}
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateSOAPNoteInput(ctx context.Context, obj any) (model.UpdateSOAPNoteInput, error) {
-	var it model.UpdateSOAPNoteInput
-	if obj == nil {
-		return it, nil
-	}
-
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"subjective", "objective", "assessment", "plan", "painScale", "vitals"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "subjective":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subjective"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Subjective = data
-		case "objective":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("objective"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Objective = data
-		case "assessment":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assessment"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Assessment = data
-		case "plan":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("plan"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Plan = data
-		case "painScale":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("painScale"))
-			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PainScale = data
-		case "vitals":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vitals"))
-			data, err := ec.unmarshalOVitalsInput2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐVitalsInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Vitals = data
 		}
 	}
 	return it, nil
@@ -8326,15 +6808,15 @@ func (ec *executionContext) unmarshalInputUpdateStaffInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"fullName", "specialization", "licenseNo", "phone"}
+	fieldsInOrder := [...]string{"full_name", "specialization", "license_no", "phone"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "fullName":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+		case "full_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("full_name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
@@ -8347,8 +6829,8 @@ func (ec *executionContext) unmarshalInputUpdateStaffInput(ctx context.Context, 
 				return it, err
 			}
 			it.Specialization = data
-		case "licenseNo":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("licenseNo"))
+		case "license_no":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("license_no"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
@@ -8361,6 +6843,108 @@ func (ec *executionContext) unmarshalInputUpdateStaffInput(ctx context.Context, 
 				return it, err
 			}
 			it.Phone = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateTreatmentSessionReportInput(ctx context.Context, obj any) (model.UpdateTreatmentSessionReportInput, error) {
+	var it model.UpdateTreatmentSessionReportInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"anamnesis", "mechanism_of_injury", "actual_condition", "examination", "diagnosis", "intervention", "planning_and_education"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "anamnesis":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anamnesis"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Anamnesis = data
+		case "mechanism_of_injury":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mechanism_of_injury"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MechanismOfInjury = data
+		case "actual_condition":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("actual_condition"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ActualCondition = data
+		case "examination":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("examination"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Examination = data
+		case "diagnosis":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("diagnosis"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Diagnosis = data
+		case "intervention":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("intervention"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Intervention = data
+		case "planning_and_education":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("planning_and_education"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PlanningAndEducation = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateTreatmentSessionStatusInput(ctx context.Context, obj any) (model.UpdateTreatmentSessionStatusInput, error) {
+	var it model.UpdateTreatmentSessionStatusInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalNSessionStatus2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSessionStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
 		}
 	}
 	return it, nil
@@ -8410,64 +6994,6 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputVitalsInput(ctx context.Context, obj any) (model.VitalsInput, error) {
-	var it model.VitalsInput
-	if obj == nil {
-		return it, nil
-	}
-
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"bp", "hr", "spo2", "temp", "weight"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "bp":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bp"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Bp = data
-		case "hr":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hr"))
-			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Hr = data
-		case "spo2":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spo2"))
-			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Spo2 = data
-		case "temp":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("temp"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Temp = data
-		case "weight":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Weight = data
-		}
-	}
-	return it, nil
-}
-
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -8475,233 +7001,6 @@ func (ec *executionContext) unmarshalInputVitalsInput(ctx context.Context, obj a
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
-
-var appointmentImplementors = []string{"Appointment"}
-
-func (ec *executionContext) _Appointment(ctx context.Context, sel ast.SelectionSet, obj *model.Appointment) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, appointmentImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Appointment")
-		case "id":
-			out.Values[i] = ec._Appointment_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "patientId":
-			out.Values[i] = ec._Appointment_patientId(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "staffId":
-			out.Values[i] = ec._Appointment_staffId(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "scheduledAt":
-			out.Values[i] = ec._Appointment_scheduledAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "durationMin":
-			out.Values[i] = ec._Appointment_durationMin(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "status":
-			out.Values[i] = ec._Appointment_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "chiefComplaint":
-			out.Values[i] = ec._Appointment_chiefComplaint(ctx, field, obj)
-		case "notes":
-			out.Values[i] = ec._Appointment_notes(ctx, field, obj)
-		case "createdAt":
-			out.Values[i] = ec._Appointment_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "updatedAt":
-			out.Values[i] = ec._Appointment_updatedAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "patient":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Appointment_patient(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "staff":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Appointment_staff(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "session":
-			field := field
-
-			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Appointment_session(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.ProcessDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var appointmentConnectionImplementors = []string{"AppointmentConnection"}
-
-func (ec *executionContext) _AppointmentConnection(ctx context.Context, sel ast.SelectionSet, obj *model.AppointmentConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, appointmentConnectionImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AppointmentConnection")
-		case "nodes":
-			out.Values[i] = ec._AppointmentConnection_nodes(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "totalCount":
-			out.Values[i] = ec._AppointmentConnection_totalCount(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.ProcessDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
 
 var authPayloadImplementors = []string{"AuthPayload"}
 
@@ -8864,58 +7163,30 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createAppointment":
+		case "createTreatmentSession":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createAppointment(ctx, field)
+				return ec._Mutation_createTreatmentSession(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updateAppointmentStatus":
+		case "updateTreatmentSessionStatus":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateAppointmentStatus(ctx, field)
+				return ec._Mutation_updateTreatmentSessionStatus(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "cancelAppointment":
+		case "createTreatmentSessionReport":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_cancelAppointment(ctx, field)
+				return ec._Mutation_createTreatmentSessionReport(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createSession":
+		case "updateTreatmentSessionReport":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createSession(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "completeSession":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_completeSession(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "cancelSession":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_cancelSession(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createSOAPNote":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createSOAPNote(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "updateSOAPNote":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateSOAPNote(ctx, field)
+				return ec._Mutation_updateTreatmentSessionReport(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -8959,18 +7230,18 @@ func (ec *executionContext) _Patient(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "medicalRecordNo":
-			out.Values[i] = ec._Patient_medicalRecordNo(ctx, field, obj)
+		case "medical_record_no":
+			out.Values[i] = ec._Patient_medical_record_no(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "fullName":
-			out.Values[i] = ec._Patient_fullName(ctx, field, obj)
+		case "full_name":
+			out.Values[i] = ec._Patient_full_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "dateOfBirth":
-			out.Values[i] = ec._Patient_dateOfBirth(ctx, field, obj)
+		case "date_of_birth":
+			out.Values[i] = ec._Patient_date_of_birth(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -8985,19 +7256,19 @@ func (ec *executionContext) _Patient(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Patient_email(ctx, field, obj)
 		case "address":
 			out.Values[i] = ec._Patient_address(ctx, field, obj)
-		case "emergencyContact":
-			out.Values[i] = ec._Patient_emergencyContact(ctx, field, obj)
-		case "createdAt":
-			out.Values[i] = ec._Patient_createdAt(ctx, field, obj)
+		case "emergency_contact":
+			out.Values[i] = ec._Patient_emergency_contact(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._Patient_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "updatedAt":
-			out.Values[i] = ec._Patient_updatedAt(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._Patient_updated_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "appointments":
+		case "treatment_sessions":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9006,43 +7277,7 @@ func (ec *executionContext) _Patient(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Patient_appointments(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "treatmentSessions":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Patient_treatmentSessions(ctx, field, obj)
+				res = ec._Patient_treatment_sessions(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -9108,8 +7343,8 @@ func (ec *executionContext) _PatientConnection(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalCount":
-			out.Values[i] = ec._PatientConnection_totalCount(ctx, field, obj)
+		case "total_count":
+			out.Values[i] = ec._PatientConnection_total_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9259,47 +7494,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "appointment":
-			field := field
-
-			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_appointment(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "appointments":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_appointments(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "treatmentSession":
 			field := field
 
@@ -9341,7 +7535,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "soapNote":
+		case "treatmentSessionReport":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9350,7 +7544,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_soapNote(ctx, field)
+				res = ec._Query_treatmentSessionReport(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "treatmentSessionReports":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_treatmentSessionReports(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -9391,120 +7607,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var sOAPNoteImplementors = []string{"SOAPNote"}
-
-func (ec *executionContext) _SOAPNote(ctx context.Context, sel ast.SelectionSet, obj *model.SOAPNote) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, sOAPNoteImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SOAPNote")
-		case "id":
-			out.Values[i] = ec._SOAPNote_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "sessionId":
-			out.Values[i] = ec._SOAPNote_sessionId(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "subjective":
-			out.Values[i] = ec._SOAPNote_subjective(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "objective":
-			out.Values[i] = ec._SOAPNote_objective(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "assessment":
-			out.Values[i] = ec._SOAPNote_assessment(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "plan":
-			out.Values[i] = ec._SOAPNote_plan(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "painScale":
-			out.Values[i] = ec._SOAPNote_painScale(ctx, field, obj)
-		case "vitals":
-			out.Values[i] = ec._SOAPNote_vitals(ctx, field, obj)
-		case "createdAt":
-			out.Values[i] = ec._SOAPNote_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "updatedAt":
-			out.Values[i] = ec._SOAPNote_updatedAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "session":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._SOAPNote_session(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.ProcessDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var staffImplementors = []string{"Staff"}
 
 func (ec *executionContext) _Staff(ctx context.Context, sel ast.SelectionSet, obj *model.Staff) graphql.Marshaler {
@@ -9521,29 +7623,29 @@ func (ec *executionContext) _Staff(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "userId":
-			out.Values[i] = ec._Staff_userId(ctx, field, obj)
+		case "user_id":
+			out.Values[i] = ec._Staff_user_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "fullName":
-			out.Values[i] = ec._Staff_fullName(ctx, field, obj)
+		case "full_name":
+			out.Values[i] = ec._Staff_full_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "specialization":
 			out.Values[i] = ec._Staff_specialization(ctx, field, obj)
-		case "licenseNo":
-			out.Values[i] = ec._Staff_licenseNo(ctx, field, obj)
+		case "license_no":
+			out.Values[i] = ec._Staff_license_no(ctx, field, obj)
 		case "phone":
 			out.Values[i] = ec._Staff_phone(ctx, field, obj)
-		case "createdAt":
-			out.Values[i] = ec._Staff_createdAt(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._Staff_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "updatedAt":
-			out.Values[i] = ec._Staff_updatedAt(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._Staff_updated_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -9583,42 +7685,11 @@ func (ec *executionContext) _Staff(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "appointments":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Staff_appointments(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+		case "treatment_sessions":
+			out.Values[i] = ec._Staff_treatment_sessions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9658,8 +7729,8 @@ func (ec *executionContext) _StaffConnection(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalCount":
-			out.Values[i] = ec._StaffConnection_totalCount(ctx, field, obj)
+		case "total_count":
+			out.Values[i] = ec._StaffConnection_total_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9702,25 +7773,23 @@ func (ec *executionContext) _TreatmentSession(ctx context.Context, sel ast.Selec
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "appointmentId":
-			out.Values[i] = ec._TreatmentSession_appointmentId(ctx, field, obj)
-		case "patientId":
-			out.Values[i] = ec._TreatmentSession_patientId(ctx, field, obj)
+		case "patient_id":
+			out.Values[i] = ec._TreatmentSession_patient_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "staffId":
-			out.Values[i] = ec._TreatmentSession_staffId(ctx, field, obj)
+		case "staff_id":
+			out.Values[i] = ec._TreatmentSession_staff_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "sessionDate":
-			out.Values[i] = ec._TreatmentSession_sessionDate(ctx, field, obj)
+		case "session_date":
+			out.Values[i] = ec._TreatmentSession_session_date(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "sessionNo":
-			out.Values[i] = ec._TreatmentSession_sessionNo(ctx, field, obj)
+		case "session_no":
+			out.Values[i] = ec._TreatmentSession_session_no(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -9729,49 +7798,18 @@ func (ec *executionContext) _TreatmentSession(ctx context.Context, sel ast.Selec
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "createdAt":
-			out.Values[i] = ec._TreatmentSession_createdAt(ctx, field, obj)
+		case "note":
+			out.Values[i] = ec._TreatmentSession_note(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._TreatmentSession_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "updatedAt":
-			out.Values[i] = ec._TreatmentSession_updatedAt(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._TreatmentSession_updated_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "appointment":
-			field := field
-
-			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._TreatmentSession_appointment(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "patient":
 			field := field
 
@@ -9844,7 +7882,7 @@ func (ec *executionContext) _TreatmentSession(ctx context.Context, sel ast.Selec
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "soapNote":
+		case "report":
 			field := field
 
 			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9853,7 +7891,7 @@ func (ec *executionContext) _TreatmentSession(ctx context.Context, sel ast.Selec
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._TreatmentSession_soapNote(ctx, field, obj)
+				res = ec._TreatmentSession_report(ctx, field, obj)
 				return res
 			}
 
@@ -9916,8 +7954,125 @@ func (ec *executionContext) _TreatmentSessionConnection(ctx context.Context, sel
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "totalCount":
-			out.Values[i] = ec._TreatmentSessionConnection_totalCount(ctx, field, obj)
+		case "total_count":
+			out.Values[i] = ec._TreatmentSessionConnection_total_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var treatmentSessionReportImplementors = []string{"TreatmentSessionReport"}
+
+func (ec *executionContext) _TreatmentSessionReport(ctx context.Context, sel ast.SelectionSet, obj *model.TreatmentSessionReport) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, treatmentSessionReportImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TreatmentSessionReport")
+		case "id":
+			out.Values[i] = ec._TreatmentSessionReport_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "session_id":
+			out.Values[i] = ec._TreatmentSessionReport_session_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "anamnesis":
+			out.Values[i] = ec._TreatmentSessionReport_anamnesis(ctx, field, obj)
+		case "mechanism_of_injury":
+			out.Values[i] = ec._TreatmentSessionReport_mechanism_of_injury(ctx, field, obj)
+		case "actual_condition":
+			out.Values[i] = ec._TreatmentSessionReport_actual_condition(ctx, field, obj)
+		case "examination":
+			out.Values[i] = ec._TreatmentSessionReport_examination(ctx, field, obj)
+		case "diagnosis":
+			out.Values[i] = ec._TreatmentSessionReport_diagnosis(ctx, field, obj)
+		case "intervention":
+			out.Values[i] = ec._TreatmentSessionReport_intervention(ctx, field, obj)
+		case "planning_and_education":
+			out.Values[i] = ec._TreatmentSessionReport_planning_and_education(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._TreatmentSessionReport_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updated_at":
+			out.Values[i] = ec._TreatmentSessionReport_updated_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "treatment_session":
+			out.Values[i] = ec._TreatmentSessionReport_treatment_session(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var treatmentSessionReportConnectionImplementors = []string{"TreatmentSessionReportConnection"}
+
+func (ec *executionContext) _TreatmentSessionReportConnection(ctx context.Context, sel ast.SelectionSet, obj *model.TreatmentSessionReportConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, treatmentSessionReportConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TreatmentSessionReportConnection")
+		case "nodes":
+			out.Values[i] = ec._TreatmentSessionReportConnection_nodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total_count":
+			out.Values[i] = ec._TreatmentSessionReportConnection_total_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9970,18 +8125,18 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "isActive":
-			out.Values[i] = ec._User_isActive(ctx, field, obj)
+		case "is_active":
+			out.Values[i] = ec._User_is_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "createdAt":
-			out.Values[i] = ec._User_createdAt(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._User_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "updatedAt":
-			out.Values[i] = ec._User_updatedAt(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._User_updated_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -10018,50 +8173,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.ProcessDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var vitalsImplementors = []string{"Vitals"}
-
-func (ec *executionContext) _Vitals(ctx context.Context, sel ast.SelectionSet, obj *model.Vitals) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, vitalsImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Vitals")
-		case "bp":
-			out.Values[i] = ec._Vitals_bp(ctx, field, obj)
-		case "hr":
-			out.Values[i] = ec._Vitals_hr(ctx, field, obj)
-		case "spo2":
-			out.Values[i] = ec._Vitals_spo2(ctx, field, obj)
-		case "temp":
-			out.Values[i] = ec._Vitals_temp(ctx, field, obj)
-		case "weight":
-			out.Values[i] = ec._Vitals_weight(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10420,60 +8531,6 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAppointment2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment(ctx context.Context, sel ast.SelectionSet, v model.Appointment) graphql.Marshaler {
-	return ec._Appointment(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNAppointment2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Appointment) graphql.Marshaler {
-	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
-		fc := graphql.GetFieldContext(ctx)
-		fc.Result = &v[i]
-		return ec.marshalNAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment(ctx, sel, v[i])
-	})
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment(ctx context.Context, sel ast.SelectionSet, v *model.Appointment) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Appointment(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNAppointmentConnection2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentConnection(ctx context.Context, sel ast.SelectionSet, v model.AppointmentConnection) graphql.Marshaler {
-	return ec._AppointmentConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNAppointmentConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentConnection(ctx context.Context, sel ast.SelectionSet, v *model.AppointmentConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._AppointmentConnection(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNAppointmentStatus2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentStatus(ctx context.Context, v any) (model.AppointmentStatus, error) {
-	var res model.AppointmentStatus
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNAppointmentStatus2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentStatus(ctx context.Context, sel ast.SelectionSet, v model.AppointmentStatus) graphql.Marshaler {
-	return v
-}
-
 func (ec *executionContext) marshalNAuthPayload2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAuthPayload(ctx context.Context, sel ast.SelectionSet, v model.AuthPayload) graphql.Marshaler {
 	return ec._AuthPayload(ctx, sel, &v)
 }
@@ -10504,28 +8561,23 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNCreateAppointmentInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateAppointmentInput(ctx context.Context, v any) (model.CreateAppointmentInput, error) {
-	res, err := ec.unmarshalInputCreateAppointmentInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNCreatePatientInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreatePatientInput(ctx context.Context, v any) (model.CreatePatientInput, error) {
 	res, err := ec.unmarshalInputCreatePatientInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateSOAPNoteInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateSOAPNoteInput(ctx context.Context, v any) (model.CreateSOAPNoteInput, error) {
-	res, err := ec.unmarshalInputCreateSOAPNoteInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNCreateSessionInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateSessionInput(ctx context.Context, v any) (model.CreateSessionInput, error) {
-	res, err := ec.unmarshalInputCreateSessionInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNCreateStaffInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateStaffInput(ctx context.Context, v any) (model.CreateStaffInput, error) {
 	res, err := ec.unmarshalInputCreateStaffInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateTreatmentSessionInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateTreatmentSessionInput(ctx context.Context, v any) (model.CreateTreatmentSessionInput, error) {
+	res, err := ec.unmarshalInputCreateTreatmentSessionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateTreatmentSessionReportInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐCreateTreatmentSessionReportInput(ctx context.Context, v any) (model.CreateTreatmentSessionReportInput, error) {
+	res, err := ec.unmarshalInputCreateTreatmentSessionReportInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -10607,20 +8659,6 @@ func (ec *executionContext) marshalNPatientConnection2ᚖgithubᚗcomᚋarganaph
 		return graphql.Null
 	}
 	return ec._PatientConnection(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNSOAPNote2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSOAPNote(ctx context.Context, sel ast.SelectionSet, v model.SOAPNote) graphql.Marshaler {
-	return ec._SOAPNote(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSOAPNote2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSOAPNote(ctx context.Context, sel ast.SelectionSet, v *model.SOAPNote) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._SOAPNote(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSessionStatus2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSessionStatus(ctx context.Context, v any) (model.SessionStatus, error) {
@@ -10753,6 +8791,50 @@ func (ec *executionContext) marshalNTreatmentSessionConnection2ᚖgithubᚗcom�
 	return ec._TreatmentSessionConnection(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNTreatmentSessionReport2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReport(ctx context.Context, sel ast.SelectionSet, v model.TreatmentSessionReport) graphql.Marshaler {
+	return ec._TreatmentSessionReport(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTreatmentSessionReport2ᚕᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TreatmentSessionReport) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNTreatmentSessionReport2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReport(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTreatmentSessionReport2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReport(ctx context.Context, sel ast.SelectionSet, v *model.TreatmentSessionReport) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TreatmentSessionReport(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTreatmentSessionReportConnection2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportConnection(ctx context.Context, sel ast.SelectionSet, v model.TreatmentSessionReportConnection) graphql.Marshaler {
+	return ec._TreatmentSessionReportConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTreatmentSessionReportConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportConnection(ctx context.Context, sel ast.SelectionSet, v *model.TreatmentSessionReportConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TreatmentSessionReportConnection(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, v any) (uuid.UUID, error) {
 	res, err := graphql.UnmarshalUUID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -10769,23 +8851,23 @@ func (ec *executionContext) marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdateAppointmentStatusInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateAppointmentStatusInput(ctx context.Context, v any) (model.UpdateAppointmentStatusInput, error) {
-	res, err := ec.unmarshalInputUpdateAppointmentStatusInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNUpdatePatientInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdatePatientInput(ctx context.Context, v any) (model.UpdatePatientInput, error) {
 	res, err := ec.unmarshalInputUpdatePatientInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateSOAPNoteInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateSOAPNoteInput(ctx context.Context, v any) (model.UpdateSOAPNoteInput, error) {
-	res, err := ec.unmarshalInputUpdateSOAPNoteInput(ctx, v)
+func (ec *executionContext) unmarshalNUpdateStaffInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateStaffInput(ctx context.Context, v any) (model.UpdateStaffInput, error) {
+	res, err := ec.unmarshalInputUpdateStaffInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateStaffInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateStaffInput(ctx context.Context, v any) (model.UpdateStaffInput, error) {
-	res, err := ec.unmarshalInputUpdateStaffInput(ctx, v)
+func (ec *executionContext) unmarshalNUpdateTreatmentSessionReportInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateTreatmentSessionReportInput(ctx context.Context, v any) (model.UpdateTreatmentSessionReportInput, error) {
+	res, err := ec.unmarshalInputUpdateTreatmentSessionReportInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateTreatmentSessionStatusInput2githubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐUpdateTreatmentSessionStatusInput(ctx context.Context, v any) (model.UpdateTreatmentSessionStatusInput, error) {
+	res, err := ec.unmarshalInputUpdateTreatmentSessionStatusInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -10959,37 +9041,6 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAppointment2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointment(ctx context.Context, sel ast.SelectionSet, v *model.Appointment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Appointment(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOAppointmentFilter2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentFilter(ctx context.Context, v any) (*model.AppointmentFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputAppointmentFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOAppointmentStatus2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentStatus(ctx context.Context, v any) (*model.AppointmentStatus, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.AppointmentStatus)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOAppointmentStatus2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐAppointmentStatus(ctx context.Context, sel ast.SelectionSet, v *model.AppointmentStatus) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -11035,23 +9086,6 @@ func (ec *executionContext) unmarshalOEmergencyContactInput2ᚖgithubᚗcomᚋar
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v any) (*float64, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalFloatContext(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	_ = sel
-	res := graphql.MarshalFloatContext(*v)
-	return graphql.WrapContextMarshaler(ctx, res)
-}
-
 func (ec *executionContext) unmarshalOInt2ᚖint32(ctx context.Context, v any) (*int32, error) {
 	if v == nil {
 		return nil, nil
@@ -11077,11 +9111,12 @@ func (ec *executionContext) marshalOPatient2ᚖgithubᚗcomᚋarganaphangᚋcycl
 	return ec._Patient(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOSOAPNote2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSOAPNote(ctx context.Context, sel ast.SelectionSet, v *model.SOAPNote) graphql.Marshaler {
+func (ec *executionContext) unmarshalOReportFilter2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐReportFilter(ctx context.Context, v any) (*model.ReportFilter, error) {
 	if v == nil {
-		return graphql.Null
+		return nil, nil
 	}
-	return ec._SOAPNote(ctx, sel, v)
+	res, err := ec.unmarshalInputReportFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOSessionFilter2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSessionFilter(ctx context.Context, v any) (*model.SessionFilter, error) {
@@ -11158,6 +9193,13 @@ func (ec *executionContext) marshalOTreatmentSession2ᚖgithubᚗcomᚋarganapha
 	return ec._TreatmentSession(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOTreatmentSessionReport2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReport(ctx context.Context, sel ast.SelectionSet, v *model.TreatmentSessionReport) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TreatmentSessionReport(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, v any) (*uuid.UUID, error) {
 	if v == nil {
 		return nil, nil
@@ -11190,21 +9232,6 @@ func (ec *executionContext) marshalOUserRole2ᚖgithubᚗcomᚋarganaphangᚋcyc
 		return graphql.Null
 	}
 	return v
-}
-
-func (ec *executionContext) marshalOVitals2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐVitals(ctx context.Context, sel ast.SelectionSet, v *model.Vitals) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Vitals(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOVitalsInput2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐVitalsInput(ctx context.Context, v any) (*model.VitalsInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputVitalsInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

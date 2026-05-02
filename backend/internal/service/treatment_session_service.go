@@ -11,7 +11,7 @@ import (
 type TreatmentSessionService interface {
 	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
-	Create(ctx context.Context, input model.CreateSessionInput) (*model.TreatmentSession, error)
+	Create(ctx context.Context, input model.CreateTreatmentSessionInput) (*model.TreatmentSession, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status model.SessionStatus) (*model.TreatmentSession, error)
 }
 
@@ -24,7 +24,7 @@ func NewTreatmentSessionService(repositories repository.Repositories) TreatmentS
 }
 
 // Create implements [TreatmentSessionService].
-func (t *treatmentSessionService) Create(ctx context.Context, input model.CreateSessionInput) (*model.TreatmentSession, error) {
+func (t *treatmentSessionService) Create(ctx context.Context, input model.CreateTreatmentSessionInput) (*model.TreatmentSession, error) {
 	result, err := t.repositories.TreatmentSessionRepository.Create(ctx, input)
 	if err != nil {
 		return nil, err
