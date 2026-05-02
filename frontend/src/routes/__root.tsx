@@ -1,6 +1,16 @@
 /// <reference types="vite/client" />
 import type { ReactNode } from "react";
-import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import {
+  Outlet,
+  createRootRoute,
+  HeadContent,
+  Scripts,
+} from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
+import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import appCss from "../styles/app.css?url";
 import { TooltipProvider } from "../components/ui/tooltip";
 
@@ -39,6 +49,7 @@ function RootComponent() {
     </RootDocument>
   );
 }
+const queryClient = new QueryClient();
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
@@ -47,7 +58,26 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
       <body>
-        <TooltipProvider>{children}</TooltipProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>{children}</TooltipProvider>
+          <TanStackDevtools
+            plugins={[
+              {
+                name: "TanStack Query",
+                render: <ReactQueryDevtoolsPanel />,
+              },
+              {
+                name: "TanStack Form",
+                render: <FormDevtoolsPanel />,
+              },
+              {
+                name: "TanStack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+        </QueryClientProvider>
+
         <Scripts />
       </body>
     </html>
