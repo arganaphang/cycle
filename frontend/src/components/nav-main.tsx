@@ -1,4 +1,5 @@
 import { SidebarGroup, SidebarMenu, SidebarMenuButton } from "@/components/ui/sidebar";
+import { Link } from "@tanstack/react-router";
 
 export function NavMain({
   items,
@@ -13,7 +14,7 @@ export function NavMain({
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => (
-          <SidebarMenuButton key={item.title} tooltip={item.title} render={<a href={item.url} />}>
+          <SidebarMenuButton key={item.title} tooltip={item.title} render={<Link to={item.url} />}>
             {item.icon}
             <span>{item.title}</span>
           </SidebarMenuButton>

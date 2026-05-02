@@ -1,5 +1,7 @@
 /* eslint-disable */
-import * as types from "./graphql";
+import * as types from './graphql';
+
+
 
 /**
  * Map of all GraphQL operations in the project.
@@ -13,19 +15,21 @@ import * as types from "./graphql";
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-  "\n  query Me {\n    me {\n      id\n      email\n      is_active\n    }\n  }\n": typeof types.MeDocument;
+    "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": typeof types.MeDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n": typeof types.LoginDocument,
 };
 const documents: Documents = {
-  "\n  query Me {\n    me {\n      id\n      email\n      is_active\n    }\n  }\n":
-    types.MeDocument,
+    "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": types.MeDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n": types.LoginDocument,
 };
 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(
-  source: "\n  query Me {\n    me {\n      id\n      email\n      is_active\n    }\n  }\n",
-): typeof import("./graphql").MeDocument;
+export function graphql(source: "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n"): typeof import('./graphql').MeDocument;
+
+export function graphql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n"): typeof import('./graphql').LoginDocument;
+
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

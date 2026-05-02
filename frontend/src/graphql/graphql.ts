@@ -2,19 +2,39 @@
 /** Internal type. DO NOT USE DIRECTLY. */
 type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
-export type Incremental<T> =
-  | T
-  | { [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type { DocumentTypeDecoration } from "@graphql-typed-document-node/core";
-export type MeQueryVariables = Exact<{ [key: string]: never }>;
+export type UserRole =
+  | 'ADMIN'
+  | 'RECEPTIONIST'
+  | 'THERAPIST';
 
-export type MeQuery = { me: { id: unknown; email: string; is_active: boolean } };
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { me: { id: string; email: string; role: UserRole } };
+
+export type LoginInput = {
+  email: string;
+  password: string;
+};
+
+export type LoginMutationVariables = Exact<{
+  input: LoginInput;
+}>;
+
+export type LoginMutation = {
+  login: {
+    token: string;
+    user: { id: string; email: string; role: UserRole };
+  };
+};
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
 {
-  __apiType?: NonNullable<DocumentTypeDecoration<TResult, TVariables>["__apiType"]>;
+  __apiType?: NonNullable<DocumentTypeDecoration<TResult, TVariables>['__apiType']>;
   private value: string;
   public __meta__?: Record<string, any> | undefined;
 
@@ -34,7 +54,20 @@ export const MeDocument = new TypedDocumentString(`
   me {
     id
     email
-    is_active
+    role
   }
 }
     `) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
+
+export const LoginDocument = new TypedDocumentString(`
+  mutation Login($input: LoginInput!) {
+    login(input: $input) {
+      token
+      user {
+        id
+        email
+        role
+      }
+    }
+  }
+`) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;

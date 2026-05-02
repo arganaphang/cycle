@@ -9,9 +9,13 @@ const config: CodegenConfig = {
       preset: "client",
       config: {
         documentMode: "string",
+        scalars: {
+          UUID: "string",
+          Time: "string",
+        },
       },
     },
-    "./schema.graphql": {
+    "./src/schema.graphql": {
       plugins: ["schema-ast"],
       config: {
         includeDirectives: true,

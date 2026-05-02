@@ -3,22 +3,69 @@ import { useForm } from "@tanstack/react-form";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { createFileRoute } from "@tanstack/react-router";
+import { login } from "@/mutations/mutationLogin";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { GalleryVerticalEnd } from "lucide-react";
+import { useState } from "react";
+import { fetchMe } from "@/queries/useMe";
+
+function postLoginPath(redirect: string | undefined): string {
+  if (!redirect) return "/";
+  try {
+    if (redirect.startsWith("/")) return redirect;
+    const u = new URL(redirect);
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : u.origin;
+    if (u.origin !== origin) return "/";
+    return `${u.pathname}${u.search}${u.hash}`;
+  } catch {
+    /* ignore */
+  }
+  return "/";
+}
 
 export const Route = createFileRoute("/login")({
+  beforeLoad: async ({ search }) => {
+    const user = await fetchMe();
+    if (user) {
+      throw redirect({
+        to: postLoginPath(search.redirect),
+        replace: true,
+      });
+    }
+  },
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
+    redirect:
+      typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   component: PageComponent,
   ssr: false,
 });
 
 function PageComponent() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { redirect } = Route.useSearch();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const form = useForm({
     defaultValues: {
       email: "",
       password: "",
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      setSubmitError(null);
+      try {
+        await login(value);
+        await queryClient.invalidateQueries({ queryKey: ["me"] });
+        await router.navigate({
+          to: postLoginPath(redirect),
+          replace: true,
+        });
+      } catch (e) {
+        setSubmitError(e instanceof Error ? e.message : "Login failed");
+      }
     },
   });
 
@@ -83,6 +130,11 @@ function PageComponent() {
               <Field>
                 <Button type="submit">Login</Button>
               </Field>
+              {submitError ? (
+                <p className="text-sm text-destructive text-center" role="alert">
+                  {submitError}
+                </p>
+              ) : null}
             </FieldGroup>
           </form>
         </div>

@@ -7,6 +7,7 @@ export async function execute<TResult, TVariables>(
   // TODO: Move this into ENV
   const response = await fetch("http://localhost:8000/query", {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/graphql-response+json",

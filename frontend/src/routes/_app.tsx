@@ -1,10 +1,14 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "../components/ui/sidebar";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { fetchMe } from "@/queries/useMe";
 
 export const Route = createFileRoute("/_app")({
+  // Avoid SSR auth check: fetchMe uses browser cookies and fails on the server,
+  // which incorrectly sent users to /login then back to / via already-logged-in redirect.
+  ssr: false,
   beforeLoad: async ({ location }) => {
-    const user = {}; // TODO: remove this
+    const user = await fetchMe();
 
     if (!user) {
       throw redirect({
