@@ -115,12 +115,23 @@ func (t *treatmentSessionReportRepository) LoaderBySessionIDs(ctx context.Contex
 	sql, _, _ := stmt.Where(goqu.C("session_id").In(sessionIDs)).ToSQL()
 	results := []*entity.TreatmentSessionReport{}
 	if err := t.db.Select(&results, sql); err != nil {
-		return nil, []error{err}
+		errors := make([]error, len(sessionIDs))
+		for idx := range errors {
+			errors[idx] = err
+		}
+		return nil, errors
 	}
-	reports := []*model.TreatmentSessionReport{}
-	for idx := range results {
-		reports = append(reports, results[idx].ToModel())
+
+	reportsBySessionID := make(map[uuid.UUID]*model.TreatmentSessionReport, len(results))
+	for _, result := range results {
+		reportsBySessionID[result.SessionID] = result.ToModel()
 	}
+
+	reports := make([]*model.TreatmentSessionReport, len(sessionIDs))
+	for idx, sessionID := range sessionIDs {
+		reports[idx] = reportsBySessionID[sessionID]
+	}
+
 	return reports, nil
 }
 

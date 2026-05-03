@@ -3,7 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { login } from "@/mutations/mutationLogin";
+import { login } from "@/mutations/login";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { GalleryVerticalEnd } from "lucide-react";
@@ -15,8 +15,7 @@ function postLoginPath(redirect: string | undefined): string {
   try {
     if (redirect.startsWith("/")) return redirect;
     const u = new URL(redirect);
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : u.origin;
+    const origin = typeof window !== "undefined" ? window.location.origin : u.origin;
     if (u.origin !== origin) return "/";
     return `${u.pathname}${u.search}${u.hash}`;
   } catch {
@@ -36,8 +35,7 @@ export const Route = createFileRoute("/login")({
     }
   },
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
-    redirect:
-      typeof search.redirect === "string" ? search.redirect : undefined,
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
   }),
   component: PageComponent,
   ssr: false,
@@ -71,7 +69,7 @@ function PageComponent() {
 
   const onLoginSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    form.handleSubmit();
+    void form.handleSubmit();
   };
 
   return (
@@ -81,10 +79,7 @@ function PageComponent() {
           <form onSubmit={(e) => onLoginSubmit(e)}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <a
-                  href="#"
-                  className="flex flex-col items-center gap-2 font-medium"
-                >
+                <a href="#" className="flex flex-col items-center gap-2 font-medium">
                   <div className="flex size-8 items-center justify-center rounded-md">
                     <GalleryVerticalEnd className="size-6" />
                   </div>

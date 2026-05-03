@@ -1,7 +1,7 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "http://localhost:8000/query", // TODO: Move this into ENV
+  schema: "src/schema.graphql",
   documents: ["src/**/*.{ts,tsx}"],
   ignoreNoDocuments: true,
   generates: {
@@ -9,6 +9,7 @@ const config: CodegenConfig = {
       preset: "client",
       config: {
         documentMode: "string",
+        useTypeImports: true,
         scalars: {
           UUID: "string",
           Time: "string",

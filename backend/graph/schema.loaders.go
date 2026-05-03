@@ -25,7 +25,7 @@ type Loaders struct {
 	PatientLoader                           *dataloadgen.Loader[uuid.UUID, *model.Patient]
 	TreatmentSessionLoader                  *dataloadgen.Loader[uuid.UUID, *model.TreatmentSession]
 	TreatmentSessionReportBySessionIDLoader *dataloadgen.Loader[uuid.UUID, *model.TreatmentSessionReport]
-	TreatmentSessionByPatientIDLoader       *dataloadgen.Loader[uuid.UUID, *model.TreatmentSession]
+	TreatmentSessionByPatientIDLoader       *dataloadgen.Loader[uuid.UUID, []*model.TreatmentSession]
 }
 
 // NewLoaders instantiates data loaders for the middleware
@@ -90,7 +90,7 @@ func GetPatient(ctx context.Context, ID uuid.UUID) (*model.Patient, error) {
 // GetTreatmentSessionByPatientID returns single treatment session by id efficiently
 func GetTreatmentSessionByPatientID(ctx context.Context, ID uuid.UUID) ([]*model.TreatmentSession, error) {
 	loaders := For(ctx)
-	return loaders.TreatmentSessionByPatientIDLoader.LoadAll(ctx, []uuid.UUID{ID})
+	return loaders.TreatmentSessionByPatientIDLoader.Load(ctx, ID)
 }
 
 // GetTreatmentSession returns single treatment session by id efficiently

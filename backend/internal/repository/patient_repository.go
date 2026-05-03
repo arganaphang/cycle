@@ -31,7 +31,8 @@ func NewPatientRepository(db *sqlx.DB) PatientRepository {
 func (p *patientRepository) Create(ctx context.Context, input model.CreatePatientInput) (*entity.Patient, error) {
 	stmt := goqu.Insert(entity.TABLE_PATIENT).
 		Rows(goqu.Record{
-			"fullName":          input.FullName,
+			"medical_record_no": fmt.Sprintf("MRN-%s", uuid.NewString()[:8]),
+			"full_name":         input.FullName,
 			"date_of_birth":     input.DateOfBirth,
 			"gender":            input.Gender,
 			"phone":             input.Phone,
@@ -54,13 +55,29 @@ func (p *patientRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*mod
 	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
 	results := []*entity.Patient{}
 	if err := p.db.Select(&results, sql); err != nil {
-		return nil, []error{err}
+		errors := make([]error, len(IDs))
+		for idx := range errors {
+			errors[idx] = err
+		}
+		return nil, errors
 	}
-	patients := []*model.Patient{}
-	for idx := range results {
-		patients = append(patients, results[idx].ToModel())
+
+	patientsByID := make(map[uuid.UUID]*model.Patient, len(results))
+	for _, result := range results {
+		patientsByID[result.ID] = result.ToModel()
 	}
-	return patients, nil
+
+	patients := make([]*model.Patient, len(IDs))
+	errors := make([]error, len(IDs))
+	for idx, id := range IDs {
+		patient, ok := patientsByID[id]
+		if !ok {
+			errors[idx] = fmt.Errorf("patient not found: %s", id)
+			continue
+		}
+		patients[idx] = patient
+	}
+	return patients, errors
 }
 
 // FindAll implements [PatientRepository].

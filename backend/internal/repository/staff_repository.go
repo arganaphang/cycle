@@ -53,13 +53,29 @@ func (s *staffRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*model
 	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
 	results := []*entity.Staff{}
 	if err := s.db.Select(&results, sql); err != nil {
-		return nil, []error{err}
+		errors := make([]error, len(IDs))
+		for idx := range errors {
+			errors[idx] = err
+		}
+		return nil, errors
 	}
-	staffs := []*model.Staff{}
-	for idx := range results {
-		staffs = append(staffs, results[idx].ToModel())
+
+	staffByID := make(map[uuid.UUID]*model.Staff, len(results))
+	for _, result := range results {
+		staffByID[result.ID] = result.ToModel()
 	}
-	return staffs, nil
+
+	staffs := make([]*model.Staff, len(IDs))
+	errors := make([]error, len(IDs))
+	for idx, id := range IDs {
+		staff, ok := staffByID[id]
+		if !ok {
+			errors[idx] = fmt.Errorf("staff not found: %s", id)
+			continue
+		}
+		staffs[idx] = staff
+	}
+	return staffs, errors
 }
 
 // LoaderByUserID implements [StaffRepository].
@@ -68,11 +84,21 @@ func (s *staffRepository) LoaderByUserIDs(ctx context.Context, userIDs []uuid.UU
 	sql, _, _ := stmt.Where(goqu.C("user_id").In(userIDs)).ToSQL()
 	results := []*entity.Staff{}
 	if err := s.db.Select(&results, sql); err != nil {
-		return nil, []error{err}
+		errors := make([]error, len(userIDs))
+		for idx := range errors {
+			errors[idx] = err
+		}
+		return nil, errors
 	}
-	staffs := []*model.Staff{}
-	for idx := range results {
-		staffs = append(staffs, results[idx].ToModel())
+
+	staffByUserID := make(map[uuid.UUID]*model.Staff, len(results))
+	for _, result := range results {
+		staffByUserID[result.UserID] = result.ToModel()
+	}
+
+	staffs := make([]*model.Staff, len(userIDs))
+	for idx, userID := range userIDs {
+		staffs[idx] = staffByUserID[userID]
 	}
 	return staffs, nil
 }

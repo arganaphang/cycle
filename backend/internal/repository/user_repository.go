@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/arganaphang/cycle/backend/graph/model"
 	"github.com/arganaphang/cycle/backend/internal/entity"
@@ -54,13 +55,29 @@ func (u *userRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.
 	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
 	results := []*entity.User{}
 	if err := u.db.Select(&results, sql); err != nil {
-		return nil, []error{err}
+		errors := make([]error, len(IDs))
+		for idx := range errors {
+			errors[idx] = err
+		}
+		return nil, errors
 	}
-	users := []*model.User{}
-	for idx := range results {
-		users = append(users, results[idx].ToModel())
+
+	usersByID := make(map[uuid.UUID]*model.User, len(results))
+	for _, result := range results {
+		usersByID[result.ID] = result.ToModel()
 	}
-	return users, nil
+
+	users := make([]*model.User, len(IDs))
+	errors := make([]error, len(IDs))
+	for idx, id := range IDs {
+		user, ok := usersByID[id]
+		if !ok {
+			errors[idx] = fmt.Errorf("user not found: %s", id)
+			continue
+		}
+		users[idx] = user
+	}
+	return users, errors
 }
 
 // FindByID implements [UserRepository].

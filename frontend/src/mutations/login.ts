@@ -24,9 +24,7 @@ export async function login(input: {
     errors?: readonly { message?: string }[];
   };
   if (json.errors?.length) {
-    throw new Error(
-      json.errors.map((e) => e.message ?? "Error").join(", ") || "Login failed",
-    );
+    throw new Error(json.errors.map((e) => e.message ?? "Error").join(", ") || "Login failed");
   }
   const payload = json.data?.login;
   if (!payload) throw new Error("Login failed");

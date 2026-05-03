@@ -30,21 +30,25 @@ type Patient struct {
 }
 
 func (p Patient) ToModel() *model.Patient {
-	return &model.Patient{
-		ID:              p.ID,
-		MedicalRecordNo: p.MedicalRecordNo,
-		FullName:        p.FullName,
-		DateOfBirth:     p.DateOfBirth,
-		Gender:          model.Gender(p.Gender),
-		Phone:           p.Phone,
-		Email:           p.Email,
-		Address:         p.Address,
-		EmergencyContact: &model.EmergencyContact{
+	var emergencyContact *model.EmergencyContact
+	if p.EmergencyContact != nil {
+		emergencyContact = &model.EmergencyContact{
 			Name:     p.EmergencyContact.Name,
 			Phone:    p.EmergencyContact.Phone,
 			Relation: p.EmergencyContact.Relation,
-		},
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		}
+	}
+	return &model.Patient{
+		ID:               p.ID,
+		MedicalRecordNo:  p.MedicalRecordNo,
+		FullName:         p.FullName,
+		DateOfBirth:      p.DateOfBirth,
+		Gender:           model.Gender(p.Gender),
+		Phone:            p.Phone,
+		Email:            p.Email,
+		Address:          p.Address,
+		EmergencyContact: emergencyContact,
+		CreatedAt:        p.CreatedAt,
+		UpdatedAt:        p.UpdatedAt,
 	}
 }

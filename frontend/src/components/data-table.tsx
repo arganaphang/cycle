@@ -3,6 +3,8 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  type OnChangeFn,
+  type PaginationState,
   type VisibilityState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -24,36 +26,54 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import React from "react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { titleCase } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pagination?: PaginationState;
+  onPaginationChange?: OnChangeFn<PaginationState>;
+  totalCount?: number;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  pagination,
+  onPaginationChange,
+  totalCount,
+}: DataTableProps<TData, TValue>) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [internalPagination, setInternalPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const currentPagination = pagination ?? internalPagination;
+  const isManualPagination = totalCount !== undefined;
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    ...(isManualPagination
+      ? {
+          manualPagination: true,
+          rowCount: totalCount,
+        }
+      : {
+          getPaginationRowModel: getPaginationRowModel(),
+        }),
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: onPaginationChange ?? setInternalPagination,
     state: {
       columnVisibility,
+      pagination: currentPagination,
     },
   });
 
   return (
     <div>
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={table.getColumn("email")?.getFilterValue() as string}
-          onChange={(event) => table.getColumn("email")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
+      <div className="flex items-end py-4">
         <DropdownMenu>
           <DropdownMenuTrigger
             render={

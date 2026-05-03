@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/arganaphang/cycle/backend/graph/model"
 	"github.com/arganaphang/cycle/backend/internal/entity"
@@ -12,7 +13,7 @@ import (
 
 type TreatmentSessionRepository interface {
 	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.TreatmentSession, []error)
-	LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([]*model.TreatmentSession, []error)
+	LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([][]*model.TreatmentSession, []error)
 	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) ([]*entity.TreatmentSession, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.TreatmentSession, error)
 	Create(ctx context.Context, input model.CreateTreatmentSessionInput) (*entity.TreatmentSession, error)
@@ -50,27 +51,54 @@ func (t *treatmentSessionRepository) Loader(ctx context.Context, IDs []uuid.UUID
 	sql, _, _ := stmt.Where(goqu.C("id").In(IDs)).ToSQL()
 	results := []*entity.TreatmentSession{}
 	if err := t.db.Select(&results, sql); err != nil {
-		return nil, []error{err}
+		errors := make([]error, len(IDs))
+		for idx := range errors {
+			errors[idx] = err
+		}
+		return nil, errors
 	}
-	sessions := []*model.TreatmentSession{}
-	for idx := range results {
-		sessions = append(sessions, results[idx].ToModel())
+
+	sessionsByID := make(map[uuid.UUID]*model.TreatmentSession, len(results))
+	for _, result := range results {
+		sessionsByID[result.ID] = result.ToModel()
 	}
-	return sessions, nil
+
+	sessions := make([]*model.TreatmentSession, len(IDs))
+	errors := make([]error, len(IDs))
+	for idx, id := range IDs {
+		session, ok := sessionsByID[id]
+		if !ok {
+			errors[idx] = fmt.Errorf("treatment session not found: %s", id)
+			continue
+		}
+		sessions[idx] = session
+	}
+	return sessions, errors
 }
 
 // LoaderByPatientIDs implements [TreatmentSessionRepository].
-func (t *treatmentSessionRepository) LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([]*model.TreatmentSession, []error) {
+func (t *treatmentSessionRepository) LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([][]*model.TreatmentSession, []error) {
 	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION)
 	sql, _, _ := stmt.Where(goqu.C("patient_id").In(patientIDs)).ToSQL()
 	results := []*entity.TreatmentSession{}
 	if err := t.db.Select(&results, sql); err != nil {
-		return nil, []error{err}
+		errors := make([]error, len(patientIDs))
+		for idx := range errors {
+			errors[idx] = err
+		}
+		return nil, errors
 	}
-	sessions := []*model.TreatmentSession{}
-	for idx := range results {
-		sessions = append(sessions, results[idx].ToModel())
+
+	sessionsByPatientID := make(map[uuid.UUID][]*model.TreatmentSession, len(patientIDs))
+	for _, result := range results {
+		sessionsByPatientID[result.PatientID] = append(sessionsByPatientID[result.PatientID], result.ToModel())
 	}
+
+	sessions := make([][]*model.TreatmentSession, len(patientIDs))
+	for idx, patientID := range patientIDs {
+		sessions[idx] = sessionsByPatientID[patientID]
+	}
+
 	return sessions, nil
 }
 

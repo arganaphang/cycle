@@ -1,9 +1,8 @@
 import { DataTable } from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
-import type { Patient } from "@/types/patient";
+import { CreatePatientSheet } from "@/components/create-record-sheet";
 import { createFileRoute } from "@tanstack/react-router";
-import type { ColumnDef } from "@tanstack/react-table";
-import { faker } from "@faker-js/faker";
+import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -13,17 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { titleCase } from "@/lib/utils";
+import { usePatients } from "@/queries/usePatient";
+import type { PatientsQuery } from "@/graphql/graphql";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_app/patient")({
   component: PageComponent,
   ssr: false,
 });
 
-export const columns: ColumnDef<Patient>[] = [
+export const columns: ColumnDef<PatientsQuery["patients"]["nodes"][number]>[] = [
   {
     accessorKey: "full_name",
     header: ({ column }) => <DataTableColumnHeader column={column} title={titleCase(column.id)} />,
@@ -67,7 +69,7 @@ export const columns: ColumnDef<Patient>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const patient = row.original;
 
       return (
         <DropdownMenu>
@@ -83,7 +85,7 @@ export const columns: ColumnDef<Patient>[] = [
             <DropdownMenuGroup>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
             </DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(patient.id)}>
               Copy payment ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -96,27 +98,34 @@ export const columns: ColumnDef<Patient>[] = [
   },
 ];
 
-const data: Patient[] = (() => {
-  return [...Array(1000).keys()].map(() => {
-    const p: Patient = {
-      id: faker.string.uuid(),
-      medical_record_no: faker.string.uuid(),
-      full_name: faker.person.fullName(),
-      date_of_birth: faker.date.birthdate(),
-      gender: faker.helpers.arrayElement(["Mele", "Female"]),
-      phone: faker.phone.number(),
-      email: faker.internet.email(),
-      created_at: new Date("2024-09-12"),
-      updated_at: new Date("2024-09-12"),
-    };
-    return p;
-  });
-})();
-
 function PageComponent() {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [createOpen, setCreateOpen] = useState(false);
+  const { data } = usePatients({
+    limit: pagination.pageSize,
+    offset: pagination.pageIndex * pagination.pageSize,
+  });
+
   return (
-    <main className="">
-      <DataTable columns={columns} data={data} />
+    <main className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Patients</h1>
+        <Button onClick={() => setCreateOpen(true)}>
+          <Plus />
+          New patient
+        </Button>
+      </div>
+      <DataTable
+        columns={columns}
+        data={data?.patients.nodes ?? []}
+        pagination={pagination}
+        onPaginationChange={setPagination}
+        totalCount={data?.patients.total_count ?? 0}
+      />
+      <CreatePatientSheet open={createOpen} onOpenChange={setCreateOpen} />
     </main>
   );
 }
