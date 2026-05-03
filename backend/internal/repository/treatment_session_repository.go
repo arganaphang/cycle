@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/arganaphang/cycle/backend/graph/model"
 	"github.com/arganaphang/cycle/backend/internal/entity"
@@ -129,30 +130,54 @@ func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.
 	if offset != nil {
 		offsetFilter = uint(*offset)
 	}
-	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION)
+	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION).As("ts")
 
 	if filter != nil && filter.PatientID != nil {
-		stmt = stmt.Where(goqu.C("patient_id").Eq(filter.PatientID))
+		stmt = stmt.Where(goqu.I("ts.patient_id").Eq(filter.PatientID))
 	}
 	if filter != nil && filter.StaffID != nil {
-		stmt = stmt.Where(goqu.C("staff_id").Eq(filter.StaffID))
+		stmt = stmt.Where(goqu.I("ts.staff_id").Eq(filter.StaffID))
 	}
 	if filter != nil && filter.Status != nil {
-		stmt = stmt.Where(goqu.C("status").Eq(filter.Status))
+		stmt = stmt.Where(goqu.I("ts.status").Eq(filter.Status))
 	}
 	if filter != nil && filter.DateFrom != nil {
-		stmt = stmt.Where(goqu.C("session_date").Gte(filter.DateFrom))
+		stmt = stmt.Where(goqu.I("ts.session_date").Gte(filter.DateFrom))
 	}
 	if filter != nil && filter.DateTo != nil {
-		stmt = stmt.Where(goqu.C("session_date").Lte(filter.DateTo))
+		stmt = stmt.Where(goqu.I("ts.session_date").Lte(filter.DateTo))
+	}
+	if filter != nil && filter.Search != nil {
+		if q := strings.TrimSpace(*filter.Search); q != "" {
+			term := "%" + q + "%"
+			stmt = stmt.
+				InnerJoin(
+					goqu.T(entity.TABLE_PATIENT).As("pat"),
+					goqu.On(goqu.I("ts.patient_id").Eq(goqu.I("pat.id"))),
+				).
+				InnerJoin(
+					goqu.T(entity.TABLE_STAFF).As("stf"),
+					goqu.On(goqu.I("ts.staff_id").Eq(goqu.I("stf.id"))),
+				).
+				Where(
+					goqu.Or(
+						goqu.I("pat.full_name").ILike(term),
+						goqu.I("stf.full_name").ILike(term),
+						goqu.L("CAST(ts.session_no AS TEXT) ILIKE ?", term),
+					),
+				)
+		}
 	}
 
-	sql, _, _ := stmt.Limit(limitFilter).Offset(offsetFilter).ToSQL()
+	sql, _, err := stmt.Select(goqu.L("ts.*")).Limit(limitFilter).Offset(offsetFilter).ToSQL()
+	if err != nil {
+		return nil, nil, err
+	}
 	sessions := []*entity.TreatmentSession{}
 	if err := t.db.Select(&sessions, sql); err != nil {
 		return nil, nil, err
 	}
-	sqlCount, _, err := stmt.Select(goqu.COUNT("*")).ToSQL()
+	sqlCount, _, err := stmt.Select(goqu.COUNT(goqu.L("*"))).ToSQL()
 	if err != nil {
 		return nil, nil, err
 	}

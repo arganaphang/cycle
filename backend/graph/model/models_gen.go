@@ -108,6 +108,8 @@ type Query struct {
 type ReportFilter struct {
 	DateFrom *time.Time `json:"date_from"`
 	DateTo   *time.Time `json:"date_to"`
+	// Matches patient name, session number, or report text fields.
+	Search *string `json:"search"`
 }
 
 type SessionFilter struct {
@@ -116,6 +118,8 @@ type SessionFilter struct {
 	Status    *SessionStatus `json:"status"`
 	DateFrom  *time.Time     `json:"date_from"`
 	DateTo    *time.Time     `json:"date_to"`
+	// Matches patient name, therapist name, or session number.
+	Search *string `json:"search"`
 }
 
 type Staff struct {

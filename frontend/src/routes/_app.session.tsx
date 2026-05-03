@@ -1,4 +1,5 @@
 import { DataTable } from "@/components/data-table/data-table";
+import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { Badge } from "@/components/ui/badge";
 import { CreateTreatmentSessionSheet } from "@/components/record-sheet/create-record-sheet";
 import { createFileRoute } from "@tanstack/react-router";
@@ -18,7 +19,8 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { titleCase } from "@/lib/utils";
 import { useTreatmentSessions } from "@/queries/useSession";
 import type { SessionStatus, TreatmentSessionsQuery } from "@/graphql/graphql";
-import { useState } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_app/session")({
   component: PageComponent,
@@ -118,19 +120,37 @@ function PageComponent() {
     pageSize: 10,
   });
   const [createOpen, setCreateOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebounce(searchInput.trim(), 300);
+
+  useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }, [debouncedSearch]);
+
   const { data } = useTreatmentSessions({
     limit: pagination.pageSize,
     offset: pagination.pageIndex * pagination.pageSize,
+    filter: debouncedSearch.length > 0 ? { search: debouncedSearch } : undefined,
   });
 
   return (
     <main className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-semibold">Sessions</h1>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus />
-          New session
-        </Button>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <ListSearchInput
+            id="session-search"
+            value={searchInput}
+            onChange={setSearchInput}
+            placeholder="Patient, therapist, session #…"
+            aria-label="Search sessions"
+            className="sm:w-72"
+          />
+          <Button className="shrink-0" onClick={() => setCreateOpen(true)}>
+            <Plus />
+            New session
+          </Button>
+        </div>
       </div>
       <DataTable
         columns={columns}

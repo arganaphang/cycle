@@ -1,4 +1,5 @@
 import { DataTable } from "@/components/data-table/data-table";
+import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { CreateStaffSheet } from "@/components/record-sheet/create-record-sheet";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef, PaginationState } from "@tanstack/react-table";
@@ -17,7 +18,8 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { titleCase } from "@/lib/utils";
 import { useStaffs } from "@/queries/useStaff";
 import type { StaffsQuery } from "@/graphql/graphql";
-import { useState } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_app/staff")({
   component: PageComponent,
@@ -83,19 +85,37 @@ function PageComponent() {
     pageSize: 10,
   });
   const [createOpen, setCreateOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebounce(searchInput.trim(), 300);
+
+  useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }, [debouncedSearch]);
+
   const { data } = useStaffs({
     limit: pagination.pageSize,
     offset: pagination.pageIndex * pagination.pageSize,
+    search: debouncedSearch.length > 0 ? debouncedSearch : undefined,
   });
 
   return (
     <main className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-semibold">Staff</h1>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus />
-          New staff
-        </Button>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <ListSearchInput
+            id="staff-search"
+            value={searchInput}
+            onChange={setSearchInput}
+            placeholder="Search by name…"
+            aria-label="Search staff"
+            className="sm:w-72"
+          />
+          <Button className="shrink-0" onClick={() => setCreateOpen(true)}>
+            <Plus />
+            New staff
+          </Button>
+        </div>
       </div>
       <DataTable
         columns={columns}

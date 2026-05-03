@@ -60,6 +60,23 @@ export type LoginInput = {
   password: string;
 };
 
+export type ReportFilter = {
+  date_from?: string | null | undefined;
+  date_to?: string | null | undefined;
+  /** Matches patient name, session number, or report text fields. */
+  search?: string | null | undefined;
+};
+
+export type SessionFilter = {
+  date_from?: string | null | undefined;
+  date_to?: string | null | undefined;
+  patient_id?: string | null | undefined;
+  /** Matches patient name, therapist name, or session number. */
+  search?: string | null | undefined;
+  staff_id?: string | null | undefined;
+  status?: SessionStatus | null | undefined;
+};
+
 export type SessionStatus = "CANCELLED" | "COMPLETED" | "IN_PROGRESS" | "SCHEDULED";
 
 export type UserRole = "ADMIN" | "RECEPTIONIST" | "THERAPIST";
@@ -133,6 +150,7 @@ export type PatientsQuery = {
 export type TreatmentSessionReportsQueryVariables = Exact<{
   limit?: number | null | undefined;
   offset?: number | null | undefined;
+  filter?: ReportFilter | null | undefined;
 }>;
 
 export type TreatmentSessionReportsQuery = {
@@ -157,6 +175,7 @@ export type TreatmentSessionReportsQuery = {
 export type TreatmentSessionsQueryVariables = Exact<{
   limit?: number | null | undefined;
   offset?: number | null | undefined;
+  filter?: SessionFilter | null | undefined;
 }>;
 
 export type TreatmentSessionsQuery = {
@@ -298,8 +317,8 @@ export const PatientsDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<PatientsQuery, PatientsQueryVariables>;
 export const TreatmentSessionReportsDocument = new TypedDocumentString(`
-    query TreatmentSessionReports($limit: Int, $offset: Int) {
-  treatmentSessionReports(limit: $limit, offset: $offset) {
+    query TreatmentSessionReports($limit: Int, $offset: Int, $filter: ReportFilter) {
+  treatmentSessionReports(limit: $limit, offset: $offset, filter: $filter) {
     nodes {
       id
       diagnosis
@@ -324,8 +343,8 @@ export const TreatmentSessionReportsDocument = new TypedDocumentString(`
   TreatmentSessionReportsQueryVariables
 >;
 export const TreatmentSessionsDocument = new TypedDocumentString(`
-    query TreatmentSessions($limit: Int, $offset: Int) {
-  treatmentSessions(limit: $limit, offset: $offset) {
+    query TreatmentSessions($limit: Int, $offset: Int, $filter: SessionFilter) {
+  treatmentSessions(limit: $limit, offset: $offset, filter: $filter) {
     nodes {
       id
       session_no

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 
 	"github.com/arganaphang/cycle/backend/graph/model"
 	"github.com/arganaphang/cycle/backend/internal/entity"
@@ -73,21 +74,51 @@ func (t *treatmentSessionReportRepository) FindAll(ctx context.Context, filter *
 	if offset != nil {
 		offsetFilter = uint(*offset)
 	}
-	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION_REPORT)
+	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION_REPORT).As("rep")
 
 	if filter != nil && filter.DateFrom != nil {
-		stmt = stmt.Where(goqu.C("created_at").Gte(filter.DateFrom))
+		stmt = stmt.Where(goqu.I("rep.created_at").Gte(filter.DateFrom))
 	}
 	if filter != nil && filter.DateTo != nil {
-		stmt = stmt.Where(goqu.C("created_at").Lte(filter.DateTo))
+		stmt = stmt.Where(goqu.I("rep.created_at").Lte(filter.DateTo))
+	}
+	if filter != nil && filter.Search != nil {
+		if q := strings.TrimSpace(*filter.Search); q != "" {
+			term := "%" + q + "%"
+			stmt = stmt.
+				InnerJoin(
+					goqu.T(entity.TABLE_TREATMENT_SESSION).As("ts"),
+					goqu.On(goqu.I("rep.session_id").Eq(goqu.I("ts.id"))),
+				).
+				InnerJoin(
+					goqu.T(entity.TABLE_PATIENT).As("pat"),
+					goqu.On(goqu.I("ts.patient_id").Eq(goqu.I("pat.id"))),
+				).
+				Where(
+					goqu.Or(
+						goqu.I("rep.diagnosis").ILike(term),
+						goqu.I("rep.anamnesis").ILike(term),
+						goqu.I("rep.mechanism_of_injury").ILike(term),
+						goqu.I("rep.actual_condition").ILike(term),
+						goqu.I("rep.examination").ILike(term),
+						goqu.I("rep.intervention").ILike(term),
+						goqu.I("rep.planning_and_education").ILike(term),
+						goqu.I("pat.full_name").ILike(term),
+						goqu.L("CAST(ts.session_no AS TEXT) ILIKE ?", term),
+					),
+				)
+		}
 	}
 
-	sql, _, _ := stmt.Limit(limitFilter).Offset(offsetFilter).ToSQL()
+	sql, _, err := stmt.Select(goqu.L("rep.*")).Limit(limitFilter).Offset(offsetFilter).ToSQL()
+	if err != nil {
+		return nil, nil, err
+	}
 	reports := []*entity.TreatmentSessionReport{}
 	if err := t.db.Select(&reports, sql); err != nil {
 		return nil, nil, err
 	}
-	sqlCount, _, err := stmt.Select(goqu.COUNT("*")).ToSQL()
+	sqlCount, _, err := stmt.Select(goqu.COUNT(goqu.L("*"))).ToSQL()
 	if err != nil {
 		return nil, nil, err
 	}

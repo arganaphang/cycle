@@ -7,8 +7,8 @@ import { execute } from "@/graphql/execute";
 import { useQuery } from "@tanstack/react-query";
 
 const queryTreatmentSessionReports = graphql(`
-  query TreatmentSessionReports($limit: Int, $offset: Int) {
-    treatmentSessionReports(limit: $limit, offset: $offset) {
+  query TreatmentSessionReports($limit: Int, $offset: Int, $filter: ReportFilter) {
+    treatmentSessionReports(limit: $limit, offset: $offset, filter: $filter) {
       nodes {
         id
         diagnosis

@@ -2656,20 +2656,7 @@ func (ec *executionContext) _Pong_success(ctx context.Context, field graphql.Col
 		func(ctx context.Context) (any, error) {
 			return obj.Success, nil
 		},
-		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
-			directive0 := next
-
-			directive1 := func(ctx context.Context) (any, error) {
-				if ec.Directives.Public == nil {
-					var zeroVal bool
-					return zeroVal, errors.New("directive public is not implemented")
-				}
-				return ec.Directives.Public(ctx, obj, directive0)
-			}
-
-			next = directive1
-			return next
-		},
+		nil,
 		ec.marshalNBoolean2bool,
 		true,
 		true,
@@ -2698,7 +2685,20 @@ func (ec *executionContext) _Query_ping(ctx context.Context, field graphql.Colle
 		func(ctx context.Context) (any, error) {
 			return ec.Resolvers.Query().Ping(ctx)
 		},
-		nil,
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Public == nil {
+					var zeroVal *model.Pong
+					return zeroVal, errors.New("directive public is not implemented")
+				}
+				return ec.Directives.Public(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
 		ec.marshalNPong2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPong,
 		true,
 		true,
@@ -6763,7 +6763,7 @@ func (ec *executionContext) unmarshalInputReportFilter(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"date_from", "date_to"}
+	fieldsInOrder := [...]string{"date_from", "date_to", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6784,6 +6784,13 @@ func (ec *executionContext) unmarshalInputReportFilter(ctx context.Context, obj 
 				return it, err
 			}
 			it.DateTo = data
+		case "search":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 	return it, nil
@@ -6800,7 +6807,7 @@ func (ec *executionContext) unmarshalInputSessionFilter(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"patient_id", "staff_id", "status", "date_from", "date_to"}
+	fieldsInOrder := [...]string{"patient_id", "staff_id", "status", "date_from", "date_to", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6842,6 +6849,13 @@ func (ec *executionContext) unmarshalInputSessionFilter(ctx context.Context, obj
 				return it, err
 			}
 			it.DateTo = data
+		case "search":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 	return it, nil

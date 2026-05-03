@@ -151,12 +151,20 @@ type Query {
 input ReportFilter {
   date_from: Time
   date_to: Time
+  """
+  Matches patient name, session number, or report text fields.
+  """
+  search: String
 }
 
 input SessionFilter {
   date_from: Time
   date_to: Time
   patient_id: UUID
+  """
+  Matches patient name, therapist name, or session number.
+  """
+  search: String
   staff_id: UUID
   status: SessionStatus
 }

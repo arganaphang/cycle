@@ -4,8 +4,8 @@ import { execute } from "@/graphql/execute";
 import { useQuery } from "@tanstack/react-query";
 
 const queryTreatmentSessions = graphql(`
-  query TreatmentSessions($limit: Int, $offset: Int) {
-    treatmentSessions(limit: $limit, offset: $offset) {
+  query TreatmentSessions($limit: Int, $offset: Int, $filter: SessionFilter) {
+    treatmentSessions(limit: $limit, offset: $offset, filter: $filter) {
       nodes {
         id
         session_no
