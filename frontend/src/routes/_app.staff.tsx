@@ -19,8 +19,19 @@ import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { formatIsoDateTime, titleCase } from "@/lib/utils";
 import { useStaffs } from "@/queries/useStaff";
-import type { StaffsQuery } from "@/graphql/graphql";
+import type { StaffSortField, StaffsQuery } from "@/graphql/graphql";
 import { useMemo, useState } from "react";
+
+function staffSortField(columnId: string): StaffSortField | undefined {
+  const map: Record<string, StaffSortField> = {
+    full_name: "FULL_NAME",
+    license_no: "LICENSE_NO",
+    phone: "PHONE",
+    specialization: "SPECIALIZATION",
+    email: "EMAIL",
+  };
+  return map[columnId];
+}
 
 export const Route = createFileRoute("/_app/staff")({
   component: PageComponent,
@@ -28,8 +39,15 @@ export const Route = createFileRoute("/_app/staff")({
 });
 
 function PageComponent() {
-  const { pagination, onPaginationChange, searchDraft, onSearchChange, querySearch } =
-    useListRouteTableUrl({ defaultPageSize: 10 });
+  const {
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange,
+    searchDraft,
+    onSearchChange,
+    querySearch,
+  } = useListRouteTableUrl({ defaultPageSize: 10 });
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editStaff, setEditStaff] = useState<StaffsQuery["staffs"]["nodes"][number] | null>(null);
@@ -37,10 +55,16 @@ function PageComponent() {
     null,
   );
 
+  const firstSort = sorting[0];
+  const sortBy = firstSort ? staffSortField(firstSort.id) : undefined;
+  const sortOrder = sortBy && firstSort ? (firstSort.desc ? "DESC" : "ASC") : undefined;
+
   const { data } = useStaffs({
     limit: pagination.pageSize,
     offset: pagination.pageIndex * pagination.pageSize,
     search: querySearch,
+    sortBy,
+    sortOrder,
   });
 
   const columns = useMemo<ColumnDef<StaffsQuery["staffs"]["nodes"][number]>[]>(
@@ -76,6 +100,7 @@ function PageComponent() {
       },
       {
         id: "actions",
+        enableSorting: false,
         cell: ({ row }) => {
           const staff = row.original;
 
@@ -133,6 +158,8 @@ function PageComponent() {
         data={data?.staffs.nodes ?? []}
         pagination={pagination}
         onPaginationChange={onPaginationChange}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
         totalCount={data?.staffs.total_count ?? 0}
         onRowClick={(row) => setDetailStaff(row)}
       />

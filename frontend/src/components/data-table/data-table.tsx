@@ -5,6 +5,7 @@ import {
   getPaginationRowModel,
   type OnChangeFn,
   type PaginationState,
+  type SortingState,
   type VisibilityState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -33,6 +34,9 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   pagination?: PaginationState;
   onPaginationChange?: OnChangeFn<PaginationState>;
+  /** Server-side sort: pass with `onSortingChange`; avoids reordering rows client-side. */
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
   totalCount?: number;
   /** Opens detail view; clicks on the actions column do not trigger this. */
   onRowClick?: (row: TData) => void;
@@ -43,6 +47,8 @@ export function DataTable<TData, TValue>({
   data,
   pagination,
   onPaginationChange,
+  sorting,
+  onSortingChange,
   totalCount,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
@@ -51,8 +57,10 @@ export function DataTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [internalSorting, setInternalSorting] = React.useState<SortingState>([]);
   const currentPagination = pagination ?? internalPagination;
   const isManualPagination = totalCount !== undefined;
+  const isManualSorting = sorting !== undefined && onSortingChange !== undefined;
 
   const table = useReactTable({
     data,
@@ -66,12 +74,15 @@ export function DataTable<TData, TValue>({
       : {
           getPaginationRowModel: getPaginationRowModel(),
         }),
+    ...(isManualSorting ? { manualSorting: true } : {}),
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: onPaginationChange ?? setInternalPagination,
     state: {
       columnVisibility,
       pagination: currentPagination,
+      sorting: isManualSorting ? sorting : internalSorting,
     },
+    onSortingChange: isManualSorting ? onSortingChange : setInternalSorting,
   });
 
   return (

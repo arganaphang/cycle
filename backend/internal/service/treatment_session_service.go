@@ -9,7 +9,7 @@ import (
 )
 
 type TreatmentSessionService interface {
-	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error)
+	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionSortField, sortOrder *model.SortOrder) (*model.TreatmentSessionConnection, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
 	Create(ctx context.Context, input model.CreateTreatmentSessionInput) (*model.TreatmentSession, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status model.SessionStatus) (*model.TreatmentSession, error)
@@ -33,8 +33,8 @@ func (t *treatmentSessionService) Create(ctx context.Context, input model.Create
 }
 
 // FindAll implements [TreatmentSessionService].
-func (t *treatmentSessionService) FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error) {
-	result, count, err := t.repositories.TreatmentSessionRepository.FindAll(ctx, filter, limit, offset)
+func (t *treatmentSessionService) FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionSortField, sortOrder *model.SortOrder) (*model.TreatmentSessionConnection, error) {
+	result, count, err := t.repositories.TreatmentSessionRepository.FindAll(ctx, filter, limit, offset, sortBy, sortOrder)
 	if err != nil {
 		return nil, err
 	}

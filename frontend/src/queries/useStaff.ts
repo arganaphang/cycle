@@ -4,8 +4,20 @@ import { execute } from "@/graphql/execute";
 import { useQuery } from "@tanstack/react-query";
 
 const queryStaffs = graphql(`
-  query Staffs($limit: Int, $offset: Int, $search: String) {
-    staffs(limit: $limit, offset: $offset, search: $search) {
+  query Staffs(
+    $limit: Int
+    $offset: Int
+    $search: String
+    $sortBy: StaffSortField
+    $sortOrder: SortOrder
+  ) {
+    staffs(
+      limit: $limit
+      offset: $offset
+      search: $search
+      sortBy: $sortBy
+      sortOrder: $sortOrder
+    ) {
       nodes {
         id
         full_name

@@ -32,6 +32,44 @@ enum SessionStatus {
   CANCELLED
 }
 
+enum SortOrder {
+  ASC
+  DESC
+}
+
+enum PatientSortField {
+  FULL_NAME
+  MEDICAL_RECORD_NO
+  DATE_OF_BIRTH
+  GENDER
+  CREATED_AT
+}
+
+enum StaffSortField {
+  FULL_NAME
+  EMAIL
+  LICENSE_NO
+  PHONE
+  SPECIALIZATION
+  CREATED_AT
+}
+
+enum TreatmentSessionSortField {
+  SESSION_DATE
+  SESSION_NO
+  STATUS
+  CREATED_AT
+  PATIENT_NAME
+  STAFF_NAME
+}
+
+enum TreatmentSessionReportSortField {
+  CREATED_AT
+  SESSION_DATE
+  PATIENT_NAME
+  DIAGNOSIS
+}
+
 # ── Nested types ─────────────────────────────────────────────
 
 type EmergencyContact {
@@ -257,16 +295,40 @@ type Query {
   me: User!
 
   patient(id: UUID!): Patient
-  patients(search: String, limit: Int, offset: Int): PatientConnection!
+  patients(
+    search: String
+    limit: Int
+    offset: Int
+    sortBy: PatientSortField
+    sortOrder: SortOrder
+  ): PatientConnection!
 
   staff(id: UUID!): Staff
-  staffs(search: String, limit: Int, offset: Int): StaffConnection!
+  staffs(
+    search: String
+    limit: Int
+    offset: Int
+    sortBy: StaffSortField
+    sortOrder: SortOrder
+  ): StaffConnection!
 
   treatmentSession(id: UUID!): TreatmentSession
-  treatmentSessions(filter: SessionFilter, limit: Int, offset: Int): TreatmentSessionConnection!
+  treatmentSessions(
+    filter: SessionFilter
+    limit: Int
+    offset: Int
+    sortBy: TreatmentSessionSortField
+    sortOrder: SortOrder
+  ): TreatmentSessionConnection!
 
   treatmentSessionReport(id: UUID!): TreatmentSessionReport
-  treatmentSessionReports(filter: ReportFilter, limit: Int, offset: Int): TreatmentSessionReportConnection!
+  treatmentSessionReports(
+    filter: ReportFilter
+    limit: Int
+    offset: Int
+    sortBy: TreatmentSessionReportSortField
+    sortOrder: SortOrder
+  ): TreatmentSessionReportConnection!
 }
 
 type Mutation {

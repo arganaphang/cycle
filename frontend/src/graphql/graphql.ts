@@ -60,6 +60,13 @@ export type LoginInput = {
   password: string;
 };
 
+export type PatientSortField =
+  | "CREATED_AT"
+  | "DATE_OF_BIRTH"
+  | "FULL_NAME"
+  | "GENDER"
+  | "MEDICAL_RECORD_NO";
+
 export type ReportFilter = {
   date_from?: string | null | undefined;
   date_to?: string | null | undefined;
@@ -78,6 +85,30 @@ export type SessionFilter = {
 };
 
 export type SessionStatus = "CANCELLED" | "COMPLETED" | "IN_PROGRESS" | "SCHEDULED";
+
+export type SortOrder = "ASC" | "DESC";
+
+export type StaffSortField =
+  | "CREATED_AT"
+  | "EMAIL"
+  | "FULL_NAME"
+  | "LICENSE_NO"
+  | "PHONE"
+  | "SPECIALIZATION";
+
+export type TreatmentSessionReportSortField =
+  | "CREATED_AT"
+  | "DIAGNOSIS"
+  | "PATIENT_NAME"
+  | "SESSION_DATE";
+
+export type TreatmentSessionSortField =
+  | "CREATED_AT"
+  | "PATIENT_NAME"
+  | "SESSION_DATE"
+  | "SESSION_NO"
+  | "STAFF_NAME"
+  | "STATUS";
 
 export type UpdateStaffInput = {
   full_name?: string | null | undefined;
@@ -141,6 +172,8 @@ export type PatientsQueryVariables = Exact<{
   limit?: number | null | undefined;
   offset?: number | null | undefined;
   search?: string | null | undefined;
+  sortBy?: PatientSortField | null | undefined;
+  sortOrder?: SortOrder | null | undefined;
 }>;
 
 export type PatientsQuery = {
@@ -165,6 +198,8 @@ export type TreatmentSessionReportsQueryVariables = Exact<{
   limit?: number | null | undefined;
   offset?: number | null | undefined;
   filter?: ReportFilter | null | undefined;
+  sortBy?: TreatmentSessionReportSortField | null | undefined;
+  sortOrder?: SortOrder | null | undefined;
 }>;
 
 export type TreatmentSessionReportsQuery = {
@@ -190,6 +225,8 @@ export type TreatmentSessionsQueryVariables = Exact<{
   limit?: number | null | undefined;
   offset?: number | null | undefined;
   filter?: SessionFilter | null | undefined;
+  sortBy?: TreatmentSessionSortField | null | undefined;
+  sortOrder?: SortOrder | null | undefined;
 }>;
 
 export type TreatmentSessionsQuery = {
@@ -212,6 +249,8 @@ export type StaffsQueryVariables = Exact<{
   limit?: number | null | undefined;
   offset?: number | null | undefined;
   search?: string | null | undefined;
+  sortBy?: StaffSortField | null | undefined;
+  sortOrder?: SortOrder | null | undefined;
 }>;
 
 export type StaffsQuery = {
@@ -319,8 +358,14 @@ export const MeDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
 export const PatientsDocument = new TypedDocumentString(`
-    query Patients($limit: Int, $offset: Int, $search: String) {
-  patients(limit: $limit, offset: $offset, search: $search) {
+    query Patients($limit: Int, $offset: Int, $search: String, $sortBy: PatientSortField, $sortOrder: SortOrder) {
+  patients(
+    limit: $limit
+    offset: $offset
+    search: $search
+    sortBy: $sortBy
+    sortOrder: $sortOrder
+  ) {
     nodes {
       id
       full_name
@@ -338,8 +383,14 @@ export const PatientsDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<PatientsQuery, PatientsQueryVariables>;
 export const TreatmentSessionReportsDocument = new TypedDocumentString(`
-    query TreatmentSessionReports($limit: Int, $offset: Int, $filter: ReportFilter) {
-  treatmentSessionReports(limit: $limit, offset: $offset, filter: $filter) {
+    query TreatmentSessionReports($limit: Int, $offset: Int, $filter: ReportFilter, $sortBy: TreatmentSessionReportSortField, $sortOrder: SortOrder) {
+  treatmentSessionReports(
+    limit: $limit
+    offset: $offset
+    filter: $filter
+    sortBy: $sortBy
+    sortOrder: $sortOrder
+  ) {
     nodes {
       id
       diagnosis
@@ -364,8 +415,14 @@ export const TreatmentSessionReportsDocument = new TypedDocumentString(`
   TreatmentSessionReportsQueryVariables
 >;
 export const TreatmentSessionsDocument = new TypedDocumentString(`
-    query TreatmentSessions($limit: Int, $offset: Int, $filter: SessionFilter) {
-  treatmentSessions(limit: $limit, offset: $offset, filter: $filter) {
+    query TreatmentSessions($limit: Int, $offset: Int, $filter: SessionFilter, $sortBy: TreatmentSessionSortField, $sortOrder: SortOrder) {
+  treatmentSessions(
+    limit: $limit
+    offset: $offset
+    filter: $filter
+    sortBy: $sortBy
+    sortOrder: $sortOrder
+  ) {
     nodes {
       id
       session_no
@@ -387,8 +444,14 @@ export const TreatmentSessionsDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<TreatmentSessionsQuery, TreatmentSessionsQueryVariables>;
 export const StaffsDocument = new TypedDocumentString(`
-    query Staffs($limit: Int, $offset: Int, $search: String) {
-  staffs(limit: $limit, offset: $offset, search: $search) {
+    query Staffs($limit: Int, $offset: Int, $search: String, $sortBy: StaffSortField, $sortOrder: SortOrder) {
+  staffs(
+    limit: $limit
+    offset: $offset
+    search: $search
+    sortBy: $sortBy
+    sortOrder: $sortOrder
+  ) {
     nodes {
       id
       full_name

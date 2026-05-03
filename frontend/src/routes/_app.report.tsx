@@ -19,8 +19,23 @@ import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { formatIsoDate, formatIsoDateTime, titleCase } from "@/lib/utils";
 import { useTreatmentSessionReports } from "@/queries/useReport";
-import type { TreatmentSessionReportsQuery } from "@/graphql/graphql";
+import type {
+  TreatmentSessionReportSortField,
+  TreatmentSessionReportsQuery,
+} from "@/graphql/graphql";
 import { useMemo, useState } from "react";
+
+function treatmentSessionReportSortField(
+  columnId: string,
+): TreatmentSessionReportSortField | undefined {
+  const map: Record<string, TreatmentSessionReportSortField> = {
+    patient: "PATIENT_NAME",
+    session_date: "SESSION_DATE",
+    diagnosis: "DIAGNOSIS",
+    created_at: "CREATED_AT",
+  };
+  return map[columnId];
+}
 
 export const Route = createFileRoute("/_app/report")({
   component: PageComponent,
@@ -28,18 +43,31 @@ export const Route = createFileRoute("/_app/report")({
 });
 
 function PageComponent() {
-  const { pagination, onPaginationChange, searchDraft, onSearchChange, querySearch } =
-    useListRouteTableUrl({ defaultPageSize: 20 });
+  const {
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange,
+    searchDraft,
+    onSearchChange,
+    querySearch,
+  } = useListRouteTableUrl({ defaultPageSize: 20 });
 
   const [createOpen, setCreateOpen] = useState(false);
   const [detail, setDetail] = useState<
     TreatmentSessionReportsQuery["treatmentSessionReports"]["nodes"][number] | null
   >(null);
 
+  const firstSort = sorting[0];
+  const sortBy = firstSort ? treatmentSessionReportSortField(firstSort.id) : undefined;
+  const sortOrder = sortBy && firstSort ? (firstSort.desc ? "DESC" : "ASC") : undefined;
+
   const { data } = useTreatmentSessionReports({
     limit: pagination.pageSize,
     offset: pagination.pageIndex * pagination.pageSize,
     filter: querySearch ? { search: querySearch } : undefined,
+    sortBy,
+    sortOrder,
   });
 
   const columns = useMemo<
@@ -54,6 +82,7 @@ function PageComponent() {
       {
         id: "session_no",
         accessorFn: (row) => row.treatment_session.session_no,
+        enableSorting: false,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Session #" />,
       },
       {
@@ -91,6 +120,7 @@ function PageComponent() {
       },
       {
         id: "actions",
+        enableSorting: false,
         cell: ({ row }) => {
           const report = row.original;
 
@@ -145,6 +175,8 @@ function PageComponent() {
         data={data?.treatmentSessionReports.nodes ?? []}
         pagination={pagination}
         onPaginationChange={onPaginationChange}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
         totalCount={data?.treatmentSessionReports.total_count ?? 0}
         onRowClick={(row) => setDetail(row)}
       />

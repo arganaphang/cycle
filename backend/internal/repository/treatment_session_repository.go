@@ -15,7 +15,7 @@ import (
 type TreatmentSessionRepository interface {
 	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.TreatmentSession, []error)
 	LoaderByPatientIDs(ctx context.Context, patientIDs []uuid.UUID) ([][]*model.TreatmentSession, []error)
-	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) ([]*entity.TreatmentSession, *int32, error)
+	FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionSortField, sortOrder *model.SortOrder) ([]*entity.TreatmentSession, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.TreatmentSession, error)
 	Create(ctx context.Context, input model.CreateTreatmentSessionInput) (*entity.TreatmentSession, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status model.SessionStatus) (*entity.TreatmentSession, error)
@@ -121,7 +121,7 @@ func (t *treatmentSessionRepository) LoaderByPatientIDs(ctx context.Context, pat
 }
 
 // FindAll implements [TreatmentSessionRepository].
-func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) ([]*entity.TreatmentSession, *int32, error) {
+func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionSortField, sortOrder *model.SortOrder) ([]*entity.TreatmentSession, *int32, error) {
 	limitFilter := uint(20)
 	offsetFilter := uint(0)
 	if limit != nil {
@@ -130,7 +130,7 @@ func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.
 	if offset != nil {
 		offsetFilter = uint(*offset)
 	}
-	stmt := goqu.From(entity.TABLE_TREATMENT_SESSION).As("ts")
+	stmt := goqu.From(goqu.T(entity.TABLE_TREATMENT_SESSION).As("ts"))
 
 	if filter != nil && filter.PatientID != nil {
 		stmt = stmt.Where(goqu.I("ts.patient_id").Eq(filter.PatientID))
@@ -147,8 +147,10 @@ func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.
 	if filter != nil && filter.DateTo != nil {
 		stmt = stmt.Where(goqu.I("ts.session_date").Lte(filter.DateTo))
 	}
+	searchJoined := false
 	if filter != nil && filter.Search != nil {
 		if q := strings.TrimSpace(*filter.Search); q != "" {
+			searchJoined = true
 			term := "%" + q + "%"
 			stmt = stmt.
 				InnerJoin(
@@ -169,6 +171,50 @@ func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.
 		}
 	}
 
+	field := model.TreatmentSessionSortFieldSessionDate
+	if sortBy != nil {
+		field = *sortBy
+	}
+	asc := sortOrder != nil && *sortOrder == model.SortOrderAsc
+	orderIdent := goqu.I("ts.session_date")
+	switch field {
+	case model.TreatmentSessionSortFieldSessionDate:
+		orderIdent = goqu.I("ts.session_date")
+	case model.TreatmentSessionSortFieldSessionNo:
+		orderIdent = goqu.I("ts.session_no")
+	case model.TreatmentSessionSortFieldStatus:
+		orderIdent = goqu.I("ts.status")
+	case model.TreatmentSessionSortFieldCreatedAt:
+		orderIdent = goqu.I("ts.created_at")
+	case model.TreatmentSessionSortFieldPatientName:
+		if searchJoined {
+			orderIdent = goqu.I("pat.full_name")
+		} else {
+			stmt = stmt.LeftJoin(
+				goqu.T(entity.TABLE_PATIENT).As("pat_sort"),
+				goqu.On(goqu.I("ts.patient_id").Eq(goqu.I("pat_sort.id"))),
+			)
+			orderIdent = goqu.I("pat_sort.full_name")
+		}
+	case model.TreatmentSessionSortFieldStaffName:
+		if searchJoined {
+			orderIdent = goqu.I("stf.full_name")
+		} else {
+			stmt = stmt.LeftJoin(
+				goqu.T(entity.TABLE_STAFF).As("stf_sort"),
+				goqu.On(goqu.I("ts.staff_id").Eq(goqu.I("stf_sort.id"))),
+			)
+			orderIdent = goqu.I("stf_sort.full_name")
+		}
+	default:
+		orderIdent = goqu.I("ts.session_date")
+	}
+	if asc {
+		stmt = stmt.Order(orderIdent.Asc())
+	} else {
+		stmt = stmt.Order(orderIdent.Desc())
+	}
+
 	sql, _, err := stmt.Select(goqu.L("ts.*")).Limit(limitFilter).Offset(offsetFilter).ToSQL()
 	if err != nil {
 		return nil, nil, err
@@ -177,7 +223,7 @@ func (t *treatmentSessionRepository) FindAll(ctx context.Context, filter *model.
 	if err := t.db.Select(&sessions, sql); err != nil {
 		return nil, nil, err
 	}
-	sqlCount, _, err := stmt.Select(goqu.COUNT(goqu.L("*"))).ToSQL()
+	sqlCount, _, err := stmt.ClearOrder().Select(goqu.COUNT(goqu.L("*"))).ToSQL()
 	if err != nil {
 		return nil, nil, err
 	}

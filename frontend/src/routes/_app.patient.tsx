@@ -20,8 +20,18 @@ import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { formatIsoDate, formatIsoDateTime, titleCase } from "@/lib/utils";
 import { usePatients } from "@/queries/usePatient";
-import type { PatientsQuery } from "@/graphql/graphql";
+import type { PatientSortField, PatientsQuery } from "@/graphql/graphql";
 import { useMemo, useState } from "react";
+
+function patientSortField(columnId: string): PatientSortField | undefined {
+  const map: Record<string, PatientSortField> = {
+    full_name: "FULL_NAME",
+    medical_record_no: "MEDICAL_RECORD_NO",
+    date_of_birth: "DATE_OF_BIRTH",
+    gender: "GENDER",
+  };
+  return map[columnId];
+}
 
 export const Route = createFileRoute("/_app/patient")({
   component: PageComponent,
@@ -29,16 +39,29 @@ export const Route = createFileRoute("/_app/patient")({
 });
 
 function PageComponent() {
-  const { pagination, onPaginationChange, searchDraft, onSearchChange, querySearch } =
-    useListRouteTableUrl({ defaultPageSize: 10 });
+  const {
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange,
+    searchDraft,
+    onSearchChange,
+    querySearch,
+  } = useListRouteTableUrl({ defaultPageSize: 10 });
 
   const [createOpen, setCreateOpen] = useState(false);
   const [detail, setDetail] = useState<PatientsQuery["patients"]["nodes"][number] | null>(null);
+
+  const firstSort = sorting[0];
+  const sortBy = firstSort ? patientSortField(firstSort.id) : undefined;
+  const sortOrder = sortBy && firstSort ? (firstSort.desc ? "DESC" : "ASC") : undefined;
 
   const { data } = usePatients({
     limit: pagination.pageSize,
     offset: pagination.pageIndex * pagination.pageSize,
     search: querySearch,
+    sortBy,
+    sortOrder,
   });
 
   const columns = useMemo<ColumnDef<PatientsQuery["patients"]["nodes"][number]>[]>(
@@ -79,18 +102,21 @@ function PageComponent() {
       },
       {
         accessorKey: "phone",
+        enableSorting: false,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title={titleCase(column.id)} />
         ),
       },
       {
         accessorKey: "email",
+        enableSorting: false,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title={titleCase(column.id)} />
         ),
       },
       {
         id: "actions",
+        enableSorting: false,
         cell: ({ row }) => {
           const patient = row.original;
 
@@ -145,6 +171,8 @@ function PageComponent() {
         data={data?.patients.nodes ?? []}
         pagination={pagination}
         onPaginationChange={onPaginationChange}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
         totalCount={data?.patients.total_count ?? 0}
         onRowClick={(row) => setDetail(row)}
       />

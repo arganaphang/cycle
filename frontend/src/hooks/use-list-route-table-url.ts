@@ -1,8 +1,16 @@
-import { parseAsInteger, parseAsNumberLiteral, parseAsString, useQueryStates } from "nuqs";
-import type { PaginationState, Updater } from "@tanstack/react-table";
+import {
+  parseAsInteger,
+  parseAsNumberLiteral,
+  parseAsString,
+  parseAsStringLiteral,
+  useQueryStates,
+} from "nuqs";
+import type { PaginationState, SortingState, Updater } from "@tanstack/react-table";
 import { useMemo, useRef, useState } from "react";
 
 import { LIST_ROUTE_PAGE_SIZE_OPTIONS, type ListRoutePageSize } from "@/lib/list-route-search";
+
+const LIST_ROUTE_SORT_ORDER = ["ASC", "DESC"] as const;
 
 function useSyncedSearchDraft(urlQ: string) {
   const [draft, setDraft] = useState(urlQ);
@@ -15,8 +23,9 @@ function useSyncedSearchDraft(urlQ: string) {
 }
 
 /**
- * URL-backed pagination (`page`, `pageSize`) and debounced search (`q`) via nuqs.
- * `searchDraft` / `onSearchChange` drive the search input; GraphQL uses `querySearch` from the URL.
+ * URL-backed pagination (`page`, `pageSize`), optional table sort (`sort`, `ord`), and debounced
+ * search (`q`) via nuqs. `searchDraft` / `onSearchChange` drive the search input; GraphQL uses
+ * `querySearch` from the URL.
  */
 export function useListRouteTableUrl(options: {
   defaultPageSize: ListRoutePageSize;
@@ -29,16 +38,23 @@ export function useListRouteTableUrl(options: {
     [defaultPageSize],
   );
 
+  const sortOrderParser = useMemo(
+    () => parseAsStringLiteral(LIST_ROUTE_SORT_ORDER).withDefault("DESC"),
+    [],
+  );
+
   const listQueryParsers = useMemo(
     () => ({
       page: parseAsInteger.withDefault(1),
       pageSize: pageSizeParser,
       q: parseAsString.withDefault(""),
+      sort: parseAsString.withDefault(""),
+      ord: sortOrderParser,
     }),
-    [pageSizeParser],
+    [pageSizeParser, sortOrderParser],
   );
 
-  const [{ page, pageSize, q }, setListState] = useQueryStates(listQueryParsers, {
+  const [{ page, pageSize, q, sort, ord }, setListState] = useQueryStates(listQueryParsers, {
     history: "replace",
     clearOnDefault: true,
   });
@@ -70,11 +86,36 @@ export function useListRouteTableUrl(options: {
     }, debounceMs);
   }
 
+  const sorting: SortingState = useMemo(() => {
+    const col = sort.trim();
+    if (!col) return [];
+    return [{ id: col, desc: ord === "DESC" }];
+  }, [sort, ord]);
+
+  function onSortingChange(updater: Updater<SortingState>) {
+    void setListState((prev) => {
+      const prevSorting: SortingState =
+        prev.sort.trim() === "" ? [] : [{ id: prev.sort, desc: prev.ord === "DESC" }];
+      const next = typeof updater === "function" ? updater(prevSorting) : updater;
+      const first = next[0];
+      if (!first) {
+        return { sort: "", ord: "DESC", page: 1 };
+      }
+      return {
+        sort: first.id,
+        ord: first.desc ? "DESC" : "ASC",
+        page: 1,
+      };
+    });
+  }
+
   const trimmed = q.trim();
 
   return {
     pagination,
     onPaginationChange,
+    sorting,
+    onSortingChange,
     searchDraft,
     onSearchChange,
     querySearch: trimmed.length > 0 ? trimmed : undefined,

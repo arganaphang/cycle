@@ -127,6 +127,14 @@ type PatientConnection {
   total_count: Int!
 }
 
+enum PatientSortField {
+  CREATED_AT
+  DATE_OF_BIRTH
+  FULL_NAME
+  GENDER
+  MEDICAL_RECORD_NO
+}
+
 type Pong {
   success: Boolean!
 }
@@ -134,18 +142,38 @@ type Pong {
 type Query {
   me: User!
   patient(id: UUID!): Patient
-  patients(limit: Int, offset: Int, search: String): PatientConnection!
+  patients(
+    limit: Int
+    offset: Int
+    search: String
+    sortBy: PatientSortField
+    sortOrder: SortOrder
+  ): PatientConnection!
   ping: Pong!
   staff(id: UUID!): Staff
-  staffs(limit: Int, offset: Int, search: String): StaffConnection!
+  staffs(
+    limit: Int
+    offset: Int
+    search: String
+    sortBy: StaffSortField
+    sortOrder: SortOrder
+  ): StaffConnection!
   treatmentSession(id: UUID!): TreatmentSession
   treatmentSessionReport(id: UUID!): TreatmentSessionReport
   treatmentSessionReports(
     filter: ReportFilter
     limit: Int
     offset: Int
+    sortBy: TreatmentSessionReportSortField
+    sortOrder: SortOrder
   ): TreatmentSessionReportConnection!
-  treatmentSessions(filter: SessionFilter, limit: Int, offset: Int): TreatmentSessionConnection!
+  treatmentSessions(
+    filter: SessionFilter
+    limit: Int
+    offset: Int
+    sortBy: TreatmentSessionSortField
+    sortOrder: SortOrder
+  ): TreatmentSessionConnection!
 }
 
 input ReportFilter {
@@ -176,6 +204,11 @@ enum SessionStatus {
   SCHEDULED
 }
 
+enum SortOrder {
+  ASC
+  DESC
+}
+
 type Staff {
   created_at: Time!
   full_name: String!
@@ -192,6 +225,15 @@ type Staff {
 type StaffConnection {
   nodes: [Staff!]!
   total_count: Int!
+}
+
+enum StaffSortField {
+  CREATED_AT
+  EMAIL
+  FULL_NAME
+  LICENSE_NO
+  PHONE
+  SPECIALIZATION
 }
 
 scalar Time
@@ -234,6 +276,22 @@ type TreatmentSessionReport {
 type TreatmentSessionReportConnection {
   nodes: [TreatmentSessionReport!]!
   total_count: Int!
+}
+
+enum TreatmentSessionReportSortField {
+  CREATED_AT
+  DIAGNOSIS
+  PATIENT_NAME
+  SESSION_DATE
+}
+
+enum TreatmentSessionSortField {
+  CREATED_AT
+  PATIENT_NAME
+  SESSION_DATE
+  SESSION_NO
+  STAFF_NAME
+  STATUS
 }
 
 scalar UUID

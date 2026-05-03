@@ -9,7 +9,7 @@ import (
 )
 
 type PatientService interface {
-	FindAll(ctx context.Context, search *string, limit *int32, offset *int32) (*model.PatientConnection, error)
+	FindAll(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.PatientSortField, sortOrder *model.SortOrder) (*model.PatientConnection, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*model.Patient, error)
 	Create(ctx context.Context, input model.CreatePatientInput) (*model.Patient, error)
 	Update(ctx context.Context, id uuid.UUID, input model.UpdatePatientInput) (*model.Patient, error)
@@ -33,8 +33,8 @@ func (p *patientService) Create(ctx context.Context, input model.CreatePatientIn
 }
 
 // FindAll implements [PatientService].
-func (p *patientService) FindAll(ctx context.Context, search *string, limit *int32, offset *int32) (*model.PatientConnection, error) {
-	result, count, err := p.repositories.PatientRepository.FindAll(ctx, search, limit, offset)
+func (p *patientService) FindAll(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.PatientSortField, sortOrder *model.SortOrder) (*model.PatientConnection, error) {
+	result, count, err := p.repositories.PatientRepository.FindAll(ctx, search, limit, offset, sortBy, sortOrder)
 	if err != nil {
 		return nil, err
 	}

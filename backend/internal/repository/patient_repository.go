@@ -13,7 +13,7 @@ import (
 
 type PatientRepository interface {
 	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Patient, []error)
-	FindAll(ctx context.Context, search *string, limit *int32, offset *int32) ([]*entity.Patient, *int32, error)
+	FindAll(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.PatientSortField, sortOrder *model.SortOrder) ([]*entity.Patient, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Patient, error)
 	Create(ctx context.Context, input model.CreatePatientInput) (*entity.Patient, error)
 	Update(ctx context.Context, id uuid.UUID, input model.UpdatePatientInput) (*entity.Patient, error)
@@ -81,7 +81,7 @@ func (p *patientRepository) Loader(ctx context.Context, IDs []uuid.UUID) ([]*mod
 }
 
 // FindAll implements [PatientRepository].
-func (p *patientRepository) FindAll(ctx context.Context, search *string, limit *int32, offset *int32) ([]*entity.Patient, *int32, error) {
+func (p *patientRepository) FindAll(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.PatientSortField, sortOrder *model.SortOrder) ([]*entity.Patient, *int32, error) {
 	limitFilter := uint(20)
 	offsetFilter := uint(0)
 	if limit != nil {
@@ -96,12 +96,36 @@ func (p *patientRepository) FindAll(ctx context.Context, search *string, limit *
 		stmt = stmt.Where(goqu.C("full_name").ILike(fmt.Sprintf("%s%%", *search)))
 	}
 
+	field := model.PatientSortFieldCreatedAt
+	if sortBy != nil {
+		field = *sortBy
+	}
+	asc := sortOrder != nil && *sortOrder == model.SortOrderAsc
+	col := "created_at"
+	switch field {
+	case model.PatientSortFieldFullName:
+		col = "full_name"
+	case model.PatientSortFieldMedicalRecordNo:
+		col = "medical_record_no"
+	case model.PatientSortFieldDateOfBirth:
+		col = "date_of_birth"
+	case model.PatientSortFieldGender:
+		col = "gender"
+	case model.PatientSortFieldCreatedAt:
+		col = "created_at"
+	}
+	if asc {
+		stmt = stmt.Order(goqu.I(col).Asc())
+	} else {
+		stmt = stmt.Order(goqu.I(col).Desc())
+	}
+
 	sql, _, _ := stmt.Limit(limitFilter).Offset(offsetFilter).ToSQL()
 	patients := []*entity.Patient{}
 	if err := p.db.Select(&patients, sql); err != nil {
 		return nil, nil, err
 	}
-	sqlCount, _, err := stmt.Select(goqu.COUNT("*")).ToSQL()
+	sqlCount, _, err := stmt.ClearOrder().Select(goqu.COUNT("*")).ToSQL()
 	if err != nil {
 		return nil, nil, err
 	}

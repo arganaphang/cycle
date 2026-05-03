@@ -95,14 +95,14 @@ type ComplexityRoot struct {
 	Query struct {
 		Me                      func(childComplexity int) int
 		Patient                 func(childComplexity int, id uuid.UUID) int
-		Patients                func(childComplexity int, search *string, limit *int32, offset *int32) int
+		Patients                func(childComplexity int, search *string, limit *int32, offset *int32, sortBy *model.PatientSortField, sortOrder *model.SortOrder) int
 		Ping                    func(childComplexity int) int
 		Staff                   func(childComplexity int, id uuid.UUID) int
-		Staffs                  func(childComplexity int, search *string, limit *int32, offset *int32) int
+		Staffs                  func(childComplexity int, search *string, limit *int32, offset *int32, sortBy *model.StaffSortField, sortOrder *model.SortOrder) int
 		TreatmentSession        func(childComplexity int, id uuid.UUID) int
 		TreatmentSessionReport  func(childComplexity int, id uuid.UUID) int
-		TreatmentSessionReports func(childComplexity int, filter *model.ReportFilter, limit *int32, offset *int32) int
-		TreatmentSessions       func(childComplexity int, filter *model.SessionFilter, limit *int32, offset *int32) int
+		TreatmentSessionReports func(childComplexity int, filter *model.ReportFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionReportSortField, sortOrder *model.SortOrder) int
+		TreatmentSessions       func(childComplexity int, filter *model.SessionFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionSortField, sortOrder *model.SortOrder) int
 	}
 
 	Staff struct {
@@ -194,13 +194,13 @@ type QueryResolver interface {
 	Ping(ctx context.Context) (*model.Pong, error)
 	Me(ctx context.Context) (*model.User, error)
 	Patient(ctx context.Context, id uuid.UUID) (*model.Patient, error)
-	Patients(ctx context.Context, search *string, limit *int32, offset *int32) (*model.PatientConnection, error)
+	Patients(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.PatientSortField, sortOrder *model.SortOrder) (*model.PatientConnection, error)
 	Staff(ctx context.Context, id uuid.UUID) (*model.Staff, error)
-	Staffs(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error)
+	Staffs(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.StaffSortField, sortOrder *model.SortOrder) (*model.StaffConnection, error)
 	TreatmentSession(ctx context.Context, id uuid.UUID) (*model.TreatmentSession, error)
-	TreatmentSessions(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error)
+	TreatmentSessions(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionSortField, sortOrder *model.SortOrder) (*model.TreatmentSessionConnection, error)
 	TreatmentSessionReport(ctx context.Context, id uuid.UUID) (*model.TreatmentSessionReport, error)
-	TreatmentSessionReports(ctx context.Context, filter *model.ReportFilter, limit *int32, offset *int32) (*model.TreatmentSessionReportConnection, error)
+	TreatmentSessionReports(ctx context.Context, filter *model.ReportFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionReportSortField, sortOrder *model.SortOrder) (*model.TreatmentSessionReportConnection, error)
 }
 type StaffResolver interface {
 	User(ctx context.Context, obj *model.Staff) (*model.User, error)
@@ -502,7 +502,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Patients(childComplexity, args["search"].(*string), args["limit"].(*int32), args["offset"].(*int32)), true
+		return e.ComplexityRoot.Query.Patients(childComplexity, args["search"].(*string), args["limit"].(*int32), args["offset"].(*int32), args["sortBy"].(*model.PatientSortField), args["sortOrder"].(*model.SortOrder)), true
 	case "Query.ping":
 		if e.ComplexityRoot.Query.Ping == nil {
 			break
@@ -530,7 +530,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Staffs(childComplexity, args["search"].(*string), args["limit"].(*int32), args["offset"].(*int32)), true
+		return e.ComplexityRoot.Query.Staffs(childComplexity, args["search"].(*string), args["limit"].(*int32), args["offset"].(*int32), args["sortBy"].(*model.StaffSortField), args["sortOrder"].(*model.SortOrder)), true
 	case "Query.treatmentSession":
 		if e.ComplexityRoot.Query.TreatmentSession == nil {
 			break
@@ -563,7 +563,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.TreatmentSessionReports(childComplexity, args["filter"].(*model.ReportFilter), args["limit"].(*int32), args["offset"].(*int32)), true
+		return e.ComplexityRoot.Query.TreatmentSessionReports(childComplexity, args["filter"].(*model.ReportFilter), args["limit"].(*int32), args["offset"].(*int32), args["sortBy"].(*model.TreatmentSessionReportSortField), args["sortOrder"].(*model.SortOrder)), true
 	case "Query.treatmentSessions":
 		if e.ComplexityRoot.Query.TreatmentSessions == nil {
 			break
@@ -574,7 +574,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.TreatmentSessions(childComplexity, args["filter"].(*model.SessionFilter), args["limit"].(*int32), args["offset"].(*int32)), true
+		return e.ComplexityRoot.Query.TreatmentSessions(childComplexity, args["filter"].(*model.SessionFilter), args["limit"].(*int32), args["offset"].(*int32), args["sortBy"].(*model.TreatmentSessionSortField), args["sortOrder"].(*model.SortOrder)), true
 
 	case "Staff.created_at":
 		if e.ComplexityRoot.Staff.CreatedAt == nil {
@@ -1167,6 +1167,16 @@ func (ec *executionContext) field_Query_patients_args(ctx context.Context, rawAr
 		return nil, err
 	}
 	args["offset"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "sortBy", ec.unmarshalOPatientSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPatientSortField)
+	if err != nil {
+		return nil, err
+	}
+	args["sortBy"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "sortOrder", ec.unmarshalOSortOrder2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSortOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["sortOrder"] = arg4
 	return args, nil
 }
 
@@ -1199,6 +1209,16 @@ func (ec *executionContext) field_Query_staffs_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["offset"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "sortBy", ec.unmarshalOStaffSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaffSortField)
+	if err != nil {
+		return nil, err
+	}
+	args["sortBy"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "sortOrder", ec.unmarshalOSortOrder2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSortOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["sortOrder"] = arg4
 	return args, nil
 }
 
@@ -1231,6 +1251,16 @@ func (ec *executionContext) field_Query_treatmentSessionReports_args(ctx context
 		return nil, err
 	}
 	args["offset"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "sortBy", ec.unmarshalOTreatmentSessionReportSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportSortField)
+	if err != nil {
+		return nil, err
+	}
+	args["sortBy"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "sortOrder", ec.unmarshalOSortOrder2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSortOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["sortOrder"] = arg4
 	return args, nil
 }
 
@@ -1263,6 +1293,16 @@ func (ec *executionContext) field_Query_treatmentSessions_args(ctx context.Conte
 		return nil, err
 	}
 	args["offset"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "sortBy", ec.unmarshalOTreatmentSessionSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionSortField)
+	if err != nil {
+		return nil, err
+	}
+	args["sortBy"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "sortOrder", ec.unmarshalOSortOrder2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSortOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["sortOrder"] = arg4
 	return args, nil
 }
 
@@ -2842,7 +2882,7 @@ func (ec *executionContext) _Query_patients(ctx context.Context, field graphql.C
 		ec.fieldContext_Query_patients,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Patients(ctx, fc.Args["search"].(*string), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32))
+			return ec.Resolvers.Query().Patients(ctx, fc.Args["search"].(*string), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32), fc.Args["sortBy"].(*model.PatientSortField), fc.Args["sortOrder"].(*model.SortOrder))
 		},
 		nil,
 		ec.marshalNPatientConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPatientConnection,
@@ -2952,7 +2992,7 @@ func (ec *executionContext) _Query_staffs(ctx context.Context, field graphql.Col
 		ec.fieldContext_Query_staffs,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Staffs(ctx, fc.Args["search"].(*string), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32))
+			return ec.Resolvers.Query().Staffs(ctx, fc.Args["search"].(*string), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32), fc.Args["sortBy"].(*model.StaffSortField), fc.Args["sortOrder"].(*model.SortOrder))
 		},
 		nil,
 		ec.marshalNStaffConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaffConnection,
@@ -3066,7 +3106,7 @@ func (ec *executionContext) _Query_treatmentSessions(ctx context.Context, field 
 		ec.fieldContext_Query_treatmentSessions,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().TreatmentSessions(ctx, fc.Args["filter"].(*model.SessionFilter), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32))
+			return ec.Resolvers.Query().TreatmentSessions(ctx, fc.Args["filter"].(*model.SessionFilter), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32), fc.Args["sortBy"].(*model.TreatmentSessionSortField), fc.Args["sortOrder"].(*model.SortOrder))
 		},
 		nil,
 		ec.marshalNTreatmentSessionConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionConnection,
@@ -3180,7 +3220,7 @@ func (ec *executionContext) _Query_treatmentSessionReports(ctx context.Context, 
 		ec.fieldContext_Query_treatmentSessionReports,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().TreatmentSessionReports(ctx, fc.Args["filter"].(*model.ReportFilter), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32))
+			return ec.Resolvers.Query().TreatmentSessionReports(ctx, fc.Args["filter"].(*model.ReportFilter), fc.Args["limit"].(*int32), fc.Args["offset"].(*int32), fc.Args["sortBy"].(*model.TreatmentSessionReportSortField), fc.Args["sortOrder"].(*model.SortOrder))
 		},
 		nil,
 		ec.marshalNTreatmentSessionReportConnection2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportConnection,
@@ -9308,6 +9348,22 @@ func (ec *executionContext) marshalOPatient2ᚖgithubᚗcomᚋarganaphangᚋcycl
 	return ec._Patient(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOPatientSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPatientSortField(ctx context.Context, v any) (*model.PatientSortField, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.PatientSortField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPatientSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐPatientSortField(ctx context.Context, sel ast.SelectionSet, v *model.PatientSortField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
 func (ec *executionContext) unmarshalOReportFilter2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐReportFilter(ctx context.Context, v any) (*model.ReportFilter, error) {
 	if v == nil {
 		return nil, nil
@@ -9340,11 +9396,43 @@ func (ec *executionContext) marshalOSessionStatus2ᚖgithubᚗcomᚋarganaphang�
 	return v
 }
 
+func (ec *executionContext) unmarshalOSortOrder2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSortOrder(ctx context.Context, v any) (*model.SortOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.SortOrder)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOSortOrder2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐSortOrder(ctx context.Context, sel ast.SelectionSet, v *model.SortOrder) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
 func (ec *executionContext) marshalOStaff2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaff(ctx context.Context, sel ast.SelectionSet, v *model.Staff) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Staff(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOStaffSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaffSortField(ctx context.Context, v any) (*model.StaffSortField, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.StaffSortField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOStaffSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐStaffSortField(ctx context.Context, sel ast.SelectionSet, v *model.StaffSortField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {
@@ -9395,6 +9483,38 @@ func (ec *executionContext) marshalOTreatmentSessionReport2ᚖgithubᚗcomᚋarg
 		return graphql.Null
 	}
 	return ec._TreatmentSessionReport(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTreatmentSessionReportSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportSortField(ctx context.Context, v any) (*model.TreatmentSessionReportSortField, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.TreatmentSessionReportSortField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTreatmentSessionReportSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionReportSortField(ctx context.Context, sel ast.SelectionSet, v *model.TreatmentSessionReportSortField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOTreatmentSessionSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionSortField(ctx context.Context, v any) (*model.TreatmentSessionSortField, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.TreatmentSessionSortField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTreatmentSessionSortField2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSessionSortField(ctx context.Context, sel ast.SelectionSet, v *model.TreatmentSessionSortField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOUUID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, v any) (*uuid.UUID, error) {

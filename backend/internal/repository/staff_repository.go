@@ -14,7 +14,7 @@ import (
 type StaffRepository interface {
 	Loader(ctx context.Context, IDs []uuid.UUID) ([]*model.Staff, []error)
 	LoaderByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]*model.Staff, []error)
-	FindAll(ctx context.Context, search *string, limit *int32, offset *int32) ([]*entity.Staff, *int32, error)
+	FindAll(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.StaffSortField, sortOrder *model.SortOrder) ([]*entity.Staff, *int32, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Staff, error)
 	Create(ctx context.Context, input model.CreateStaffInput) (*entity.Staff, error)
 	Update(ctx context.Context, id uuid.UUID, input model.UpdateStaffInput) (*entity.Staff, error)
@@ -104,7 +104,7 @@ func (s *staffRepository) LoaderByUserIDs(ctx context.Context, userIDs []uuid.UU
 }
 
 // FindAll implements [StaffRepository].
-func (s *staffRepository) FindAll(ctx context.Context, search *string, limit *int32, offset *int32) ([]*entity.Staff, *int32, error) {
+func (s *staffRepository) FindAll(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.StaffSortField, sortOrder *model.SortOrder) ([]*entity.Staff, *int32, error) {
 	limitFilter := uint(20)
 	offsetFilter := uint(0)
 	if limit != nil {
@@ -113,18 +113,49 @@ func (s *staffRepository) FindAll(ctx context.Context, search *string, limit *in
 	if offset != nil {
 		offsetFilter = uint(*offset)
 	}
-	stmt := goqu.From(entity.TABLE_STAFF)
+	stmt := goqu.From(goqu.T(entity.TABLE_STAFF).As("s"))
 
 	if search != nil {
-		stmt = stmt.Where(goqu.C("full_name").ILike(fmt.Sprintf("%s%%", *search)))
+		stmt = stmt.Where(goqu.I("s.full_name").ILike(fmt.Sprintf("%s%%", *search)))
 	}
 
-	sql, _, _ := stmt.Limit(limitFilter).Offset(offsetFilter).ToSQL()
+	field := model.StaffSortFieldCreatedAt
+	if sortBy != nil {
+		field = *sortBy
+	}
+	asc := sortOrder != nil && *sortOrder == model.SortOrderAsc
+
+	orderIdent := goqu.I("s.created_at")
+	switch field {
+	case model.StaffSortFieldEmail:
+		stmt = stmt.LeftJoin(
+			goqu.T(entity.TABLE_USER).As("u"),
+			goqu.On(goqu.I("s.user_id").Eq(goqu.I("u.id"))),
+		)
+		orderIdent = goqu.I("u.email")
+	case model.StaffSortFieldFullName:
+		orderIdent = goqu.I("s.full_name")
+	case model.StaffSortFieldLicenseNo:
+		orderIdent = goqu.I("s.license_no")
+	case model.StaffSortFieldPhone:
+		orderIdent = goqu.I("s.phone")
+	case model.StaffSortFieldSpecialization:
+		orderIdent = goqu.I("s.specialization")
+	default:
+		orderIdent = goqu.I("s.created_at")
+	}
+	if asc {
+		stmt = stmt.Order(orderIdent.Asc())
+	} else {
+		stmt = stmt.Order(orderIdent.Desc())
+	}
+
+	sql, _, _ := stmt.Select(goqu.L("s.*")).Limit(limitFilter).Offset(offsetFilter).ToSQL()
 	staffs := []*entity.Staff{}
 	if err := s.db.Select(&staffs, sql); err != nil {
 		return nil, nil, err
 	}
-	sqlCount, _, err := stmt.Select(goqu.COUNT("*")).ToSQL()
+	sqlCount, _, err := stmt.ClearOrder().Select(goqu.COUNT(goqu.L("*"))).ToSQL()
 	if err != nil {
 		return nil, nil, err
 	}

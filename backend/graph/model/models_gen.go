@@ -280,6 +280,67 @@ func (e Gender) MarshalJSON() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+type PatientSortField string
+
+const (
+	PatientSortFieldFullName        PatientSortField = "FULL_NAME"
+	PatientSortFieldMedicalRecordNo PatientSortField = "MEDICAL_RECORD_NO"
+	PatientSortFieldDateOfBirth     PatientSortField = "DATE_OF_BIRTH"
+	PatientSortFieldGender          PatientSortField = "GENDER"
+	PatientSortFieldCreatedAt       PatientSortField = "CREATED_AT"
+)
+
+var AllPatientSortField = []PatientSortField{
+	PatientSortFieldFullName,
+	PatientSortFieldMedicalRecordNo,
+	PatientSortFieldDateOfBirth,
+	PatientSortFieldGender,
+	PatientSortFieldCreatedAt,
+}
+
+func (e PatientSortField) IsValid() bool {
+	switch e {
+	case PatientSortFieldFullName, PatientSortFieldMedicalRecordNo, PatientSortFieldDateOfBirth, PatientSortFieldGender, PatientSortFieldCreatedAt:
+		return true
+	}
+	return false
+}
+
+func (e PatientSortField) String() string {
+	return string(e)
+}
+
+func (e *PatientSortField) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PatientSortField(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PatientSortField", str)
+	}
+	return nil
+}
+
+func (e PatientSortField) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *PatientSortField) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e PatientSortField) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
 type SessionStatus string
 
 const (
@@ -334,6 +395,246 @@ func (e *SessionStatus) UnmarshalJSON(b []byte) error {
 }
 
 func (e SessionStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type SortOrder string
+
+const (
+	SortOrderAsc  SortOrder = "ASC"
+	SortOrderDesc SortOrder = "DESC"
+)
+
+var AllSortOrder = []SortOrder{
+	SortOrderAsc,
+	SortOrderDesc,
+}
+
+func (e SortOrder) IsValid() bool {
+	switch e {
+	case SortOrderAsc, SortOrderDesc:
+		return true
+	}
+	return false
+}
+
+func (e SortOrder) String() string {
+	return string(e)
+}
+
+func (e *SortOrder) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SortOrder(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SortOrder", str)
+	}
+	return nil
+}
+
+func (e SortOrder) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *SortOrder) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e SortOrder) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type StaffSortField string
+
+const (
+	StaffSortFieldFullName       StaffSortField = "FULL_NAME"
+	StaffSortFieldEmail          StaffSortField = "EMAIL"
+	StaffSortFieldLicenseNo      StaffSortField = "LICENSE_NO"
+	StaffSortFieldPhone          StaffSortField = "PHONE"
+	StaffSortFieldSpecialization StaffSortField = "SPECIALIZATION"
+	StaffSortFieldCreatedAt      StaffSortField = "CREATED_AT"
+)
+
+var AllStaffSortField = []StaffSortField{
+	StaffSortFieldFullName,
+	StaffSortFieldEmail,
+	StaffSortFieldLicenseNo,
+	StaffSortFieldPhone,
+	StaffSortFieldSpecialization,
+	StaffSortFieldCreatedAt,
+}
+
+func (e StaffSortField) IsValid() bool {
+	switch e {
+	case StaffSortFieldFullName, StaffSortFieldEmail, StaffSortFieldLicenseNo, StaffSortFieldPhone, StaffSortFieldSpecialization, StaffSortFieldCreatedAt:
+		return true
+	}
+	return false
+}
+
+func (e StaffSortField) String() string {
+	return string(e)
+}
+
+func (e *StaffSortField) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = StaffSortField(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid StaffSortField", str)
+	}
+	return nil
+}
+
+func (e StaffSortField) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *StaffSortField) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e StaffSortField) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type TreatmentSessionReportSortField string
+
+const (
+	TreatmentSessionReportSortFieldCreatedAt   TreatmentSessionReportSortField = "CREATED_AT"
+	TreatmentSessionReportSortFieldSessionDate TreatmentSessionReportSortField = "SESSION_DATE"
+	TreatmentSessionReportSortFieldPatientName TreatmentSessionReportSortField = "PATIENT_NAME"
+	TreatmentSessionReportSortFieldDiagnosis   TreatmentSessionReportSortField = "DIAGNOSIS"
+)
+
+var AllTreatmentSessionReportSortField = []TreatmentSessionReportSortField{
+	TreatmentSessionReportSortFieldCreatedAt,
+	TreatmentSessionReportSortFieldSessionDate,
+	TreatmentSessionReportSortFieldPatientName,
+	TreatmentSessionReportSortFieldDiagnosis,
+}
+
+func (e TreatmentSessionReportSortField) IsValid() bool {
+	switch e {
+	case TreatmentSessionReportSortFieldCreatedAt, TreatmentSessionReportSortFieldSessionDate, TreatmentSessionReportSortFieldPatientName, TreatmentSessionReportSortFieldDiagnosis:
+		return true
+	}
+	return false
+}
+
+func (e TreatmentSessionReportSortField) String() string {
+	return string(e)
+}
+
+func (e *TreatmentSessionReportSortField) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TreatmentSessionReportSortField(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TreatmentSessionReportSortField", str)
+	}
+	return nil
+}
+
+func (e TreatmentSessionReportSortField) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *TreatmentSessionReportSortField) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e TreatmentSessionReportSortField) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type TreatmentSessionSortField string
+
+const (
+	TreatmentSessionSortFieldSessionDate TreatmentSessionSortField = "SESSION_DATE"
+	TreatmentSessionSortFieldSessionNo   TreatmentSessionSortField = "SESSION_NO"
+	TreatmentSessionSortFieldStatus      TreatmentSessionSortField = "STATUS"
+	TreatmentSessionSortFieldCreatedAt   TreatmentSessionSortField = "CREATED_AT"
+	TreatmentSessionSortFieldPatientName TreatmentSessionSortField = "PATIENT_NAME"
+	TreatmentSessionSortFieldStaffName   TreatmentSessionSortField = "STAFF_NAME"
+)
+
+var AllTreatmentSessionSortField = []TreatmentSessionSortField{
+	TreatmentSessionSortFieldSessionDate,
+	TreatmentSessionSortFieldSessionNo,
+	TreatmentSessionSortFieldStatus,
+	TreatmentSessionSortFieldCreatedAt,
+	TreatmentSessionSortFieldPatientName,
+	TreatmentSessionSortFieldStaffName,
+}
+
+func (e TreatmentSessionSortField) IsValid() bool {
+	switch e {
+	case TreatmentSessionSortFieldSessionDate, TreatmentSessionSortFieldSessionNo, TreatmentSessionSortFieldStatus, TreatmentSessionSortFieldCreatedAt, TreatmentSessionSortFieldPatientName, TreatmentSessionSortFieldStaffName:
+		return true
+	}
+	return false
+}
+
+func (e TreatmentSessionSortField) String() string {
+	return string(e)
+}
+
+func (e *TreatmentSessionSortField) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TreatmentSessionSortField(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TreatmentSessionSortField", str)
+	}
+	return nil
+}
+
+func (e TreatmentSessionSortField) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *TreatmentSessionSortField) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e TreatmentSessionSortField) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil

@@ -117,8 +117,8 @@ func (r *queryResolver) Patient(ctx context.Context, id uuid.UUID) (*model.Patie
 }
 
 // Patients is the resolver for the patients field.
-func (r *queryResolver) Patients(ctx context.Context, search *string, limit *int32, offset *int32) (*model.PatientConnection, error) {
-	return r.Services.PatientService.FindAll(ctx, search, limit, offset)
+func (r *queryResolver) Patients(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.PatientSortField, sortOrder *model.SortOrder) (*model.PatientConnection, error) {
+	return r.Services.PatientService.FindAll(ctx, search, limit, offset, sortBy, sortOrder)
 }
 
 // Staff is the resolver for the staff field.
@@ -127,8 +127,8 @@ func (r *queryResolver) Staff(ctx context.Context, id uuid.UUID) (*model.Staff, 
 }
 
 // Staffs is the resolver for the staffs field.
-func (r *queryResolver) Staffs(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error) {
-	return r.Services.StaffService.FindAll(ctx, search, limit, offset)
+func (r *queryResolver) Staffs(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.StaffSortField, sortOrder *model.SortOrder) (*model.StaffConnection, error) {
+	return r.Services.StaffService.FindAll(ctx, search, limit, offset, sortBy, sortOrder)
 }
 
 // TreatmentSession is the resolver for the treatmentSession field.
@@ -137,8 +137,8 @@ func (r *queryResolver) TreatmentSession(ctx context.Context, id uuid.UUID) (*mo
 }
 
 // TreatmentSessions is the resolver for the treatmentSessions field.
-func (r *queryResolver) TreatmentSessions(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32) (*model.TreatmentSessionConnection, error) {
-	return r.Services.TreatmentSessionService.FindAll(ctx, filter, limit, offset)
+func (r *queryResolver) TreatmentSessions(ctx context.Context, filter *model.SessionFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionSortField, sortOrder *model.SortOrder) (*model.TreatmentSessionConnection, error) {
+	return r.Services.TreatmentSessionService.FindAll(ctx, filter, limit, offset, sortBy, sortOrder)
 }
 
 // TreatmentSessionReport is the resolver for the treatmentSessionReport field.
@@ -147,8 +147,8 @@ func (r *queryResolver) TreatmentSessionReport(ctx context.Context, id uuid.UUID
 }
 
 // TreatmentSessionReports is the resolver for the treatmentSessionReports field.
-func (r *queryResolver) TreatmentSessionReports(ctx context.Context, filter *model.ReportFilter, limit *int32, offset *int32) (*model.TreatmentSessionReportConnection, error) {
-	return r.Services.TreatmentSessionReportService.FindAll(ctx, filter, limit, offset)
+func (r *queryResolver) TreatmentSessionReports(ctx context.Context, filter *model.ReportFilter, limit *int32, offset *int32, sortBy *model.TreatmentSessionReportSortField, sortOrder *model.SortOrder) (*model.TreatmentSessionReportConnection, error) {
+	return r.Services.TreatmentSessionReportService.FindAll(ctx, filter, limit, offset, sortBy, sortOrder)
 }
 
 // User is the resolver for the user field.

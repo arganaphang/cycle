@@ -9,7 +9,7 @@ import (
 )
 
 type StaffService interface {
-	FindAll(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error)
+	FindAll(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.StaffSortField, sortOrder *model.SortOrder) (*model.StaffConnection, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*model.Staff, error)
 	Create(ctx context.Context, input model.CreateStaffInput) (*model.Staff, error)
 	Update(ctx context.Context, id uuid.UUID, input model.UpdateStaffInput) (*model.Staff, error)
@@ -33,8 +33,8 @@ func (s *staffService) Create(ctx context.Context, input model.CreateStaffInput)
 }
 
 // FindAll implements [StaffService].
-func (s *staffService) FindAll(ctx context.Context, search *string, limit *int32, offset *int32) (*model.StaffConnection, error) {
-	result, count, err := s.repositories.StaffRepository.FindAll(ctx, search, limit, offset)
+func (s *staffService) FindAll(ctx context.Context, search *string, limit *int32, offset *int32, sortBy *model.StaffSortField, sortOrder *model.SortOrder) (*model.StaffConnection, error) {
+	result, count, err := s.repositories.StaffRepository.FindAll(ctx, search, limit, offset, sortBy, sortOrder)
 	if err != nil {
 		return nil, err
 	}

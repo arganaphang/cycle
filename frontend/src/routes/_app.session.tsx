@@ -20,8 +20,23 @@ import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { formatIsoDate, formatIsoDateTime, titleCase } from "@/lib/utils";
 import { useTreatmentSessions } from "@/queries/useSession";
-import type { SessionStatus, TreatmentSessionsQuery } from "@/graphql/graphql";
+import type {
+  SessionStatus,
+  TreatmentSessionSortField,
+  TreatmentSessionsQuery,
+} from "@/graphql/graphql";
 import { useMemo, useState } from "react";
+
+function treatmentSessionSortField(columnId: string): TreatmentSessionSortField | undefined {
+  const map: Record<string, TreatmentSessionSortField> = {
+    session_no: "SESSION_NO",
+    session_date: "SESSION_DATE",
+    status: "STATUS",
+    patient: "PATIENT_NAME",
+    therapist: "STAFF_NAME",
+  };
+  return map[columnId];
+}
 
 export const Route = createFileRoute("/_app/session")({
   component: PageComponent,
@@ -45,18 +60,31 @@ function statusBadgeVariant(
 }
 
 function PageComponent() {
-  const { pagination, onPaginationChange, searchDraft, onSearchChange, querySearch } =
-    useListRouteTableUrl({ defaultPageSize: 20 });
+  const {
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange,
+    searchDraft,
+    onSearchChange,
+    querySearch,
+  } = useListRouteTableUrl({ defaultPageSize: 20 });
 
   const [createOpen, setCreateOpen] = useState(false);
   const [detail, setDetail] = useState<
     TreatmentSessionsQuery["treatmentSessions"]["nodes"][number] | null
   >(null);
 
+  const firstSort = sorting[0];
+  const sortBy = firstSort ? treatmentSessionSortField(firstSort.id) : undefined;
+  const sortOrder = sortBy && firstSort ? (firstSort.desc ? "DESC" : "ASC") : undefined;
+
   const { data } = useTreatmentSessions({
     limit: pagination.pageSize,
     offset: pagination.pageIndex * pagination.pageSize,
     filter: querySearch ? { search: querySearch } : undefined,
+    sortBy,
+    sortOrder,
   });
 
   const columns = useMemo<
@@ -100,6 +128,7 @@ function PageComponent() {
       },
       {
         id: "actions",
+        enableSorting: false,
         cell: ({ row }) => {
           const session = row.original;
 
@@ -154,6 +183,8 @@ function PageComponent() {
         data={data?.treatmentSessions.nodes ?? []}
         pagination={pagination}
         onPaginationChange={onPaginationChange}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
         totalCount={data?.treatmentSessions.total_count ?? 0}
         onRowClick={(row) => setDetail(row)}
       />
