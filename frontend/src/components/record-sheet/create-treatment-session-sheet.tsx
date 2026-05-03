@@ -16,12 +16,13 @@ import { usePatients } from "@/queries/usePatient";
 import { useStaffs } from "@/queries/useStaff";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
-import { format } from "date-fns";
+import { format, isBefore, startOfDay } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import type { ChangeEvent, SubmitEvent } from "react";
 import { useMemo, useState } from "react";
 import { DatePickerFieldTrigger, FormError, FormIdCombobox } from "./create-record-form-controls";
-import { pad2, requiredFormValue, toDateTime, toDatetimeLocalString } from "./form-helpers";
+import { parseCreateTreatmentSessionForm } from "./form-schemas";
+import { pad2, toDatetimeLocalString } from "./form-helpers";
 import type { CreateSheetProps } from "./types";
 
 export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetProps) {
@@ -86,15 +87,17 @@ export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetP
 
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formEl = event.currentTarget;
     setError(undefined);
-    const form = new FormData(event.currentTarget);
+    const parsed = parseCreateTreatmentSessionForm(new FormData(formEl));
+    if (!parsed.success) {
+      const msg = parsed.error.issues[0]?.message ?? "Invalid form";
+      setError(msg);
+      return;
+    }
     try {
-      await mutation.mutateAsync({
-        patient_id: requiredFormValue(form, "patient_id"),
-        staff_id: requiredFormValue(form, "staff_id"),
-        session_date: toDateTime(requiredFormValue(form, "session_date")),
-      });
-      event.currentTarget.reset();
+      await mutation.mutateAsync(parsed.data);
+      formEl.reset();
       setSelectedPatientId("");
       setSelectedStaffId("");
       setSessionAt(undefined);
@@ -129,13 +132,13 @@ export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetP
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto sm:max-w-md">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader>
           <SheetTitle>New Session</SheetTitle>
           <SheetDescription>Schedule a treatment session.</SheetDescription>
         </SheetHeader>
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
-          <FieldGroup className="gap-5 px-8">
+          <FieldGroup className="gap-5 px-4 sm:px-8">
             <Field>
               <FieldLabel htmlFor="create-session-patient">Patient</FieldLabel>
               <FormIdCombobox
@@ -200,6 +203,7 @@ export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetP
                     selected={sessionAt}
                     onSelect={onSessionDateSelect}
                     captionLayout="dropdown"
+                    disabled={(d) => isBefore(startOfDay(d), startOfDay(new Date()))}
                   />
                   <div className="border-t border-border/60 bg-muted/20 px-3 py-2.5">
                     <span className="mb-2 block text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">

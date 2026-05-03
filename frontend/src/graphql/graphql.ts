@@ -79,6 +79,13 @@ export type SessionFilter = {
 
 export type SessionStatus = "CANCELLED" | "COMPLETED" | "IN_PROGRESS" | "SCHEDULED";
 
+export type UpdateStaffInput = {
+  full_name?: string | null | undefined;
+  license_no?: string | null | undefined;
+  phone?: string | null | undefined;
+  specialization?: string | null | undefined;
+};
+
 export type UserRole = "ADMIN" | "RECEPTIONIST" | "THERAPIST";
 
 export type CreatePatientMutationVariables = Exact<{
@@ -118,6 +125,13 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = {
   login: { token: string; user: { id: string; email: string; role: UserRole } };
 };
+
+export type UpdateStaffMutationVariables = Exact<{
+  id: string;
+  input: UpdateStaffInput;
+}>;
+
+export type UpdateStaffMutation = { updateStaff: { id: string } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -288,6 +302,13 @@ export const LoginDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;
+export const UpdateStaffDocument = new TypedDocumentString(`
+    mutation UpdateStaff($id: UUID!, $input: UpdateStaffInput!) {
+  updateStaff(id: $id, input: $input) {
+    id
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateStaffMutation, UpdateStaffMutationVariables>;
 export const MeDocument = new TypedDocumentString(`
     query Me {
   me {

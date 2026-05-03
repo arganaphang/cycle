@@ -14,7 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SubmitEvent } from "react";
 import { useMemo, useState } from "react";
 import { FormError, FormIdCombobox } from "./create-record-form-controls";
-import { optionalFormValue, requiredFormValue } from "./form-helpers";
+import { parseCreateTreatmentSessionReportForm } from "./form-schemas";
 import type { CreateSheetProps } from "./types";
 
 export function CreateTreatmentSessionReportSheet({ open, onOpenChange }: CreateSheetProps) {
@@ -42,20 +42,16 @@ export function CreateTreatmentSessionReportSheet({ open, onOpenChange }: Create
 
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formEl = event.currentTarget;
     setError(undefined);
-    const form = new FormData(event.currentTarget);
+    const parsed = parseCreateTreatmentSessionReportForm(new FormData(formEl));
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Invalid form");
+      return;
+    }
     try {
-      await mutation.mutateAsync({
-        session_id: requiredFormValue(form, "session_id"),
-        anamnesis: optionalFormValue(form, "anamnesis"),
-        mechanism_of_injury: optionalFormValue(form, "mechanism_of_injury"),
-        actual_condition: optionalFormValue(form, "actual_condition"),
-        examination: optionalFormValue(form, "examination"),
-        diagnosis: optionalFormValue(form, "diagnosis"),
-        intervention: optionalFormValue(form, "intervention"),
-        planning_and_education: optionalFormValue(form, "planning_and_education"),
-      });
-      event.currentTarget.reset();
+      await mutation.mutateAsync(parsed.data);
+      formEl.reset();
       setSelectedSessionId("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create report");
@@ -64,13 +60,13 @@ export function CreateTreatmentSessionReportSheet({ open, onOpenChange }: Create
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto sm:max-w-lg">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>New Report</SheetTitle>
           <SheetDescription>Create a treatment session report.</SheetDescription>
         </SheetHeader>
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
-          <FieldGroup className="gap-5 px-8">
+          <FieldGroup className="gap-5 px-4 sm:px-8">
             <Field>
               <FieldLabel htmlFor="create-report-session">Session</FieldLabel>
               <FormIdCombobox

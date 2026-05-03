@@ -22,26 +22,26 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SubmitEvent } from "react";
 import { useState } from "react";
 import { FormError } from "./create-record-form-controls";
-import { optionalFormValue, requiredFormValue } from "./form-helpers";
+import { type CreateStaffFormValues, parseCreateStaffForm } from "./form-schemas";
 import type { CreateSheetProps } from "./types";
 
 export function CreateStaffSheet({ open, onOpenChange }: CreateSheetProps) {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string>();
   const mutation = useMutation({
-    mutationFn: async (form: FormData) => {
+    mutationFn: async (values: CreateStaffFormValues) => {
       const user = await createUser({
-        email: requiredFormValue(form, "email"),
-        password: requiredFormValue(form, "password"),
-        role: requiredFormValue(form, "role") as "ADMIN" | "RECEPTIONIST" | "THERAPIST",
+        email: values.email,
+        password: values.password,
+        role: values.role,
       });
 
       return createStaff({
         user_id: user.id,
-        full_name: requiredFormValue(form, "full_name"),
-        license_no: optionalFormValue(form, "license_no"),
-        phone: optionalFormValue(form, "phone"),
-        specialization: optionalFormValue(form, "specialization"),
+        full_name: values.full_name,
+        license_no: values.license_no,
+        phone: values.phone,
+        specialization: values.specialization,
       });
     },
     onSuccess: async () => {
@@ -52,10 +52,16 @@ export function CreateStaffSheet({ open, onOpenChange }: CreateSheetProps) {
 
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formEl = event.currentTarget;
     setError(undefined);
+    const parsed = parseCreateStaffForm(new FormData(formEl));
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Invalid form");
+      return;
+    }
     try {
-      await mutation.mutateAsync(new FormData(event.currentTarget));
-      event.currentTarget.reset();
+      await mutation.mutateAsync(parsed.data);
+      formEl.reset();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create staff");
     }
@@ -63,13 +69,13 @@ export function CreateStaffSheet({ open, onOpenChange }: CreateSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto sm:max-w-md">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader>
           <SheetTitle>New Staff</SheetTitle>
           <SheetDescription>Create the login and staff profile.</SheetDescription>
         </SheetHeader>
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
-          <FieldGroup className="gap-5 px-8">
+          <FieldGroup className="gap-5 px-4 sm:px-8">
             <Field>
               <FieldLabel htmlFor="staff-full-name">Full name</FieldLabel>
               <Input id="staff-full-name" name="full_name" required />

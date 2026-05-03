@@ -26,12 +26,7 @@ import type { SubmitEvent } from "react";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePickerFieldTrigger, FormError } from "./create-record-form-controls";
-import {
-  optionalEmergencyContactFromForm,
-  optionalFormValue,
-  requiredFormValue,
-  toDate,
-} from "./form-helpers";
+import { parseCreatePatientForm } from "./form-schemas";
 import type { CreateSheetProps } from "./types";
 
 export function CreatePatientSheet({ open, onOpenChange }: CreateSheetProps) {
@@ -48,19 +43,16 @@ export function CreatePatientSheet({ open, onOpenChange }: CreateSheetProps) {
 
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formEl = event.currentTarget;
     setError(undefined);
-    const form = new FormData(event.currentTarget);
+    const parsed = parseCreatePatientForm(new FormData(formEl));
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Invalid form");
+      return;
+    }
     try {
-      await mutation.mutateAsync({
-        full_name: requiredFormValue(form, "full_name"),
-        date_of_birth: toDate(requiredFormValue(form, "date_of_birth")),
-        gender: requiredFormValue(form, "gender") as "FEMALE" | "MALE",
-        phone: optionalFormValue(form, "phone"),
-        email: optionalFormValue(form, "email"),
-        address: optionalFormValue(form, "address"),
-        emergency_contact: optionalEmergencyContactFromForm(form),
-      });
-      event.currentTarget.reset();
+      await mutation.mutateAsync(parsed.data);
+      formEl.reset();
       setDateOfBirth(undefined);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create patient");
@@ -69,13 +61,13 @@ export function CreatePatientSheet({ open, onOpenChange }: CreateSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto sm:max-w-md">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader>
           <SheetTitle>New Patient</SheetTitle>
           <SheetDescription>Create a patient record.</SheetDescription>
         </SheetHeader>
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
-          <FieldGroup className="gap-5 px-8">
+          <FieldGroup className="gap-5 px-4 sm:px-8">
             <Field>
               <FieldLabel htmlFor="patient-full-name">Full name</FieldLabel>
               <Input id="patient-full-name" name="full_name" required />

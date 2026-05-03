@@ -34,6 +34,8 @@ interface DataTableProps<TData, TValue> {
   pagination?: PaginationState;
   onPaginationChange?: OnChangeFn<PaginationState>;
   totalCount?: number;
+  /** Opens detail view; clicks on the actions column do not trigger this. */
+  onRowClick?: (row: TData) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -42,6 +44,7 @@ export function DataTable<TData, TValue>({
   pagination,
   onPaginationChange,
   totalCount,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [internalPagination, setInternalPagination] = React.useState<PaginationState>({
@@ -101,7 +104,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="overflow-hidden rounded-md border">
+      <div className="min-w-0 overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -121,9 +124,33 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={
+                    onRowClick
+                      ? "cursor-pointer hover:bg-muted/50 data-[state=selected]:hover:bg-muted"
+                      : undefined
+                  }
+                  onClick={
+                    onRowClick
+                      ? () => {
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      onClick={
+                        cell.column.id === "actions"
+                          ? (e) => {
+                              e.stopPropagation();
+                            }
+                          : undefined
+                      }
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

@@ -8,6 +8,7 @@ import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import appCss from "../styles/app.css?url";
 import { TooltipProvider } from "../components/ui/tooltip";
+import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -54,7 +55,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <NuqsAdapter>{children}</NuqsAdapter>
+          </TooltipProvider>
           <TanStackDevtools
             config={{ position: "middle-left" }}
             plugins={[
