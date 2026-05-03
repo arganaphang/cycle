@@ -1,4 +1,4 @@
-import { DataTable } from "@/components/data-table/data-table";
+import { DataTable, DataTableColumnMenu } from "@/components/data-table/data-table";
 import { DetailFields, EntityDetailSheet } from "@/components/data-table/entity-detail-sheet";
 import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { Badge } from "@/components/ui/badge";
@@ -162,22 +162,6 @@ function PageComponent() {
 
   return (
     <main className="min-w-0 space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <ListSearchInput
-            id="session-search"
-            value={searchDraft}
-            onChange={onSearchChange}
-            placeholder="Patient, therapist, session #…"
-            aria-label="Search sessions"
-            className="sm:w-72"
-          />
-          <Button className="w-full shrink-0 sm:w-auto" onClick={() => setCreateOpen(true)}>
-            <Plus />
-            New session
-          </Button>
-        </div>
-      </div>
       <DataTable
         columns={columns}
         data={data?.treatmentSessions.nodes ?? []}
@@ -187,7 +171,25 @@ function PageComponent() {
         onSortingChange={onSortingChange}
         totalCount={data?.treatmentSessions.total_count ?? 0}
         onRowClick={(row) => setDetail(row)}
-      />
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+            <ListSearchInput
+              id="session-search"
+              value={searchDraft}
+              onChange={onSearchChange}
+              placeholder="Patient, therapist, session #…"
+              aria-label="Search sessions"
+              className="sm:w-72"
+            />
+            <Button className="w-full shrink-0 sm:w-auto" onClick={() => setCreateOpen(true)}>
+              <Plus />
+              New session
+            </Button>
+            <DataTableColumnMenu />
+          </div>
+        </div>
+      </DataTable>
       <CreateTreatmentSessionSheet open={createOpen} onOpenChange={setCreateOpen} />
       <EntityDetailSheet
         open={detail !== null}
