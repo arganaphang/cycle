@@ -116,7 +116,7 @@ func (s *staffRepository) FindAll(ctx context.Context, search *string, limit *in
 	stmt := goqu.From(entity.TABLE_STAFF)
 
 	if search != nil {
-		stmt = stmt.Where(goqu.C("full_name").Like(fmt.Sprintf("%s%%", *search)))
+		stmt = stmt.Where(goqu.C("full_name").ILike(fmt.Sprintf("%s%%", *search)))
 	}
 
 	sql, _, _ := stmt.Limit(limitFilter).Offset(offsetFilter).ToSQL()

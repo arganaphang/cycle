@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTablePagination } from "./data-table-pagination";
 import React from "react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { titleCase } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {

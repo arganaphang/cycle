@@ -56,6 +56,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>{children}</TooltipProvider>
           <TanStackDevtools
+            config={{ position: "middle-left" }}
             plugins={[
               {
                 name: "TanStack Query",

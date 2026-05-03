@@ -1,5 +1,5 @@
-import { DataTable } from "@/components/data-table";
-import { CreateStaffSheet } from "@/components/create-record-sheet";
+import { DataTable } from "@/components/data-table/data-table";
+import { CreateStaffSheet } from "@/components/record-sheet/create-record-sheet";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DataTableColumnHeader } from "@/components/data-table-column-header";
+import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { titleCase } from "@/lib/utils";
 import { useStaffs } from "@/queries/useStaff";
 import type { StaffsQuery } from "@/graphql/graphql";

@@ -4,8 +4,8 @@ import { execute } from "@/graphql/execute";
 import { useQuery } from "@tanstack/react-query";
 
 const queryPatients = graphql(`
-  query Patients($limit: Int, $offset: Int) {
-    patients(limit: $limit, offset: $offset) {
+  query Patients($limit: Int, $offset: Int, $search: String) {
+    patients(limit: $limit, offset: $offset, search: $search) {
       nodes {
         id
         full_name

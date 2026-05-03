@@ -93,7 +93,7 @@ func (p *patientRepository) FindAll(ctx context.Context, search *string, limit *
 	stmt := goqu.From(entity.TABLE_PATIENT)
 
 	if search != nil {
-		stmt = stmt.Where(goqu.C("full_name").Like(fmt.Sprintf("%s%%", *search)))
+		stmt = stmt.Where(goqu.C("full_name").ILike(fmt.Sprintf("%s%%", *search)))
 	}
 
 	sql, _, _ := stmt.Limit(limitFilter).Offset(offsetFilter).ToSQL()

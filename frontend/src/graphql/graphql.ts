@@ -109,6 +109,7 @@ export type MeQuery = { me: { id: string; email: string; role: UserRole } };
 export type PatientsQueryVariables = Exact<{
   limit?: number | null | undefined;
   offset?: number | null | undefined;
+  search?: string | null | undefined;
 }>;
 
 export type PatientsQuery = {
@@ -177,6 +178,7 @@ export type TreatmentSessionsQuery = {
 export type StaffsQueryVariables = Exact<{
   limit?: number | null | undefined;
   offset?: number | null | undefined;
+  search?: string | null | undefined;
 }>;
 
 export type StaffsQuery = {
@@ -277,8 +279,8 @@ export const MeDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
 export const PatientsDocument = new TypedDocumentString(`
-    query Patients($limit: Int, $offset: Int) {
-  patients(limit: $limit, offset: $offset) {
+    query Patients($limit: Int, $offset: Int, $search: String) {
+  patients(limit: $limit, offset: $offset, search: $search) {
     nodes {
       id
       full_name
@@ -345,8 +347,8 @@ export const TreatmentSessionsDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<TreatmentSessionsQuery, TreatmentSessionsQueryVariables>;
 export const StaffsDocument = new TypedDocumentString(`
-    query Staffs($limit: Int, $offset: Int) {
-  staffs(limit: $limit, offset: $offset) {
+    query Staffs($limit: Int, $offset: Int, $search: String) {
+  staffs(limit: $limit, offset: $offset, search: $search) {
     nodes {
       id
       full_name

@@ -30,16 +30,33 @@ func NewTreatmentSessionRepository(db *sqlx.DB) TreatmentSessionRepository {
 
 // Create implements [TreatmentSessionRepository].
 func (t *treatmentSessionRepository) Create(ctx context.Context, input model.CreateTreatmentSessionInput) (*entity.TreatmentSession, error) {
+	tx, err := t.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	// Per migration: session_no = next index for this patient (1-based).
+	var sessionNo int32
+	const nextNoQuery = `SELECT COALESCE(MAX(session_no), 0) + 1 FROM treatment_sessions WHERE patient_id = $1`
+	if err := tx.GetContext(ctx, &sessionNo, nextNoQuery, input.PatientID); err != nil {
+		return nil, err
+	}
+
 	stmt := goqu.Insert(entity.TABLE_TREATMENT_SESSION).
 		Rows(goqu.Record{
 			"patient_id":   input.PatientID,
 			"staff_id":     input.StaffID,
 			"session_date": input.SessionDate,
+			"session_no":   sessionNo,
 		}).
 		Returning("*")
 	sql, _, _ := stmt.ToSQL()
 	session := entity.TreatmentSession{}
-	if err := t.db.Get(&session, sql); err != nil {
+	if err := tx.GetContext(ctx, &session, sql); err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 	return &session, nil

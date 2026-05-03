@@ -20,10 +20,10 @@ type Documents = {
   "\n  mutation CreateTreatmentSessionReport($input: CreateTreatmentSessionReportInput!) {\n    createTreatmentSessionReport(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateTreatmentSessionReportDocument;
   "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n": typeof types.LoginDocument;
   "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": typeof types.MeDocument;
-  "\n  query Patients($limit: Int, $offset: Int) {\n    patients(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n": typeof types.PatientsDocument;
+  "\n  query Patients($limit: Int, $offset: Int, $search: String) {\n    patients(limit: $limit, offset: $offset, search: $search) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n": typeof types.PatientsDocument;
   "\n  query TreatmentSessionReports($limit: Int, $offset: Int) {\n    treatmentSessionReports(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        diagnosis\n        created_at\n        updated_at\n        session_id\n        treatment_session {\n          id\n          session_no\n          session_date\n          patient {\n            id\n            full_name\n          }\n        }\n      }\n      total_count\n    }\n  }\n": typeof types.TreatmentSessionReportsDocument;
   "\n  query TreatmentSessions($limit: Int, $offset: Int) {\n    treatmentSessions(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        session_no\n        session_date\n        status\n        created_at\n        updated_at\n        patient {\n          id\n          full_name\n        }\n        staff {\n          id\n          full_name\n        }\n      }\n      total_count\n    }\n  }\n": typeof types.TreatmentSessionsDocument;
-  "\n  query Staffs($limit: Int, $offset: Int) {\n    staffs(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        full_name\n        license_no\n        phone\n        specialization\n        created_at\n        updated_at\n        user {\n          email\n        }\n      }\n      total_count\n    }\n  }\n": typeof types.StaffsDocument;
+  "\n  query Staffs($limit: Int, $offset: Int, $search: String) {\n    staffs(limit: $limit, offset: $offset, search: $search) {\n      nodes {\n        id\n        full_name\n        license_no\n        phone\n        specialization\n        created_at\n        updated_at\n        user {\n          email\n        }\n      }\n      total_count\n    }\n  }\n": typeof types.StaffsDocument;
 };
 const documents: Documents = {
   "\n  mutation CreatePatient($input: CreatePatientInput!) {\n    createPatient(input: $input) {\n      id\n    }\n  }\n":
@@ -39,13 +39,13 @@ const documents: Documents = {
   "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n":
     types.LoginDocument,
   "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": types.MeDocument,
-  "\n  query Patients($limit: Int, $offset: Int) {\n    patients(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n":
+  "\n  query Patients($limit: Int, $offset: Int, $search: String) {\n    patients(limit: $limit, offset: $offset, search: $search) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n":
     types.PatientsDocument,
   "\n  query TreatmentSessionReports($limit: Int, $offset: Int) {\n    treatmentSessionReports(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        diagnosis\n        created_at\n        updated_at\n        session_id\n        treatment_session {\n          id\n          session_no\n          session_date\n          patient {\n            id\n            full_name\n          }\n        }\n      }\n      total_count\n    }\n  }\n":
     types.TreatmentSessionReportsDocument,
   "\n  query TreatmentSessions($limit: Int, $offset: Int) {\n    treatmentSessions(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        session_no\n        session_date\n        status\n        created_at\n        updated_at\n        patient {\n          id\n          full_name\n        }\n        staff {\n          id\n          full_name\n        }\n      }\n      total_count\n    }\n  }\n":
     types.TreatmentSessionsDocument,
-  "\n  query Staffs($limit: Int, $offset: Int) {\n    staffs(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        full_name\n        license_no\n        phone\n        specialization\n        created_at\n        updated_at\n        user {\n          email\n        }\n      }\n      total_count\n    }\n  }\n":
+  "\n  query Staffs($limit: Int, $offset: Int, $search: String) {\n    staffs(limit: $limit, offset: $offset, search: $search) {\n      nodes {\n        id\n        full_name\n        license_no\n        phone\n        specialization\n        created_at\n        updated_at\n        user {\n          email\n        }\n      }\n      total_count\n    }\n  }\n":
     types.StaffsDocument,
 };
 
@@ -95,7 +95,7 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  query Patients($limit: Int, $offset: Int) {\n    patients(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n",
+  source: "\n  query Patients($limit: Int, $offset: Int, $search: String) {\n    patients(limit: $limit, offset: $offset, search: $search) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n",
 ): typeof import("./graphql").PatientsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -113,7 +113,7 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  query Staffs($limit: Int, $offset: Int) {\n    staffs(limit: $limit, offset: $offset) {\n      nodes {\n        id\n        full_name\n        license_no\n        phone\n        specialization\n        created_at\n        updated_at\n        user {\n          email\n        }\n      }\n      total_count\n    }\n  }\n",
+  source: "\n  query Staffs($limit: Int, $offset: Int, $search: String) {\n    staffs(limit: $limit, offset: $offset, search: $search) {\n      nodes {\n        id\n        full_name\n        license_no\n        phone\n        specialization\n        created_at\n        updated_at\n        user {\n          email\n        }\n      }\n      total_count\n    }\n  }\n",
 ): typeof import("./graphql").StaffsDocument;
 
 export function graphql(source: string) {
