@@ -38,6 +38,33 @@ services:
         condition: service_healthy
     networks:
       - application_network
+  backend:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_HOST: postgres
+      PORT: "8000"
+    expose:
+      - "8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - application_network
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - application_network
 networks:
   application_network:
     driver: bridge

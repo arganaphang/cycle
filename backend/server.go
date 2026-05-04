@@ -34,12 +34,16 @@ func main() {
 		port = defaultPort
 	}
 
-	db, err := sqlx.Connect("postgres", fmt.Sprintf(
+	dsn := fmt.Sprintf(
 		"user=%s dbname=%s password=%s sslmode=disable",
 		os.Getenv("DATABASE_USER"),
 		os.Getenv("DATABASE_NAME"),
 		os.Getenv("DATABASE_PASS"),
-	))
+	)
+	if h := strings.TrimSpace(os.Getenv("DATABASE_HOST")); h != "" {
+		dsn = fmt.Sprintf("host=%s %s", h, dsn)
+	}
+	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
 		zap.L().Fatal("failed to connect to database", zap.Error(err))
 	}
