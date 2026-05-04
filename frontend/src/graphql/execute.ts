@@ -4,8 +4,7 @@ export async function execute<TResult, TVariables>(
   query: TypedDocumentString<TResult, TVariables>,
   ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
 ) {
-  // TODO: Move this into ENV
-  const response = await fetch("http://localhost:8000/query", {
+  const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/query`, {
     method: "POST",
     credentials: "include",
     headers: {

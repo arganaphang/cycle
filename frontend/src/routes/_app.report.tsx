@@ -7,7 +7,7 @@ import {
 import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { CreateTreatmentSessionReportSheet } from "@/components/record-sheet/create-record-sheet";
 import { useListRouteTableUrl } from "@/hooks/use-list-route-table-url";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal, Plus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { formatIsoDate, formatIsoDateTime, titleCase } from "@/lib/utils";
@@ -46,7 +46,6 @@ export const Route = createFileRoute("/_app/report")({
 });
 
 function PageComponent() {
-  const navigate = useNavigate();
   const {
     pagination,
     onPaginationChange,
@@ -144,14 +143,16 @@ function PageComponent() {
                 </DropdownMenuGroup>
                 <DropdownMenuItem onClick={() => setDetail(report)}>View details</DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() =>
-                    navigate({
-                      to: "/session",
-                      search: { sessionId: report.treatment_session.id },
-                    })
-                  }
+                  onClick={() => {
+                    window.open(
+                      `/preview/report/${encodeURIComponent(report.id)}`,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                  }}
                 >
-                  Open session & report
+                  <Printer className="mr-2 size-4" />
+                  Print
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -159,7 +160,7 @@ function PageComponent() {
         },
       },
     ],
-    [navigate],
+    [],
   );
 
   return (
@@ -211,6 +212,23 @@ function PageComponent() {
             <DetailSection
               title="Diagnosis"
               description="Primary clinical impression for this visit."
+              actions={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    window.open(
+                      `/preview/report/${encodeURIComponent(detail.id)}`,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                  }}
+                >
+                  <Printer className="size-4" />
+                  Print
+                </Button>
+              }
             >
               {detail.diagnosis?.trim() ? (
                 <div className="text-sm leading-relaxed">

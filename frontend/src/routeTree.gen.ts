@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -16,7 +17,13 @@ import { Route as AppStaffRouteImport } from './routes/_app.staff'
 import { Route as AppSessionRouteImport } from './routes/_app.session'
 import { Route as AppReportRouteImport } from './routes/_app.report'
 import { Route as AppPatientRouteImport } from './routes/_app.patient'
+import { Route as PreviewReportReportIdRouteImport } from './routes/preview.report.$reportId'
 
+const PreviewRoute = PreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -51,57 +58,94 @@ const AppPatientRoute = AppPatientRouteImport.update({
   path: '/patient',
   getParentRoute: () => AppRoute,
 } as any)
+const PreviewReportReportIdRoute = PreviewReportReportIdRouteImport.update({
+  id: '/report/$reportId',
+  path: '/report/$reportId',
+  getParentRoute: () => PreviewRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/preview': typeof PreviewRouteWithChildren
   '/patient': typeof AppPatientRoute
   '/report': typeof AppReportRoute
   '/session': typeof AppSessionRoute
   '/staff': typeof AppStaffRoute
+  '/preview/report/$reportId': typeof PreviewReportReportIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/preview': typeof PreviewRouteWithChildren
   '/patient': typeof AppPatientRoute
   '/report': typeof AppReportRoute
   '/session': typeof AppSessionRoute
   '/staff': typeof AppStaffRoute
+  '/preview/report/$reportId': typeof PreviewReportReportIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/preview': typeof PreviewRouteWithChildren
   '/_app/patient': typeof AppPatientRoute
   '/_app/report': typeof AppReportRoute
   '/_app/session': typeof AppSessionRoute
   '/_app/staff': typeof AppStaffRoute
+  '/preview/report/$reportId': typeof PreviewReportReportIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/patient' | '/report' | '/session' | '/staff'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/preview'
+    | '/patient'
+    | '/report'
+    | '/session'
+    | '/staff'
+    | '/preview/report/$reportId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/patient' | '/report' | '/session' | '/staff'
+  to:
+    | '/'
+    | '/login'
+    | '/preview'
+    | '/patient'
+    | '/report'
+    | '/session'
+    | '/staff'
+    | '/preview/report/$reportId'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/login'
+    | '/preview'
     | '/_app/patient'
     | '/_app/report'
     | '/_app/session'
     | '/_app/staff'
+    | '/preview/report/$reportId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PreviewRoute: typeof PreviewRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/preview': {
+      id: '/preview'
+      path: '/preview'
+      fullPath: '/preview'
+      preLoaderRoute: typeof PreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -151,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPatientRouteImport
       parentRoute: typeof AppRoute
     }
+    '/preview/report/$reportId': {
+      id: '/preview/report/$reportId'
+      path: '/report/$reportId'
+      fullPath: '/preview/report/$reportId'
+      preLoaderRoute: typeof PreviewReportReportIdRouteImport
+      parentRoute: typeof PreviewRoute
+    }
   }
 }
 
@@ -170,10 +221,22 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface PreviewRouteChildren {
+  PreviewReportReportIdRoute: typeof PreviewReportReportIdRoute
+}
+
+const PreviewRouteChildren: PreviewRouteChildren = {
+  PreviewReportReportIdRoute: PreviewReportReportIdRoute,
+}
+
+const PreviewRouteWithChildren =
+  PreviewRoute._addFileChildren(PreviewRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  PreviewRoute: PreviewRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

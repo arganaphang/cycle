@@ -332,6 +332,49 @@ export type TreatmentSessionDetailQuery = {
   } | null;
 };
 
+export type TreatmentSessionReportDetailQueryVariables = Exact<{
+  id: string;
+}>;
+
+export type TreatmentSessionReportDetailQuery = {
+  treatmentSessionReport: {
+    id: string;
+    anamnesis: string | null;
+    mechanism_of_injury: string | null;
+    actual_condition: string | null;
+    examination: string | null;
+    diagnosis: string | null;
+    intervention: string | null;
+    planning_and_education: string | null;
+    created_at: string;
+    updated_at: string;
+    treatment_session: {
+      id: string;
+      session_no: number;
+      session_date: string;
+      status: SessionStatus;
+      note: string | null;
+      patient: {
+        id: string;
+        full_name: string;
+        medical_record_no: string;
+        date_of_birth: string;
+        gender: Gender;
+        phone: string | null;
+        email: string | null;
+        address: string | null;
+      };
+      staff: {
+        id: string;
+        full_name: string;
+        specialization: string | null;
+        license_no: string | null;
+        phone: string | null;
+      };
+    };
+  } | null;
+};
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -594,4 +637,47 @@ export const TreatmentSessionDetailDocument = new TypedDocumentString(`
     `) as unknown as TypedDocumentString<
   TreatmentSessionDetailQuery,
   TreatmentSessionDetailQueryVariables
+>;
+export const TreatmentSessionReportDetailDocument = new TypedDocumentString(`
+    query TreatmentSessionReportDetail($id: UUID!) {
+  treatmentSessionReport(id: $id) {
+    id
+    anamnesis
+    mechanism_of_injury
+    actual_condition
+    examination
+    diagnosis
+    intervention
+    planning_and_education
+    created_at
+    updated_at
+    treatment_session {
+      id
+      session_no
+      session_date
+      status
+      note
+      patient {
+        id
+        full_name
+        medical_record_no
+        date_of_birth
+        gender
+        phone
+        email
+        address
+      }
+      staff {
+        id
+        full_name
+        specialization
+        license_no
+        phone
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<
+  TreatmentSessionReportDetailQuery,
+  TreatmentSessionReportDetailQueryVariables
 >;

@@ -128,3 +128,14 @@
     @apply font-sans;
   }
 }
+
+@media print {
+  .print-preview-toolbar {
+    display: none !important;
+  }
+
+  .print-preview-document {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

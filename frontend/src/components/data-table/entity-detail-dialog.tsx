@@ -82,16 +82,36 @@ export function DetailSection({
 const detailRowClass =
   "flex flex-col gap-1 sm:grid sm:grid-cols-[minmax(7.25rem,11rem)_minmax(0,1fr)] sm:items-start sm:gap-x-8 sm:gap-y-1";
 
+/** Label above value, full width — for long-form / print content. */
+const detailRowClassStacked = "flex flex-col gap-1.5";
+
 const labelClass = "text-muted-foreground pt-0.5 text-[11px] font-semibold uppercase tracking-wide";
 
 const valueClass = "text-foreground min-w-0 text-sm leading-relaxed";
 
 /** Single label/value row — matches rows inside `DetailFields` for custom layouts. */
-export function DetailValueRow({ label, value }: { label: string; value: ReactNode }) {
+export function DetailValueRow({
+  label,
+  value,
+  layout = "default",
+}: {
+  label: string;
+  value: ReactNode;
+  /** `stacked` = label on top, value below (no side-by-side grid on larger screens). */
+  layout?: "default" | "stacked";
+}) {
   return (
-    <div className={detailRowClass}>
+    <div className={layout === "stacked" ? detailRowClassStacked : detailRowClass}>
       <dt className={labelClass}>{label}</dt>
-      <dd className={cn(valueClass, "wrap-break-word font-normal")}>{value ?? "—"}</dd>
+      <dd
+        className={cn(
+          valueClass,
+          "wrap-break-word font-normal",
+          layout === "stacked" && "whitespace-pre-wrap",
+        )}
+      >
+        {value ?? "—"}
+      </dd>
     </div>
   );
 }
@@ -99,14 +119,21 @@ export function DetailValueRow({ label, value }: { label: string; value: ReactNo
 export function DetailFields({
   rows,
   className,
+  layout = "default",
 }: {
   rows: { label: string; value: ReactNode }[];
   className?: string;
+  layout?: "default" | "stacked";
 }) {
   return (
     <dl className={cn("flex flex-col gap-4", className)}>
       {rows.map((row, i) => (
-        <DetailValueRow key={`${row.label}-${i}`} label={row.label} value={row.value} />
+        <DetailValueRow
+          key={`${row.label}-${i}`}
+          label={row.label}
+          value={row.value}
+          layout={layout}
+        />
       ))}
     </dl>
   );

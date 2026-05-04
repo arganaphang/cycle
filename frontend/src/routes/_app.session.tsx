@@ -26,7 +26,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, Printer } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { formatIsoDate, formatIsoDateTime, titleCase } from "@/lib/utils";
@@ -221,14 +221,6 @@ function PageComponent() {
                 <DropdownMenuItem onClick={() => openSessionDetail(session.id)}>
                   View detail
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    console.log("session table: export / print", { sessionId: session.id });
-                  }}
-                >
-                  <Printer className="mr-2 size-4" />
-                  Print
-                </DropdownMenuItem>
                 {!session.report ? (
                   <DropdownMenuItem onClick={() => openAddReport(session)}>
                     Add report
@@ -336,19 +328,6 @@ function PageComponent() {
             <DetailSection
               title="Session & contacts"
               description="Scheduling, people involved, and administrative notes."
-              actions={
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    console.log("session detail: export / print", { sessionId: sessionFull.id });
-                  }}
-                >
-                  <Printer className="size-4" />
-                  Print
-                </Button>
-              }
             >
               <DetailFields
                 rows={[
