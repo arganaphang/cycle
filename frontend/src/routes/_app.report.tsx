@@ -3,7 +3,7 @@ import { DetailFields, EntityDetailSheet } from "@/components/data-table/entity-
 import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { CreateTreatmentSessionReportSheet } from "@/components/record-sheet/create-record-sheet";
 import { useListRouteTableUrl } from "@/hooks/use-list-route-table-url";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
@@ -42,6 +42,7 @@ export const Route = createFileRoute("/_app/report")({
 });
 
 function PageComponent() {
+  const navigate = useNavigate();
   const {
     pagination,
     onPaginationChange,
@@ -138,13 +139,23 @@ function PageComponent() {
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 </DropdownMenuGroup>
                 <DropdownMenuItem onClick={() => setDetail(report)}>View details</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    navigate({
+                      to: "/session",
+                      search: { sessionId: report.treatment_session.id },
+                    })
+                  }
+                >
+                  Open session & report
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           );
         },
       },
     ],
-    [],
+    [navigate],
   );
 
   return (

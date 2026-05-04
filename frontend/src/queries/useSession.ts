@@ -33,6 +33,9 @@ const queryTreatmentSessions = graphql(`
           id
           full_name
         }
+        report {
+          id
+        }
       }
       total_count
     }

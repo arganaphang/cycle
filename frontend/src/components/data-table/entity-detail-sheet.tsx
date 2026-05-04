@@ -5,6 +5,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 export function EntityDetailSheet({
@@ -13,16 +14,19 @@ export function EntityDetailSheet({
   title,
   description,
   children,
+  sheetContentClassName,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
   children: ReactNode;
+  /** Appended to default SheetContent layout (e.g. wider panel for long-form content). */
+  sheetContentClassName?: string;
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
+      <SheetContent className={cn("w-full overflow-y-auto sm:max-w-lg", sheetContentClassName)}>
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           {description ? <SheetDescription>{description}</SheetDescription> : null}

@@ -258,6 +258,7 @@ export type TreatmentSessionsQuery = {
       updated_at: string;
       patient: { id: string; full_name: string };
       staff: { id: string; full_name: string };
+      report: { id: string } | null;
     }>;
   };
 };
@@ -284,6 +285,51 @@ export type StaffsQuery = {
       user: { email: string };
     }>;
   };
+};
+
+export type TreatmentSessionDetailQueryVariables = Exact<{
+  id: string;
+}>;
+
+export type TreatmentSessionDetailQuery = {
+  treatmentSession: {
+    id: string;
+    session_no: number;
+    session_date: string;
+    status: SessionStatus;
+    note: string | null;
+    created_at: string;
+    updated_at: string;
+    patient: {
+      id: string;
+      full_name: string;
+      medical_record_no: string;
+      date_of_birth: string;
+      gender: Gender;
+      phone: string | null;
+      email: string | null;
+      address: string | null;
+    };
+    staff: {
+      id: string;
+      full_name: string;
+      specialization: string | null;
+      license_no: string | null;
+      phone: string | null;
+    };
+    report: {
+      id: string;
+      anamnesis: string | null;
+      mechanism_of_injury: string | null;
+      actual_condition: string | null;
+      examination: string | null;
+      diagnosis: string | null;
+      intervention: string | null;
+      planning_and_education: string | null;
+      created_at: string;
+      updated_at: string;
+    } | null;
+  } | null;
 };
 
 export class TypedDocumentString<TResult, TVariables>
@@ -471,6 +517,9 @@ export const TreatmentSessionsDocument = new TypedDocumentString(`
         id
         full_name
       }
+      report {
+        id
+      }
     }
     total_count
   }
@@ -501,3 +550,48 @@ export const StaffsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<StaffsQuery, StaffsQueryVariables>;
+export const TreatmentSessionDetailDocument = new TypedDocumentString(`
+    query TreatmentSessionDetail($id: UUID!) {
+  treatmentSession(id: $id) {
+    id
+    session_no
+    session_date
+    status
+    note
+    created_at
+    updated_at
+    patient {
+      id
+      full_name
+      medical_record_no
+      date_of_birth
+      gender
+      phone
+      email
+      address
+    }
+    staff {
+      id
+      full_name
+      specialization
+      license_no
+      phone
+    }
+    report {
+      id
+      anamnesis
+      mechanism_of_injury
+      actual_condition
+      examination
+      diagnosis
+      intervention
+      planning_and_education
+      created_at
+      updated_at
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<
+  TreatmentSessionDetailQuery,
+  TreatmentSessionDetailQueryVariables
+>;

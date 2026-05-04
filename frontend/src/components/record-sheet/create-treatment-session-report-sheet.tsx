@@ -47,6 +47,8 @@ export function CreateTreatmentSessionReportSheet({
       await queryClient.invalidateQueries({
         queryKey: ["treatmentSessionReports"],
       });
+      await queryClient.invalidateQueries({ queryKey: ["treatmentSessions"] });
+      await queryClient.invalidateQueries({ queryKey: ["treatmentSession"] });
       onOpenChange(false);
     },
   });

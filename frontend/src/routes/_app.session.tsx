@@ -1,13 +1,15 @@
 import { DataTable, DataTableColumnMenu } from "@/components/data-table/data-table";
 import { DetailFields, EntityDetailSheet } from "@/components/data-table/entity-detail-sheet";
 import { ListSearchInput } from "@/components/data-table/list-search-input";
+import { TreatmentSessionReportPanel } from "@/components/session-report/treatment-session-report-panel";
 import { Badge } from "@/components/ui/badge";
+import { FormError } from "@/components/record-sheet/create-record-form-controls";
 import {
   CreateTreatmentSessionReportSheet,
   CreateTreatmentSessionSheet,
 } from "@/components/record-sheet/create-record-sheet";
 import { useListRouteTableUrl } from "@/hooks/use-list-route-table-url";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
@@ -25,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { formatIsoDate, formatIsoDateTime, titleCase } from "@/lib/utils";
 import { useTreatmentSessions } from "@/queries/useSession";
+import { useTreatmentSessionDetail } from "@/queries/useTreatmentSessionDetail";
 import type {
   SessionStatus,
   TreatmentSessionSortField,
@@ -53,6 +56,12 @@ function treatmentSessionSortField(columnId: string): TreatmentSessionSortField 
 }
 
 export const Route = createFileRoute("/_app/session")({
+  validateSearch: (search: Record<string, unknown>): { sessionId?: string } => ({
+    sessionId:
+      typeof search.sessionId === "string" && search.sessionId.length > 0
+        ? search.sessionId
+        : undefined,
+  }),
   component: PageComponent,
   ssr: false,
 });
@@ -75,6 +84,9 @@ function statusBadgeVariant(
 
 function PageComponent() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const { sessionId } = Route.useSearch();
+
   const {
     pagination,
     onPaginationChange,
@@ -90,9 +102,9 @@ function PageComponent() {
   const [reportPresetSession, setReportPresetSession] = useState<
     TreatmentSessionsQuery["treatmentSessions"]["nodes"][number] | null
   >(null);
-  const [detail, setDetail] = useState<
-    TreatmentSessionsQuery["treatmentSessions"]["nodes"][number] | null
-  >(null);
+
+  const detailOpen = Boolean(sessionId);
+  const detailQuery = useTreatmentSessionDetail(sessionId);
 
   const quickStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: SessionStatus }) =>
@@ -109,6 +121,27 @@ function PageComponent() {
     },
     [],
   );
+
+  const openSessionDetail = useCallback(
+    (id: string) => {
+      navigate({
+        search: (prev) => ({ ...(prev as object), sessionId: id }) as typeof prev,
+        replace: true,
+      });
+    },
+    [navigate],
+  );
+
+  const closeSessionDetail = useCallback(() => {
+    navigate({
+      search: (prev) => {
+        const next = { ...(prev as Record<string, unknown>) };
+        delete next.sessionId;
+        return next as typeof prev;
+      },
+      replace: true,
+    });
+  }, [navigate]);
 
   const firstSort = sorting[0];
   const sortBy = firstSort ? treatmentSessionSortField(firstSort.id) : undefined;
@@ -181,10 +214,14 @@ function PageComponent() {
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 </DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setDetail(session)}>View detail</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => openAddReport(session)}>
-                  Add report
+                <DropdownMenuItem onClick={() => openSessionDetail(session.id)}>
+                  View detail
                 </DropdownMenuItem>
+                {!session.report ? (
+                  <DropdownMenuItem onClick={() => openAddReport(session)}>
+                    Add report
+                  </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>Change status</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
@@ -210,8 +247,16 @@ function PageComponent() {
         },
       },
     ],
-    [openAddReport, quickStatusMutation],
+    [openAddReport, openSessionDetail, quickStatusMutation],
   );
+
+  const sessionFull = detailQuery.data?.treatmentSession ?? null;
+  const detailLoadError =
+    detailOpen &&
+    sessionId &&
+    !detailQuery.isLoading &&
+    !detailQuery.isFetching &&
+    sessionFull === null;
 
   return (
     <main className="min-w-0 space-y-4">
@@ -223,7 +268,7 @@ function PageComponent() {
         sorting={sorting}
         onSortingChange={onSortingChange}
         totalCount={data?.treatmentSessions.total_count ?? 0}
-        onRowClick={(row) => setDetail(row)}
+        onRowClick={(row) => openSessionDetail(row.id)}
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
@@ -258,32 +303,61 @@ function PageComponent() {
         }
       />
       <EntityDetailSheet
-        open={detail !== null}
+        open={detailOpen}
         onOpenChange={(open) => {
-          if (!open) setDetail(null);
+          if (!open) closeSessionDetail();
         }}
-        title={detail ? `Session #${detail.session_no}` : "Session"}
+        title={sessionFull ? `Session #${sessionFull.session_no}` : "Session"}
         description={
-          detail
-            ? `${formatIsoDate(detail.session_date)} · ${detail.status.replace(/_/g, " ")}`
+          sessionFull
+            ? `${formatIsoDate(sessionFull.session_date)} · ${sessionFull.status.replace(/_/g, " ")}`
             : undefined
         }
+        sheetContentClassName="sm:max-w-2xl"
       >
-        {detail ? (
-          <DetailFields
-            rows={[
-              { label: "Session no.", value: String(detail.session_no) },
-              { label: "Session date", value: formatIsoDate(detail.session_date) },
-              { label: "Status", value: detail.status.replace(/_/g, " ") },
-              { label: "Patient", value: detail.patient.full_name },
-              { label: "Patient ID", value: detail.patient.id },
-              { label: "Therapist", value: detail.staff.full_name },
-              { label: "Therapist ID", value: detail.staff.id },
-              { label: "Session ID", value: detail.id },
-              { label: "Created", value: formatIsoDateTime(detail.created_at) },
-              { label: "Updated", value: formatIsoDateTime(detail.updated_at) },
-            ]}
-          />
+        {detailQuery.isLoading || detailQuery.isFetching ? (
+          <p className="text-muted-foreground text-sm">Loading session…</p>
+        ) : detailLoadError ? (
+          <FormError message="Session could not be loaded. It may have been removed." />
+        ) : sessionFull ? (
+          <>
+            <DetailFields
+              rows={[
+                { label: "Session no.", value: String(sessionFull.session_no) },
+                { label: "Session date", value: formatIsoDate(sessionFull.session_date) },
+                { label: "Status", value: sessionFull.status.replace(/_/g, " ") },
+                { label: "Patient", value: sessionFull.patient.full_name },
+                { label: "Medical record no.", value: sessionFull.patient.medical_record_no },
+                {
+                  label: "Date of birth",
+                  value: formatIsoDate(sessionFull.patient.date_of_birth),
+                },
+                { label: "Gender", value: titleCase(sessionFull.patient.gender) },
+                ...(sessionFull.patient.phone
+                  ? [{ label: "Patient phone", value: sessionFull.patient.phone }]
+                  : []),
+                ...(sessionFull.patient.email
+                  ? [{ label: "Patient email", value: sessionFull.patient.email }]
+                  : []),
+                ...(sessionFull.patient.address
+                  ? [{ label: "Address", value: sessionFull.patient.address }]
+                  : []),
+                { label: "Therapist", value: sessionFull.staff.full_name },
+                ...(sessionFull.staff.specialization
+                  ? [{ label: "Specialization", value: sessionFull.staff.specialization }]
+                  : []),
+                ...(sessionFull.staff.license_no
+                  ? [{ label: "License no.", value: sessionFull.staff.license_no }]
+                  : []),
+                ...(sessionFull.note?.trim()
+                  ? [{ label: "Session note", value: sessionFull.note }]
+                  : []),
+                { label: "Created", value: formatIsoDateTime(sessionFull.created_at) },
+                { label: "Updated", value: formatIsoDateTime(sessionFull.updated_at) },
+              ]}
+            />
+            <TreatmentSessionReportPanel session={sessionFull} />
+          </>
         ) : null}
       </EntityDetailSheet>
     </main>
