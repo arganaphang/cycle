@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/shell/app-sidebar";
-import { SidebarInset, SidebarProvider } from "../components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { fetchMe } from "@/queries/useMe";
 
@@ -39,6 +39,7 @@ function RouteComponent() {
       <AppSidebar />
       <SidebarInset className="flex flex-1 flex-col">
         <header className="flex min-h-11 shrink-0 items-center gap-2 border-b border-border/60 px-4 py-2 sm:min-h-12 sm:gap-3 sm:px-6 sm:py-0">
+          <SidebarTrigger />
           {sectionTitle ? (
             <h1 className="min-w-0 truncate text-base font-semibold tracking-tight sm:text-lg">
               {sectionTitle}

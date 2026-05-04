@@ -17,35 +17,35 @@ export default defineConfig(({ mode }) => {
     "https://physiorehab.gbaajakarta.com";
 
   return {
-  staged: { "*": "vp check --fix" },
-  resolve: {
-    tsconfigPaths: true,
-    alias: {
-      "@graphql-typed-document-node/core": path.resolve(
-        __dirname,
-        "src/shims/graphql-typed-document-node-core.ts",
-      ),
-    },
-  },
-  build: {
-    rolldownOptions: {
-      external: ["cloudflare:workers"],
-    },
-  },
-  lint: { options: { typeAware: true, typeCheck: true } },
-  plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
-    tanstackStart(),
-    react(),
-    tailwindcss(),
-  ],
-  server: {
-    proxy: {
-      "/query": {
-        target: apiProxyTarget,
-        changeOrigin: true,
+    staged: { "*": "vp check --fix" },
+    resolve: {
+      tsconfigPaths: true,
+      alias: {
+        "@graphql-typed-document-node/core": path.resolve(
+          __dirname,
+          "src/shims/graphql-typed-document-node-core.ts",
+        ),
       },
     },
-  },
+    build: {
+      rolldownOptions: {
+        external: ["cloudflare:workers"],
+      },
+    },
+    lint: { options: { typeAware: true, typeCheck: true } },
+    plugins: [
+      cloudflare({ viteEnvironment: { name: "ssr" } }),
+      tanstackStart(),
+      react(),
+      tailwindcss(),
+    ],
+    server: {
+      proxy: {
+        "/query": {
+          target: apiProxyTarget,
+          changeOrigin: true,
+        },
+      },
+    },
   };
 });

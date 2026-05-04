@@ -75,7 +75,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <span className="truncate text-xs">Clinic</span>
               </div>
             </SidebarMenuButton>
-            <SidebarTrigger/>
+            <SidebarTrigger className="sm:hidden"/>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
