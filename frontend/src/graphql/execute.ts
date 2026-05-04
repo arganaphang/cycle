@@ -1,11 +1,10 @@
 import type { TypedDocumentString } from "./graphql";
-import { env } from "cloudflare:workers";
 
 export async function execute<TResult, TVariables>(
   query: TypedDocumentString<TResult, TVariables>,
   ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
 ) {
-  const response = await fetch(`${env.VITE_BACKEND_URL}/query`, {
+  const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/query`, {
     method: "POST",
     credentials: "include",
     headers: {
