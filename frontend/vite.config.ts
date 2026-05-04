@@ -20,6 +20,11 @@ export default defineConfig({
       ),
     },
   },
+  build: {
+    rolldownOptions: {
+      external: ["cloudflare:workers"],
+    },
+  },
   lint: { options: { typeAware: true, typeCheck: true } },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
