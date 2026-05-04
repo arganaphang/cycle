@@ -1,5 +1,9 @@
 import { DataTable, DataTableColumnMenu } from "@/components/data-table/data-table";
-import { DetailFields, EntityDetailSheet } from "@/components/data-table/entity-detail-sheet";
+import {
+  DetailFields,
+  DetailSection,
+  EntityDetailDialog,
+} from "@/components/data-table/entity-detail-dialog";
 import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { TreatmentSessionReportPanel } from "@/components/session-report/treatment-session-report-panel";
 import { Badge } from "@/components/ui/badge";
@@ -302,7 +306,7 @@ function PageComponent() {
             : undefined
         }
       />
-      <EntityDetailSheet
+      <EntityDetailDialog
         open={detailOpen}
         onOpenChange={(open) => {
           if (!open) closeSessionDetail();
@@ -313,7 +317,7 @@ function PageComponent() {
             ? `${formatIsoDate(sessionFull.session_date)} · ${sessionFull.status.replace(/_/g, " ")}`
             : undefined
         }
-        sheetContentClassName="sm:max-w-2xl"
+        contentClassName="sm:max-w-2xl"
       >
         {detailQuery.isLoading || detailQuery.isFetching ? (
           <p className="text-muted-foreground text-sm">Loading session…</p>
@@ -321,45 +325,64 @@ function PageComponent() {
           <FormError message="Session could not be loaded. It may have been removed." />
         ) : sessionFull ? (
           <>
-            <DetailFields
-              rows={[
-                { label: "Session no.", value: String(sessionFull.session_no) },
-                { label: "Session date", value: formatIsoDate(sessionFull.session_date) },
-                { label: "Status", value: sessionFull.status.replace(/_/g, " ") },
-                { label: "Patient", value: sessionFull.patient.full_name },
-                { label: "Medical record no.", value: sessionFull.patient.medical_record_no },
-                {
-                  label: "Date of birth",
-                  value: formatIsoDate(sessionFull.patient.date_of_birth),
-                },
-                { label: "Gender", value: titleCase(sessionFull.patient.gender) },
-                ...(sessionFull.patient.phone
-                  ? [{ label: "Patient phone", value: sessionFull.patient.phone }]
-                  : []),
-                ...(sessionFull.patient.email
-                  ? [{ label: "Patient email", value: sessionFull.patient.email }]
-                  : []),
-                ...(sessionFull.patient.address
-                  ? [{ label: "Address", value: sessionFull.patient.address }]
-                  : []),
-                { label: "Therapist", value: sessionFull.staff.full_name },
-                ...(sessionFull.staff.specialization
-                  ? [{ label: "Specialization", value: sessionFull.staff.specialization }]
-                  : []),
-                ...(sessionFull.staff.license_no
-                  ? [{ label: "License no.", value: sessionFull.staff.license_no }]
-                  : []),
-                ...(sessionFull.note?.trim()
-                  ? [{ label: "Session note", value: sessionFull.note }]
-                  : []),
-                { label: "Created", value: formatIsoDateTime(sessionFull.created_at) },
-                { label: "Updated", value: formatIsoDateTime(sessionFull.updated_at) },
-              ]}
-            />
+            <DetailSection
+              title="Session & contacts"
+              description="Scheduling, people involved, and administrative notes."
+            >
+              <DetailFields
+                rows={[
+                  { label: "Session no.", value: String(sessionFull.session_no) },
+                  { label: "Session date", value: formatIsoDate(sessionFull.session_date) },
+                  { label: "Status", value: sessionFull.status.replace(/_/g, " ") },
+                  { label: "Patient", value: sessionFull.patient.full_name },
+                  { label: "Medical record no.", value: sessionFull.patient.medical_record_no },
+                  {
+                    label: "Date of birth",
+                    value: formatIsoDate(sessionFull.patient.date_of_birth),
+                  },
+                  { label: "Gender", value: titleCase(sessionFull.patient.gender) },
+                  ...(sessionFull.patient.phone
+                    ? [{ label: "Patient phone", value: sessionFull.patient.phone }]
+                    : []),
+                  ...(sessionFull.patient.email
+                    ? [{ label: "Patient email", value: sessionFull.patient.email }]
+                    : []),
+                  ...(sessionFull.patient.address
+                    ? [
+                        {
+                          label: "Address",
+                          value: (
+                            <span className="whitespace-pre-wrap">
+                              {sessionFull.patient.address}
+                            </span>
+                          ),
+                        },
+                      ]
+                    : []),
+                  { label: "Therapist", value: sessionFull.staff.full_name },
+                  ...(sessionFull.staff.specialization
+                    ? [{ label: "Specialization", value: sessionFull.staff.specialization }]
+                    : []),
+                  ...(sessionFull.staff.license_no
+                    ? [{ label: "License no.", value: sessionFull.staff.license_no }]
+                    : []),
+                  ...(sessionFull.note?.trim()
+                    ? [
+                        {
+                          label: "Session note",
+                          value: <span className="whitespace-pre-wrap">{sessionFull.note}</span>,
+                        },
+                      ]
+                    : []),
+                  { label: "Created", value: formatIsoDateTime(sessionFull.created_at) },
+                  { label: "Updated", value: formatIsoDateTime(sessionFull.updated_at) },
+                ]}
+              />
+            </DetailSection>
             <TreatmentSessionReportPanel session={sessionFull} />
           </>
         ) : null}
-      </EntityDetailSheet>
+      </EntityDetailDialog>
     </main>
   );
 }

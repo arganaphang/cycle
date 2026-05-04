@@ -1,5 +1,9 @@
 import { DataTable, DataTableColumnMenu } from "@/components/data-table/data-table";
-import { DetailFields, EntityDetailSheet } from "@/components/data-table/entity-detail-sheet";
+import {
+  DetailFields,
+  DetailSection,
+  EntityDetailDialog,
+} from "@/components/data-table/entity-detail-dialog";
 import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { Badge } from "@/components/ui/badge";
 import { CreatePatientSheet } from "@/components/record-sheet/create-record-sheet";
@@ -174,38 +178,44 @@ function PageComponent() {
         </div>
       </DataTable>
       <CreatePatientSheet open={createOpen} onOpenChange={setCreateOpen} />
-      <EntityDetailSheet
+      <EntityDetailDialog
         open={detail !== null}
         onOpenChange={(open) => {
           if (!open) setDetail(null);
         }}
         title={detail ? detail.full_name : "Patient"}
         description={detail ? `Medical record ${detail.medical_record_no}` : undefined}
+        contentClassName="sm:max-w-xl"
       >
         {detail ? (
-          <DetailFields
-            rows={[
-              { label: "Full name", value: detail.full_name },
-              { label: "MRN", value: detail.medical_record_no },
-              { label: "Date of birth", value: formatIsoDate(detail.date_of_birth) },
-              { label: "Gender", value: detail.gender },
-              { label: "Phone", value: detail.phone },
-              { label: "Email", value: detail.email },
-              {
-                label: "Address",
-                value: detail.address ? (
-                  <span className="whitespace-pre-wrap">{detail.address}</span>
-                ) : (
-                  "—"
-                ),
-              },
-              { label: "Patient ID", value: detail.id },
-              { label: "Created", value: formatIsoDateTime(detail.created_at) },
-              { label: "Updated", value: formatIsoDateTime(detail.updated_at) },
-            ]}
-          />
+          <DetailSection
+            title="Patient profile"
+            description="Demographics and contact information."
+          >
+            <DetailFields
+              rows={[
+                { label: "Full name", value: detail.full_name },
+                { label: "MRN", value: detail.medical_record_no },
+                { label: "Date of birth", value: formatIsoDate(detail.date_of_birth) },
+                { label: "Gender", value: detail.gender },
+                { label: "Phone", value: detail.phone ?? "—" },
+                { label: "Email", value: detail.email ?? "—" },
+                {
+                  label: "Address",
+                  value: detail.address ? (
+                    <span className="whitespace-pre-wrap">{detail.address}</span>
+                  ) : (
+                    "—"
+                  ),
+                },
+                { label: "Patient ID", value: detail.id },
+                { label: "Created", value: formatIsoDateTime(detail.created_at) },
+                { label: "Updated", value: formatIsoDateTime(detail.updated_at) },
+              ]}
+            />
+          </DetailSection>
         ) : null}
-      </EntityDetailSheet>
+      </EntityDetailDialog>
     </main>
   );
 }

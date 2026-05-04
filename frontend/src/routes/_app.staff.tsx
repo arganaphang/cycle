@@ -1,5 +1,9 @@
 import { DataTable, DataTableColumnMenu } from "@/components/data-table/data-table";
-import { DetailFields, EntityDetailSheet } from "@/components/data-table/entity-detail-sheet";
+import {
+  DetailFields,
+  DetailSection,
+  EntityDetailDialog,
+} from "@/components/data-table/entity-detail-dialog";
 import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { CreateStaffSheet, EditStaffSheet } from "@/components/record-sheet/create-record-sheet";
 import { useListRouteTableUrl } from "@/hooks/use-list-route-table-url";
@@ -168,29 +172,35 @@ function PageComponent() {
           if (!open) setEditStaff(null);
         }}
       />
-      <EntityDetailSheet
+      <EntityDetailDialog
         open={detailStaff !== null}
         onOpenChange={(open) => {
           if (!open) setDetailStaff(null);
         }}
         title={detailStaff ? detailStaff.full_name : "Staff"}
         description={detailStaff ? detailStaff.user.email : undefined}
+        contentClassName="sm:max-w-xl"
       >
         {detailStaff ? (
-          <DetailFields
-            rows={[
-              { label: "Full name", value: detailStaff.full_name },
-              { label: "Email", value: detailStaff.user.email },
-              { label: "License no", value: detailStaff.license_no },
-              { label: "Phone", value: detailStaff.phone },
-              { label: "Specialization", value: detailStaff.specialization },
-              { label: "Staff ID", value: detailStaff.id },
-              { label: "Created", value: formatIsoDateTime(detailStaff.created_at) },
-              { label: "Updated", value: formatIsoDateTime(detailStaff.updated_at) },
-            ]}
-          />
+          <DetailSection
+            title="Staff profile"
+            description="Professional identity and account linkage."
+          >
+            <DetailFields
+              rows={[
+                { label: "Full name", value: detailStaff.full_name },
+                { label: "Email", value: detailStaff.user.email },
+                { label: "License no", value: detailStaff.license_no ?? "—" },
+                { label: "Phone", value: detailStaff.phone ?? "—" },
+                { label: "Specialization", value: detailStaff.specialization ?? "—" },
+                { label: "Staff ID", value: detailStaff.id },
+                { label: "Created", value: formatIsoDateTime(detailStaff.created_at) },
+                { label: "Updated", value: formatIsoDateTime(detailStaff.updated_at) },
+              ]}
+            />
+          </DetailSection>
         ) : null}
-      </EntityDetailSheet>
+      </EntityDetailDialog>
     </main>
   );
 }

@@ -1,5 +1,9 @@
 import { DataTable, DataTableColumnMenu } from "@/components/data-table/data-table";
-import { DetailFields, EntityDetailSheet } from "@/components/data-table/entity-detail-sheet";
+import {
+  DetailFields,
+  DetailSection,
+  EntityDetailDialog,
+} from "@/components/data-table/entity-detail-dialog";
 import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { CreateTreatmentSessionReportSheet } from "@/components/record-sheet/create-record-sheet";
 import { useListRouteTableUrl } from "@/hooks/use-list-route-table-url";
@@ -189,7 +193,7 @@ function PageComponent() {
         </div>
       </DataTable>
       <CreateTreatmentSessionReportSheet open={createOpen} onOpenChange={setCreateOpen} />
-      <EntityDetailSheet
+      <EntityDetailDialog
         open={detail !== null}
         onOpenChange={(open) => {
           if (!open) setDetail(null);
@@ -200,32 +204,51 @@ function PageComponent() {
             ? `Session #${detail.treatment_session.session_no} · ${formatIsoDate(detail.treatment_session.session_date)}`
             : undefined
         }
+        contentClassName="sm:max-w-xl"
       >
         {detail ? (
-          <DetailFields
-            rows={[
-              {
-                label: "Diagnosis",
-                value: detail.diagnosis ? (
-                  <span className="whitespace-pre-wrap">{detail.diagnosis}</span>
-                ) : (
-                  "—"
-                ),
-              },
-              { label: "Patient", value: detail.treatment_session.patient.full_name },
-              { label: "Patient ID", value: detail.treatment_session.patient.id },
-              {
-                label: "Session",
-                value: `#${detail.treatment_session.session_no} (${formatIsoDate(detail.treatment_session.session_date)})`,
-              },
-              { label: "Session ID", value: detail.treatment_session.id },
-              { label: "Report ID", value: detail.id },
-              { label: "Created", value: formatIsoDateTime(detail.created_at) },
-              { label: "Updated", value: formatIsoDateTime(detail.updated_at) },
-            ]}
-          />
+          <div className="flex flex-col gap-7">
+            <DetailSection
+              title="Diagnosis"
+              description="Primary clinical impression for this visit."
+            >
+              {detail.diagnosis?.trim() ? (
+                <div className="border-primary/20 bg-primary/5 text-foreground rounded-xl border px-4 py-4 text-sm leading-relaxed shadow-sm ring-1 ring-primary/10 dark:bg-primary/15">
+                  <p className="whitespace-pre-wrap">{detail.diagnosis}</p>
+                </div>
+              ) : (
+                <p className="text-muted-foreground bg-muted/25 rounded-xl border border-dashed border-border/80 px-4 py-5 text-center text-sm">
+                  No diagnosis recorded for this report.
+                </p>
+              )}
+            </DetailSection>
+
+            <DetailSection title="Visit context" description="Who was seen and when.">
+              <DetailFields
+                rows={[
+                  { label: "Patient", value: detail.treatment_session.patient.full_name },
+                  {
+                    label: "Session",
+                    value: `#${detail.treatment_session.session_no} · ${formatIsoDate(detail.treatment_session.session_date)}`,
+                  },
+                ]}
+              />
+            </DetailSection>
+
+            <DetailSection title="Record" description="Identifiers and audit timestamps.">
+              <DetailFields
+                rows={[
+                  { label: "Report ID", value: detail.id },
+                  { label: "Patient ID", value: detail.treatment_session.patient.id },
+                  { label: "Session ID", value: detail.treatment_session.id },
+                  { label: "Created", value: formatIsoDateTime(detail.created_at) },
+                  { label: "Updated", value: formatIsoDateTime(detail.updated_at) },
+                ]}
+              />
+            </DetailSection>
+          </div>
         ) : null}
-      </EntityDetailSheet>
+      </EntityDetailDialog>
     </main>
   );
 }
