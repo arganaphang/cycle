@@ -1,9 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { DetailFields, DetailSection } from "@/components/data-table/entity-detail-dialog";
 import type { TreatmentSessionDetailQuery } from "@/graphql/graphql";
-import { downloadSessionReportPdf } from "@/lib/session-report-pdf";
 import { formatIsoDateTime } from "@/lib/utils";
-import { FileDown } from "lucide-react";
 
 type SessionDetail = NonNullable<TreatmentSessionDetailQuery["treatmentSession"]>;
 
@@ -19,18 +16,6 @@ export function TreatmentSessionReportPanel({ session }: { session: SessionDetai
           : "Add a report from the session list when this session has no clinical note yet."
       }
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" size="sm" onClick={() => downloadSessionReportPdf(session)}>
-          <FileDown className="size-4" />
-          Export PDF
-        </Button>
-        {!report ? (
-          <span className="text-muted-foreground text-xs leading-snug">
-            PDF can still include session and patient details.
-          </span>
-        ) : null}
-      </div>
-
       {report ? (
         <>
           <DetailFields

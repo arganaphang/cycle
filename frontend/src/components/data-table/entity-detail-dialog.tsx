@@ -42,9 +42,7 @@ export function EntityDetailDialog({
             </DialogDescription>
           ) : null}
         </DialogHeader>
-        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 sm:px-8 sm:py-6">
-          {children}
-        </div>
+        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto">{children}</div>
       </DialogContent>
     </Dialog>
   );
@@ -56,19 +54,25 @@ export function DetailSection({
   description,
   children,
   className,
+  actions,
 }: {
   title: string;
   description?: string;
   children: ReactNode;
   className?: string;
+  /** Shown on the right of the section heading (e.g. primary actions for this block). */
+  actions?: ReactNode;
 }) {
   return (
     <section className={cn("space-y-3", className)}>
-      <div className="space-y-0.5 px-0.5">
-        <h3 className="text-foreground text-xs font-semibold tracking-wide uppercase">{title}</h3>
-        {description ? (
-          <p className="text-muted-foreground text-xs leading-relaxed">{description}</p>
-        ) : null}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 space-y-0.5 px-0.5">
+          <h3 className="text-foreground text-xs font-semibold tracking-wide uppercase">{title}</h3>
+          {description ? (
+            <p className="text-muted-foreground text-xs leading-relaxed">{description}</p>
+          ) : null}
+        </div>
+        {actions ? <div className="shrink-0">{actions}</div> : null}
       </div>
       {children}
     </section>

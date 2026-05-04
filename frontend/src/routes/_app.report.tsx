@@ -213,8 +213,8 @@ function PageComponent() {
               description="Primary clinical impression for this visit."
             >
               {detail.diagnosis?.trim() ? (
-                <div className="border-primary/20 bg-primary/5 text-foreground rounded-xl border px-4 py-4 text-sm leading-relaxed shadow-sm ring-1 ring-primary/10 dark:bg-primary/15">
-                  <p className="whitespace-pre-wrap">{detail.diagnosis}</p>
+                <div className="text-sm leading-relaxed">
+                  <p className="whitespace-pre-wrap font-bold underline">{detail.diagnosis}</p>
                 </div>
               ) : (
                 <p className="text-muted-foreground bg-muted/25 rounded-xl border border-dashed border-border/80 px-4 py-5 text-center text-sm">
