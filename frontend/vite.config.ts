@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadEnv } from "vite";
 import { defineConfig } from "vite-plus";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
@@ -9,7 +10,13 @@ import tailwindcss from "@tailwindcss/vite";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, __dirname, "");
+  const apiProxyTarget =
+    env.VITE_API_PROXY_TARGET?.replace(/\/$/, "") ||
+    "https://physiorehab.gbaajakarta.com";
+
+  return {
   staged: { "*": "vp check --fix" },
   resolve: {
     tsconfigPaths: true,
@@ -32,4 +39,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      "/query": {
+        target: apiProxyTarget,
+        changeOrigin: true,
+      },
+    },
+  },
+  };
 });

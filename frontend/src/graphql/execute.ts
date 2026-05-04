@@ -1,10 +1,18 @@
 import type { TypedDocumentString } from "./graphql";
 
+function graphqlEndpoint(): string {
+  const raw = (import.meta.env.VITE_BACKEND_URL as string | undefined)?.trim() ?? "";
+  if (raw && /^https?:\/\//i.test(raw)) {
+    return `${raw.replace(/\/$/, "")}/query`;
+  }
+  return "/query";
+}
+
 export async function execute<TResult, TVariables>(
   query: TypedDocumentString<TResult, TVariables>,
   ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
 ) {
-  const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/query`, {
+  const response = await fetch(graphqlEndpoint(), {
     method: "POST",
     credentials: "include",
     headers: {
