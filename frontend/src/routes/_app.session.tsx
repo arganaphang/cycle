@@ -2,7 +2,10 @@ import { DataTable, DataTableColumnMenu } from "@/components/data-table/data-tab
 import { DetailFields, EntityDetailSheet } from "@/components/data-table/entity-detail-sheet";
 import { ListSearchInput } from "@/components/data-table/list-search-input";
 import { Badge } from "@/components/ui/badge";
-import { CreateTreatmentSessionSheet } from "@/components/record-sheet/create-record-sheet";
+import {
+  CreateTreatmentSessionReportSheet,
+  CreateTreatmentSessionSheet,
+} from "@/components/record-sheet/create-record-sheet";
 import { useListRouteTableUrl } from "@/hooks/use-list-route-table-url";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -14,6 +17,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuGroup,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,7 +31,16 @@ import type {
   TreatmentSessionSortField,
   TreatmentSessionsQuery,
 } from "@/graphql/graphql";
-import { useMemo, useState } from "react";
+import { updateTreatmentSessionStatus } from "@/mutations/update";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
+
+const SESSION_STATUS_OPTIONS: { value: SessionStatus; label: string }[] = [
+  { value: "SCHEDULED", label: "Scheduled" },
+  { value: "IN_PROGRESS", label: "In progress" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CANCELLED", label: "Cancelled" },
+];
 
 function treatmentSessionSortField(columnId: string): TreatmentSessionSortField | undefined {
   const map: Record<string, TreatmentSessionSortField> = {
@@ -60,6 +75,7 @@ function statusBadgeVariant(
 }
 
 function PageComponent() {
+  const queryClient = useQueryClient();
   const {
     pagination,
     onPaginationChange,
@@ -71,9 +87,29 @@ function PageComponent() {
   } = useListRouteTableUrl({ defaultPageSize: 20 });
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [createReportOpen, setCreateReportOpen] = useState(false);
+  const [reportPresetSession, setReportPresetSession] = useState<
+    TreatmentSessionsQuery["treatmentSessions"]["nodes"][number] | null
+  >(null);
   const [detail, setDetail] = useState<
     TreatmentSessionsQuery["treatmentSessions"]["nodes"][number] | null
   >(null);
+
+  const quickStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: SessionStatus }) =>
+      updateTreatmentSessionStatus(id, { status }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["treatmentSessions"] });
+    },
+  });
+
+  const openAddReport = useCallback(
+    (session: TreatmentSessionsQuery["treatmentSessions"]["nodes"][number]) => {
+      setReportPresetSession(session);
+      setCreateReportOpen(true);
+    },
+    [],
+  );
 
   const firstSort = sorting[0];
   const sortBy = firstSort ? treatmentSessionSortField(firstSort.id) : undefined;
@@ -146,18 +182,40 @@ function PageComponent() {
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 </DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => setDetail(session)}>View detail</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => openAddReport(session)}>
+                  Add report
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Change status</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {SESSION_STATUS_OPTIONS.map(({ value, label }) => (
+                      <DropdownMenuItem
+                        key={value}
+                        disabled={session.status === value || quickStatusMutation.isPending}
+                        onClick={() =>
+                          quickStatusMutation.mutate({
+                            id: session.id,
+                            status: value,
+                          })
+                        }
+                      >
+                        {label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigator.clipboard.writeText(session.id)}>
                   Copy session ID
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setDetail(session)}>View details</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           );
         },
       },
     ],
-    [],
+    [openAddReport, quickStatusMutation],
   );
 
   return (
@@ -191,6 +249,19 @@ function PageComponent() {
         </div>
       </DataTable>
       <CreateTreatmentSessionSheet open={createOpen} onOpenChange={setCreateOpen} />
+      <CreateTreatmentSessionReportSheet
+        open={createReportOpen}
+        onOpenChange={(open) => {
+          setCreateReportOpen(open);
+          if (!open) setReportPresetSession(null);
+        }}
+        presetSessionId={reportPresetSession?.id}
+        presetSessionLabel={
+          reportPresetSession
+            ? `#${reportPresetSession.session_no} · ${reportPresetSession.patient.full_name}`
+            : undefined
+        }
+      />
       <EntityDetailSheet
         open={detail !== null}
         onOpenChange={(open) => {

@@ -117,6 +117,10 @@ export type UpdateStaffInput = {
   specialization?: string | null | undefined;
 };
 
+export type UpdateTreatmentSessionStatusInput = {
+  status: SessionStatus;
+};
+
 export type UserRole = "ADMIN" | "RECEPTIONIST" | "THERAPIST";
 
 export type CreatePatientMutationVariables = Exact<{
@@ -167,6 +171,15 @@ export type UpdateStaffMutationVariables = Exact<{
 }>;
 
 export type UpdateStaffMutation = { updateStaff: { id: string } };
+
+export type UpdateTreatmentSessionStatusMutationVariables = Exact<{
+  id: string;
+  input: UpdateTreatmentSessionStatusInput;
+}>;
+
+export type UpdateTreatmentSessionStatusMutation = {
+  updateTreatmentSessionStatus: { id: string; status: SessionStatus };
+};
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -357,6 +370,17 @@ export const UpdateStaffDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateStaffMutation, UpdateStaffMutationVariables>;
+export const UpdateTreatmentSessionStatusDocument = new TypedDocumentString(`
+    mutation UpdateTreatmentSessionStatus($id: UUID!, $input: UpdateTreatmentSessionStatusInput!) {
+  updateTreatmentSessionStatus(id: $id, input: $input) {
+    id
+    status
+  }
+}
+    `) as unknown as TypedDocumentString<
+  UpdateTreatmentSessionStatusMutation,
+  UpdateTreatmentSessionStatusMutationVariables
+>;
 export const MeDocument = new TypedDocumentString(`
     query Me {
   me {

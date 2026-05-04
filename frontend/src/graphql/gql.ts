@@ -21,6 +21,7 @@ type Documents = {
   "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n": typeof types.LoginDocument;
   "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument;
   "\n  mutation UpdateStaff($id: UUID!, $input: UpdateStaffInput!) {\n    updateStaff(id: $id, input: $input) {\n      id\n    }\n  }\n": typeof types.UpdateStaffDocument;
+  "\n  mutation UpdateTreatmentSessionStatus($id: UUID!, $input: UpdateTreatmentSessionStatusInput!) {\n    updateTreatmentSessionStatus(id: $id, input: $input) {\n      id\n      status\n    }\n  }\n": typeof types.UpdateTreatmentSessionStatusDocument;
   "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": typeof types.MeDocument;
   "\n  query Patients(\n    $limit: Int\n    $offset: Int\n    $search: String\n    $sortBy: PatientSortField\n    $sortOrder: SortOrder\n  ) {\n    patients(\n      limit: $limit\n      offset: $offset\n      search: $search\n      sortBy: $sortBy\n      sortOrder: $sortOrder\n    ) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n": typeof types.PatientsDocument;
   "\n  query TreatmentSessionReports(\n    $limit: Int\n    $offset: Int\n    $filter: ReportFilter\n    $sortBy: TreatmentSessionReportSortField\n    $sortOrder: SortOrder\n  ) {\n    treatmentSessionReports(\n      limit: $limit\n      offset: $offset\n      filter: $filter\n      sortBy: $sortBy\n      sortOrder: $sortOrder\n    ) {\n      nodes {\n        id\n        diagnosis\n        created_at\n        updated_at\n        session_id\n        treatment_session {\n          id\n          session_no\n          session_date\n          patient {\n            id\n            full_name\n          }\n        }\n      }\n      total_count\n    }\n  }\n": typeof types.TreatmentSessionReportsDocument;
@@ -43,6 +44,8 @@ const documents: Documents = {
   "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
   "\n  mutation UpdateStaff($id: UUID!, $input: UpdateStaffInput!) {\n    updateStaff(id: $id, input: $input) {\n      id\n    }\n  }\n":
     types.UpdateStaffDocument,
+  "\n  mutation UpdateTreatmentSessionStatus($id: UUID!, $input: UpdateTreatmentSessionStatusInput!) {\n    updateTreatmentSessionStatus(id: $id, input: $input) {\n      id\n      status\n    }\n  }\n":
+    types.UpdateTreatmentSessionStatusDocument,
   "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": types.MeDocument,
   "\n  query Patients(\n    $limit: Int\n    $offset: Int\n    $search: String\n    $sortBy: PatientSortField\n    $sortOrder: SortOrder\n  ) {\n    patients(\n      limit: $limit\n      offset: $offset\n      search: $search\n      sortBy: $sortBy\n      sortOrder: $sortOrder\n    ) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n":
     types.PatientsDocument,
@@ -102,6 +105,12 @@ export function graphql(
 export function graphql(
   source: "\n  mutation UpdateStaff($id: UUID!, $input: UpdateStaffInput!) {\n    updateStaff(id: $id, input: $input) {\n      id\n    }\n  }\n",
 ): typeof import("./graphql").UpdateStaffDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n  mutation UpdateTreatmentSessionStatus($id: UUID!, $input: UpdateTreatmentSessionStatusInput!) {\n    updateTreatmentSessionStatus(id: $id, input: $input) {\n      id\n      status\n    }\n  }\n",
+): typeof import("./graphql").UpdateTreatmentSessionStatusDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

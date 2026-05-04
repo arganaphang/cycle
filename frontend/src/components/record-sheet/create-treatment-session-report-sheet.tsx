@@ -17,7 +17,18 @@ import { FormError, FormIdCombobox } from "./create-record-form-controls";
 import { parseCreateTreatmentSessionReportForm } from "./form-schemas";
 import type { CreateSheetProps } from "./types";
 
-export function CreateTreatmentSessionReportSheet({ open, onOpenChange }: CreateSheetProps) {
+type CreateTreatmentSessionReportSheetProps = CreateSheetProps & {
+  /** When set, session is fixed (e.g. opened from a session row). */
+  presetSessionId?: string;
+  presetSessionLabel?: string;
+};
+
+export function CreateTreatmentSessionReportSheet({
+  open,
+  onOpenChange,
+  presetSessionId,
+  presetSessionLabel,
+}: CreateTreatmentSessionReportSheetProps) {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string>();
   const [selectedSessionId, setSelectedSessionId] = useState("");
@@ -69,16 +80,28 @@ export function CreateTreatmentSessionReportSheet({ open, onOpenChange }: Create
           <FieldGroup className="gap-5 px-4 sm:px-8">
             <Field>
               <FieldLabel htmlFor="create-report-session">Session</FieldLabel>
-              <FormIdCombobox
-                id="create-report-session"
-                name="session_id"
-                placeholder="Search session…"
-                emptyText="No sessions match."
-                value={selectedSessionId}
-                onValueChange={setSelectedSessionId}
-                items={sessionItems}
-                required
-              />
+              {presetSessionId ? (
+                <>
+                  <input type="hidden" name="session_id" value={presetSessionId} />
+                  <p
+                    id="create-report-session"
+                    className="border-b border-input py-2 text-sm text-foreground"
+                  >
+                    {presetSessionLabel ?? `#${presetSessionId}`}
+                  </p>
+                </>
+              ) : (
+                <FormIdCombobox
+                  id="create-report-session"
+                  name="session_id"
+                  placeholder="Search session…"
+                  emptyText="No sessions match."
+                  value={selectedSessionId}
+                  onValueChange={setSelectedSessionId}
+                  items={sessionItems}
+                  required
+                />
+              )}
             </Field>
             {[
               ["anamnesis", "Anamnesis"],
