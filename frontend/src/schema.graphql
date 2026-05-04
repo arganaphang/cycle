@@ -94,6 +94,7 @@ type Mutation {
   createTreatmentSessionReport(input: CreateTreatmentSessionReportInput!): TreatmentSessionReport!
   createUser(input: CreateUserInput!): User!
   login(input: LoginInput!): AuthPayload!
+  logout: Boolean!
   updatePatient(id: UUID!, input: UpdatePatientInput!): Patient!
   updateStaff(id: UUID!, input: UpdateStaffInput!): Staff!
   updateTreatmentSessionReport(

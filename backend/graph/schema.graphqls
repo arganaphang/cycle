@@ -333,6 +333,7 @@ type Query {
 
 type Mutation {
   login(input: LoginInput!): AuthPayload! @public
+  logout: Boolean! @public
 
   createUser(input: CreateUserInput!): User!
   updateUser(id: UUID!, input: UpdateUserInput!): User!

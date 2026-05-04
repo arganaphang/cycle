@@ -20,13 +20,11 @@ import {
   CalendarIcon,
   DumbbellIcon,
 } from "lucide-react";
+import { getRouteApi } from "@tanstack/react-router";
+
+const appRoute = getRouteApi("/_app");
 
 const data = {
-  user: {
-    name: "Joice",
-    email: "joice@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Patients",
@@ -57,7 +55,11 @@ const data = {
     },
   ],
 };
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = appRoute.useRouteContext();
+  const displayName = user.email.split("@")[0] ?? user.email;
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -80,7 +82,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={{ name: displayName, email: user.email, avatar: "" }} />
       </SidebarFooter>
     </Sidebar>
   );

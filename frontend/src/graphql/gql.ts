@@ -19,6 +19,7 @@ type Documents = {
   "\n  mutation CreateTreatmentSession($input: CreateTreatmentSessionInput!) {\n    createTreatmentSession(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateTreatmentSessionDocument;
   "\n  mutation CreateTreatmentSessionReport($input: CreateTreatmentSessionReportInput!) {\n    createTreatmentSessionReport(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateTreatmentSessionReportDocument;
   "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n": typeof types.LoginDocument;
+  "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument;
   "\n  mutation UpdateStaff($id: UUID!, $input: UpdateStaffInput!) {\n    updateStaff(id: $id, input: $input) {\n      id\n    }\n  }\n": typeof types.UpdateStaffDocument;
   "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": typeof types.MeDocument;
   "\n  query Patients(\n    $limit: Int\n    $offset: Int\n    $search: String\n    $sortBy: PatientSortField\n    $sortOrder: SortOrder\n  ) {\n    patients(\n      limit: $limit\n      offset: $offset\n      search: $search\n      sortBy: $sortBy\n      sortOrder: $sortOrder\n    ) {\n      nodes {\n        id\n        full_name\n        medical_record_no\n        date_of_birth\n        gender\n        phone\n        email\n        address\n        created_at\n        updated_at\n      }\n      total_count\n    }\n  }\n": typeof types.PatientsDocument;
@@ -39,6 +40,7 @@ const documents: Documents = {
     types.CreateTreatmentSessionReportDocument,
   "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n":
     types.LoginDocument,
+  "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
   "\n  mutation UpdateStaff($id: UUID!, $input: UpdateStaffInput!) {\n    updateStaff(id: $id, input: $input) {\n      id\n    }\n  }\n":
     types.UpdateStaffDocument,
   "\n  query Me {\n    me {\n      id\n      email\n      role\n    }\n  }\n": types.MeDocument,
@@ -88,6 +90,12 @@ export function graphql(
 export function graphql(
   source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      token\n      user {\n        id\n        email\n        role\n      }\n    }\n  }\n",
 ): typeof import("./graphql").LoginDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n  mutation Logout {\n    logout\n  }\n",
+): typeof import("./graphql").LogoutDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

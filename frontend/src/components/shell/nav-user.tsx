@@ -15,7 +15,11 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { initialName } from "@/lib/utils";
+import { logout as logoutRequest } from "@/mutations/logout";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
 import { ChevronsUpDownIcon, BadgeCheckIcon, LogOutIcon } from "lucide-react";
+import { useState } from "react";
 
 export function NavUser({
   user,
@@ -27,6 +31,21 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    setLogoutError(null);
+    try {
+      await logoutRequest();
+      queryClient.removeQueries({ queryKey: ["me"] });
+      await router.navigate({ to: "/login", replace: true });
+    } catch (e) {
+      setLogoutError(e instanceof Error ? e.message : "Log out failed");
+    }
+  };
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -72,7 +91,10 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            {logoutError ? (
+              <p className="px-2 py-1.5 text-xs text-destructive">{logoutError}</p>
+            ) : null}
+            <DropdownMenuItem onClick={() => void handleLogout()}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

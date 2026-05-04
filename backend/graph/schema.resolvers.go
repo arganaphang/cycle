@@ -40,6 +40,23 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	return result, nil
 }
 
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
+	hr := ForHttpContext(ctx)
+	if hr == nil {
+		return false, errors.New("failed to get http context")
+	}
+	http.SetCookie(hr, &http.Cookie{
+		Name:     "auth_token",
+		Value:    "",
+		Path:     "",
+		HttpOnly: true,
+		MaxAge:   -1,
+		Expires:  time.Unix(0, 0),
+	})
+	return true, nil
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
 	return r.Services.UserService.Create(ctx, input)

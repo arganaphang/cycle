@@ -39,3 +39,13 @@ migrate-up:
 # migrate-down -> reset migration
 migrate-down:
 	migrate -path ./migrations -database "$DATABASE_URL" down
+
+# create-superuser -> insert ADMIN user (DATABASE_* required; password = arg or SUPERUSER_PASSWORD)
+create-superuser email password="":
+	#!/usr/bin/env bash
+	set -euo pipefail
+	cd "{{ justfile_directory() }}"
+	if [[ -n "{{ password }}" ]]; then
+		exec go run ./cmd/superuser -email "{{ email }}" -password "{{ password }}"
+	fi
+	exec go run ./cmd/superuser -email "{{ email }}"

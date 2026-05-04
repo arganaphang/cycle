@@ -157,6 +157,10 @@ export type LoginMutation = {
   login: { token: string; user: { id: string; email: string; role: UserRole } };
 };
 
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+
+export type LogoutMutation = { logout: boolean };
+
 export type UpdateStaffMutationVariables = Exact<{
   id: string;
   input: UpdateStaffInput;
@@ -341,6 +345,11 @@ export const LoginDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;
+export const LogoutDocument = new TypedDocumentString(`
+    mutation Logout {
+  logout
+}
+    `) as unknown as TypedDocumentString<LogoutMutation, LogoutMutationVariables>;
 export const UpdateStaffDocument = new TypedDocumentString(`
     mutation UpdateStaff($id: UUID!, $input: UpdateStaffInput!) {
   updateStaff(id: $id, input: $input) {
