@@ -1,4 +1,4 @@
-import { DataTable, DataTableColumnMenu } from "@/components/data-table/data-table";
+import { DataTable } from "@/components/data-table/data-table";
 import {
   DetailFields,
   DetailSection,
@@ -189,7 +189,6 @@ function PageComponent() {
               <Plus />
               New report
             </Button>
-            <DataTableColumnMenu />
           </div>
         </div>
       </DataTable>
