@@ -133,7 +133,7 @@ export function TreatmentSessionReportPrintView({ report }: { report: ReportDeta
         </PrintSection>
       </div>
 
-      <footer className="from-[#0e7c8f] to-[#0a6575] text-white mt-12 overflow-hidden rounded-xl bg-linear-to-b px-5 py-8 shadow-sm sm:px-8 sm:py-10 print:mt-8 print:rounded-none print:px-4 print:py-6 print:shadow-none">
+      <footer className="from-[#23b1ca] to-[#14a9c3] text-white mt-12 overflow-hidden rounded-xl bg-linear-to-b px-5 py-8 shadow-sm sm:px-8 sm:py-10 print:mt-8 print:rounded-none print:px-4 print:py-6 print:shadow-none">
         <div className="border-white/15 border-b pb-6">
           <p className="text-[0.65rem] font-semibold tracking-[0.2em] text-white/70 uppercase">
             Physiorehab
@@ -170,7 +170,7 @@ export function TreatmentSessionReportPrintView({ report }: { report: ReportDeta
         </ul>
         <p className="text-white/70 mt-8 border-t border-white/15 pt-6 text-center text-xs sm:text-left">
           <a
-            className="text-white/90 decoration-white/40 underline-offset-2 transition-colors hover:text-white hover:decoration-white"
+            className="text-white/90 decoration-white/40 underline transition-colors hover:text-white hover:decoration-white"
             href="https://linktr.ee/physiorehab.clinic"
             rel="noopener noreferrer"
             target="_blank"

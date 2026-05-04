@@ -8,7 +8,9 @@
     "build": "tsc -b && vp build",
     "preview": "vp preview",
     "prepare": "vp config",
-    "gen:gql": "graphql-codegen --config codegen.ts"
+    "gen:gql": "graphql-codegen --config codegen.ts",
+    "deploy": "npm run build && wrangler deploy",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -43,6 +45,7 @@
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.15.4",
+    "@cloudflare/vite-plugin": "^1.35.0",
     "@graphql-codegen/cli": "^7.0.0",
     "@graphql-codegen/schema-ast": "^6.0.0",
     "@graphql-codegen/typed-document-node": "^7.0.0",
@@ -53,7 +56,8 @@
     "@vitejs/plugin-react": "^6.0.1",
     "typescript": "~6.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vite-plus": "latest"
+    "vite-plus": "latest",
+    "wrangler": "^4.87.0"
   },
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
