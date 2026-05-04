@@ -2,10 +2,6 @@
 import type { ReactNode } from "react";
 import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
-import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import appCss from "../styles/app.css?url";
 import { TooltipProvider } from "../components/ui/tooltip";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
@@ -58,23 +54,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           <TooltipProvider>
             <NuqsAdapter>{children}</NuqsAdapter>
           </TooltipProvider>
-          <TanStackDevtools
-            config={{ position: "middle-left" }}
-            plugins={[
-              {
-                name: "TanStack Query",
-                render: <ReactQueryDevtoolsPanel />,
-              },
-              {
-                name: "TanStack Form",
-                render: <FormDevtoolsPanel />,
-              },
-              {
-                name: "TanStack Router",
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-            ]}
-          />
         </QueryClientProvider>
 
         <Scripts />
