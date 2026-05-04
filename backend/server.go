@@ -74,6 +74,10 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	mux.Handle("/healthz", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "OK")
+	}))
 	mux.Handle("/query", srvWithAuth)
 
 	h := cors.New(cors.Options{
@@ -107,5 +111,6 @@ func corsAllowedOrigins() []string {
 		"http://127.0.0.1:5173",
 		"http://localhost:3000",
 		"http://127.0.0.1:3000",
+		"https://physiorehab-frontend.argana.workers.dev",
 	}
 }
