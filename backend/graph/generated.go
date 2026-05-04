@@ -35,6 +35,7 @@ type ResolverRoot interface {
 	Query() QueryResolver
 	Staff() StaffResolver
 	TreatmentSession() TreatmentSessionResolver
+	TreatmentSessionReport() TreatmentSessionReportResolver
 	User() UserResolver
 }
 
@@ -211,6 +212,9 @@ type TreatmentSessionResolver interface {
 	Patient(ctx context.Context, obj *model.TreatmentSession) (*model.Patient, error)
 	Staff(ctx context.Context, obj *model.TreatmentSession) (*model.Staff, error)
 	Report(ctx context.Context, obj *model.TreatmentSession) (*model.TreatmentSessionReport, error)
+}
+type TreatmentSessionReportResolver interface {
+	TreatmentSession(ctx context.Context, obj *model.TreatmentSessionReport) (*model.TreatmentSession, error)
 }
 type UserResolver interface {
 	Staff(ctx context.Context, obj *model.User) (*model.Staff, error)
@@ -4661,7 +4665,7 @@ func (ec *executionContext) _TreatmentSessionReport_treatment_session(ctx contex
 		field,
 		ec.fieldContext_TreatmentSessionReport_treatment_session,
 		func(ctx context.Context) (any, error) {
-			return obj.TreatmentSession, nil
+			return ec.Resolvers.TreatmentSessionReport().TreatmentSession(ctx, obj)
 		},
 		nil,
 		ec.marshalNTreatmentSession2ᚖgithubᚗcomᚋarganaphangᚋcycleᚋbackendᚋgraphᚋmodelᚐTreatmentSession,
@@ -4674,8 +4678,8 @@ func (ec *executionContext) fieldContext_TreatmentSessionReport_treatment_sessio
 	fc = &graphql.FieldContext{
 		Object:     "TreatmentSessionReport",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -8276,12 +8280,12 @@ func (ec *executionContext) _TreatmentSessionReport(ctx context.Context, sel ast
 		case "id":
 			out.Values[i] = ec._TreatmentSessionReport_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "session_id":
 			out.Values[i] = ec._TreatmentSessionReport_session_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "anamnesis":
 			out.Values[i] = ec._TreatmentSessionReport_anamnesis(ctx, field, obj)
@@ -8300,18 +8304,49 @@ func (ec *executionContext) _TreatmentSessionReport(ctx context.Context, sel ast
 		case "created_at":
 			out.Values[i] = ec._TreatmentSessionReport_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "updated_at":
 			out.Values[i] = ec._TreatmentSessionReport_updated_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "treatment_session":
-			out.Values[i] = ec._TreatmentSessionReport_treatment_session(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TreatmentSessionReport_treatment_session(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

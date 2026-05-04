@@ -11,7 +11,6 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Plus } from "lucide-react";
@@ -118,10 +117,6 @@ function PageComponent() {
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 </DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => navigator.clipboard.writeText(staff.id)}>
-                  Copy staff ID
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setDetailStaff(staff)}>
                   View details
                 </DropdownMenuItem>

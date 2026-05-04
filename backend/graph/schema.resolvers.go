@@ -188,6 +188,11 @@ func (r *treatmentSessionResolver) Report(ctx context.Context, obj *model.Treatm
 	return GetReportBySessionID(ctx, obj.ID)
 }
 
+// TreatmentSession is the resolver for the treatment_session field.
+func (r *treatmentSessionReportResolver) TreatmentSession(ctx context.Context, obj *model.TreatmentSessionReport) (*model.TreatmentSession, error) {
+	return GetTreatmentSession(ctx, obj.SessionID)
+}
+
 // Staff is the resolver for the staff field.
 func (r *userResolver) Staff(ctx context.Context, obj *model.User) (*model.Staff, error) {
 	return GetStaffByUserID(ctx, obj.ID)
@@ -208,6 +213,11 @@ func (r *Resolver) Staff() StaffResolver { return &staffResolver{r} }
 // TreatmentSession returns TreatmentSessionResolver implementation.
 func (r *Resolver) TreatmentSession() TreatmentSessionResolver { return &treatmentSessionResolver{r} }
 
+// TreatmentSessionReport returns TreatmentSessionReportResolver implementation.
+func (r *Resolver) TreatmentSessionReport() TreatmentSessionReportResolver {
+	return &treatmentSessionReportResolver{r}
+}
+
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
@@ -216,4 +226,5 @@ type patientResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type staffResolver struct{ *Resolver }
 type treatmentSessionResolver struct{ *Resolver }
+type treatmentSessionReportResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

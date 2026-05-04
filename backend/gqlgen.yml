@@ -211,7 +211,7 @@ models:
         resolver: true
       report:
         resolver: true
-  report:
+  TreatmentSessionReport:
     fields:
-      session:
+      treatment_session:
         resolver: true

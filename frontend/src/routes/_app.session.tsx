@@ -15,7 +15,6 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuGroup,
   DropdownMenuSub,
   DropdownMenuSubTrigger,
@@ -205,10 +204,6 @@ function PageComponent() {
                     ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigator.clipboard.writeText(session.id)}>
-                  Copy session ID
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           );
