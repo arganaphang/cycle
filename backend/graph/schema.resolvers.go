@@ -28,11 +28,15 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 		return nil, errors.New("failed to get http context")
 	}
 
+	p, sameSite, secure := authTokenCookieOptions()
 	cookie := &http.Cookie{
 		Name:     "auth_token",
 		Value:    result.Token,
+		Path:     p,
 		HttpOnly: true,
 		Expires:  time.Now().Add((time.Hour * 24 * 30) - time.Second),
+		SameSite: sameSite,
+		Secure:   secure,
 	}
 
 	http.SetCookie(hr, cookie)
@@ -46,13 +50,16 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 	if hr == nil {
 		return false, errors.New("failed to get http context")
 	}
+	p, sameSite, secure := authTokenCookieOptions()
 	http.SetCookie(hr, &http.Cookie{
 		Name:     "auth_token",
 		Value:    "",
-		Path:     "",
+		Path:     p,
 		HttpOnly: true,
 		MaxAge:   -1,
 		Expires:  time.Unix(0, 0),
+		SameSite: sameSite,
+		Secure:   secure,
 	})
 	return true, nil
 }
