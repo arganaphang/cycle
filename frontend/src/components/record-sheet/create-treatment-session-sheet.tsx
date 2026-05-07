@@ -16,7 +16,7 @@ import { usePatients } from "@/queries/usePatient";
 import { useStaffs } from "@/queries/useStaff";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
-import { format, isBefore, startOfDay } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import type { ChangeEvent, SubmitEvent } from "react";
 import { useMemo, useState } from "react";
