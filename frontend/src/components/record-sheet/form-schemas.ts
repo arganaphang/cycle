@@ -194,13 +194,6 @@ export const createTreatmentSessionFormSchema = z
       });
       return;
     }
-    if (at.getTime() < Date.now()) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Session cannot be scheduled in the past",
-        path: ["session_date"],
-      });
-    }
   })
   .transform(
     (data): CreateTreatmentSessionInput => ({
