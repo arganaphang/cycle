@@ -20,12 +20,19 @@ import { format, isBefore, startOfDay } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import type { ChangeEvent, SubmitEvent } from "react";
 import { useMemo, useState } from "react";
-import { DatePickerFieldTrigger, FormError, FormIdCombobox } from "./create-record-form-controls";
+import {
+  DatePickerFieldTrigger,
+  FormError,
+  FormIdCombobox,
+} from "./create-record-form-controls";
 import { parseCreateTreatmentSessionForm } from "./form-schemas";
 import { pad2, toDatetimeLocalString } from "./form-helpers";
 import type { CreateSheetProps } from "./types";
 
-export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetProps) {
+export function CreateTreatmentSessionSheet({
+  open,
+  onOpenChange,
+}: CreateSheetProps) {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string>();
   const [selectedPatientId, setSelectedPatientId] = useState("");
@@ -33,8 +40,12 @@ export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetP
   const [sessionAt, setSessionAt] = useState<Date | undefined>();
   const [patientSearchInput, setPatientSearchInput] = useState("");
   const [staffSearchInput, setStaffSearchInput] = useState("");
-  const [patientLabelById, setPatientLabelById] = useState<Record<string, string>>({});
-  const [staffLabelById, setStaffLabelById] = useState<Record<string, string>>({});
+  const [patientLabelById, setPatientLabelById] = useState<
+    Record<string, string>
+  >({});
+  const [staffLabelById, setStaffLabelById] = useState<Record<string, string>>(
+    {},
+  );
 
   const debouncedPatientSearch = useDebounce(patientSearchInput.trim(), 300);
   const debouncedStaffSearch = useDebounce(staffSearchInput.trim(), 300);
@@ -42,7 +53,8 @@ export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetP
   const patients = usePatients({
     limit: 100,
     offset: 0,
-    search: debouncedPatientSearch.length > 0 ? debouncedPatientSearch : undefined,
+    search:
+      debouncedPatientSearch.length > 0 ? debouncedPatientSearch : undefined,
   });
   const staffs = useStaffs({
     limit: 100,
@@ -149,7 +161,9 @@ export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetP
                 value={selectedPatientId}
                 onValueChange={(id) => {
                   setSelectedPatientId(id);
-                  const row = patients.data?.patients.nodes.find((p) => p.id === id);
+                  const row = patients.data?.patients.nodes.find(
+                    (p) => p.id === id,
+                  );
                   if (row) {
                     setPatientLabelById((prev) => ({
                       ...prev,
@@ -175,9 +189,14 @@ export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetP
                 value={selectedStaffId}
                 onValueChange={(id) => {
                   setSelectedStaffId(id);
-                  const row = staffs.data?.staffs.nodes.find((s) => s.id === id);
+                  const row = staffs.data?.staffs.nodes.find(
+                    (s) => s.id === id,
+                  );
                   if (row) {
-                    setStaffLabelById((prev) => ({ ...prev, [id]: row.full_name }));
+                    setStaffLabelById((prev) => ({
+                      ...prev,
+                      [id]: row.full_name,
+                    }));
                     setStaffSearchInput(row.full_name);
                   }
                 }}
@@ -189,21 +208,30 @@ export function CreateTreatmentSessionSheet({ open, onOpenChange }: CreateSheetP
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="session-date-trigger">Date and time</FieldLabel>
+              <FieldLabel htmlFor="session-date-trigger">
+                Date and time
+              </FieldLabel>
               <Popover>
-                <DatePickerFieldTrigger id="session-date-trigger" empty={!sessionAt}>
+                <DatePickerFieldTrigger
+                  id="session-date-trigger"
+                  empty={!sessionAt}
+                >
                   <CalendarIcon />
                   <span className="min-w-0 flex-1 truncate">
-                    {sessionAt ? format(sessionAt, "PPP '·' HH:mm") : "Pick date and time"}
+                    {sessionAt
+                      ? format(sessionAt, "PPP '·' HH:mm")
+                      : "Pick date and time"}
                   </span>
                 </DatePickerFieldTrigger>
-                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                <PopoverContent
+                  className="w-auto overflow-hidden p-0"
+                  align="start"
+                >
                   <Calendar
                     mode="single"
                     selected={sessionAt}
                     onSelect={onSessionDateSelect}
                     captionLayout="dropdown"
-                    disabled={(d) => isBefore(startOfDay(d), startOfDay(new Date()))}
                   />
                   <div className="border-t border-border/60 bg-muted/20 px-3 py-2.5">
                     <span className="mb-2 block text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
